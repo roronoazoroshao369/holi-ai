@@ -63,6 +63,16 @@ Locked from user's confirmation. These do **not** block M1 / P0 scaffold but the
 - Theatrical Atmos / 5.1 master (Q13).
 - Hard project-level cost cap UI (Q14). User accepts "spend until satisfied" risk.
 
+## Open (Q15) — does NOT block P0 scaffold
+
+Documented in `v7-oss-leverage.md §2`. Decision can wait until the first adapter that has both a paid-API and an OSS-via-aggregator candidate (`image.t2i` is the earliest, in P0).
+
+| # | Question | **Default proposal** | If overridden, what changes |
+|---|---|---|---|
+| **Q15** | OSS access strategy primary | **API-first qua aggregator** (Replicate primary, fal secondary for video / music, Together for LLM open weights). Self-host (Runpod / Modal) only when (a) steady-state spend > $300/month for a single model AND (b) Q14 budget allows ops time, or (c) aggregator does not host the model we need. | Self-host primary → add `packages/providers/adapters/runpod-modal/`, add infra/devops sub-phase before F2, and write per-model Docker images. Fully self-host → CapEx GPU rather than OpEx aggregator; ops time becomes a recurring cost in v6 §4.3 cost-error budget. |
+
+Reason the default is API-first: it lines up with Q1 (single-user, no DevOps) + Q2 (BYOK — user buys a Replicate/fal key the same way they buy an Anthropic key) + v6 v0.1 wall-clock target (6–8 weeks, no time to operate self-hosted GPUs). Adapter abstraction in `v4-providers.md §4` is capability-based, so swapping aggregator ↔ self-host for any single model is reversible without touching agents.
+
 ## How to change a decision later
 
 Open a PR that:
