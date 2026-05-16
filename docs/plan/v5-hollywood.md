@@ -16,10 +16,10 @@
 | **Một bộ phim 90 phút full-AI khả thi 2026 chưa?** | **Stylized / animation** (anime, Pixar-look, 2D, cartoon, stop-motion-look): khả thi với gating + hierarchy đúng. **Photoreal live-action (như Dune, Oppenheimer):** chưa — vẫn lộ uncanny ở close-up dài và full body action. Mục tiêu thực tế 2026 = **stylized feature 60–90 min**. |
 | **Một người làm được không?** | Có, nếu xem mình là **showrunner + creative director**, không phải technician. AI làm 95 % công, người làm 5 % nhưng là 5 % quyết định: chốt tone, chốt cast, chốt cut, chốt mix. |
 | **Bao lâu một bộ?** | Stylized 20 min: ~2–4 tuần wall-clock. Stylized 90 min: ~3–6 tháng. Photoreal feature: chưa nên thử cho đến cuối 2026. |
-| **Bao nhiêu tiền một bộ?** | Stylized 20 min: **$200–500**. Stylized 90 min: **$2 000 – 6 000**. Photoreal feature: **chưa estimate được** (rất nhiều retake). |
+| **Bao nhiêu tiền một bộ?** | Stylized 20 min: **$200–500**. Stylized 90 min: **$2 000 – 6 000** (projection, không phải cap — xem Q14 trong `decisions.md`). Photoreal feature: **chưa estimate được** (rất nhiều retake). |
 | **Khác gì v3?** | v3 = một workflow `film.generate` chạy phẳng cho phim 60 s. v5 = **hierarchy 5 tầng** (Film → Act → Sequence → Scene → Shot) và **department system** (10+ vai trò chuyên môn) chồng lên trên v3, vẫn dùng đúng workflow runtime của Q7. |
-| **Cần lock thêm quyết định nào?** | 7 câu mới (Q8–Q14) ở §11 — về lane (animation vs photoreal), độ dài đích, casting (clone hay synthetic), composing pipeline, distribution, language, và budget cap. |
-| **Đề xuất con đường?** | **Episodic ladder + hierarchical workflow + character/world bible front-loaded + stylized lane đầu tiên.** Chi tiết §6. Phase plan F0 → F5 ở §9. |
+| **Còn quyết định nào chưa lock?** | **Không.** Q8–Q14 đã chốt — xem `decisions.md`. Tóm tắt: lane = **cả hai** (stylized + photoreal first-class trong workflow), độ dài = **mở** (leo F0→F5 tới đâu hay tới đó), genre pilot = drama character-driven, casting = 100 % synthetic, music = AI-only (Suno + ACE-Step), distribution = YouTube 4K + DCP-lite, budget = **không project-level cap** (Q4 account-level vẫn là safety net). |
+| **Đề xuất con đường?** | **Episodic ladder + hierarchical workflow + character/world bible front-loaded; default lane = stylized, photoreal lane vẫn sẵn sàng cho mọi project / scene muốn opt-in.** Chi tiết §6. Phase plan F0 → F5 ở §9. |
 
 ---
 
@@ -542,6 +542,8 @@ hints: {
 
 ### 7.5 Bible schema (data jsonb)
 
+> **Q8 = both lanes locked.** Every Style Bible carries a `lane` field. Scene-level Style Bible overrides project-level when `lane = 'mixed'` is set at the project. Adapter routing reads this field before model selection (see knock-on #7–8 in `decisions.md`).
+
 #### Character Bible
 ```json
 {
@@ -566,6 +568,7 @@ hints: {
 #### Style Bible
 ```json
 {
+  "lane": "stylized",
   "look_name": "Hà Nội đêm mùa đông pastel",
   "aspect_ratio": "2.39:1",
   "frame_rate": 24,
@@ -577,6 +580,10 @@ hints: {
   "music_theme_id": "score:hanoi_strings_theme"
 }
 ```
+
+`lane` enum: `'stylized' | 'photoreal' | 'mixed'`. When `mixed`, each `film_units` row of kind `scene` may carry its own `style_bible_id` pointing at a child Style Bible whose `lane` is concrete.
+
+Routing policy gains a sibling field `lane_to_models` jsonb — see knock-on #8 in `decisions.md` for the example shape.
 
 #### Story Bible
 ```json
@@ -645,15 +652,18 @@ Thêm vào `Capability` union ở v4 §5.1.
 - **F2**: continuity agent catch ≥80 % manual-spotted prop/costume drift.
 - **F3**: 15-min episode có score 5 cue + foley layer, **không** drift visible character.
 - **F4**: trailer-first workflow tạo trailer 2 min trước, lock style, mở rộng 30 min feature.
-- **F5**: 60–90 min phim hoàn chỉnh, ≤ 6 vòng review/approval, ≤ ngân sách $5k.
+- **F5**: 60–90 min phim hoàn chỉnh, ≤ 6 vòng review/approval. **No hard budget cap** (Q14): per-account hard-stop from Q4 is the only enforced backstop; project-level spend is informational only.
 
-### 9.2 Khi nào swap photoreal lane
-Mỗi cuối phase, đánh giá Sora/Veo/Runway versions hiện tại. Khi:
-- Sustained 30-s shot same-character drift score < 0.05
-- Lip-sync MOS ≥ 4.0 native trong model (không cần overlay)
+### 9.2 Photoreal lane policy (Q8 = both lanes)
+
+Photoreal lane is **first-class from day one** — not deferred. But it is **gated by capability**, not by calendar: any project / scene may set `style.bible.lane = 'photoreal'` and the workflow honours it. The router falls back to whichever photoreal-capable adapter is configured (Veo 3 / Sora 2 / Runway Gen-4 photoreal).
+
+**Recommended quality bar to opt into photoreal for any single shot** (informational, not enforced):
+- Sustained 30-s same-character drift score < 0.05
+- Lip-sync MOS ≥ 4.0 native in model (no overlay needed)
 - Hand artifact rate < 2 % in action scenes
 
-→ Bật `style.bible.lane = 'photoreal'`, các adapter `cinematographer` swap default model. **Workflow logic không đổi.**
+Until tooling consistently meets these, photoreal is best used for **isolated hero shots inside a stylized project** (`lane = 'mixed'`), not full-feature photoreal. Workflow logic is identical — only the resolved adapter model differs.
 
 ---
 
@@ -702,21 +712,22 @@ Mỗi cuối phase, đánh giá Sora/Veo/Runway versions hiện tại. Khi:
 
 ---
 
-## 11. New decisions to lock (Q8 — Q14)
+## 11. Decisions Q8 — Q14 (LOCKED)
 
-Đề xuất default mạnh; cần user xác nhận hoặc chọn khác.
+Tất cả 7 câu đã chốt. Chi tiết và knock-on ở `decisions.md` — tồng hợp ở đây để người đọc không phải nhảy file.
 
-| # | Decision | Default (đề xuất) | Why |
-|---|---|---|---|
-| **Q8** | Lane | **Stylized animation (anime/2D-leaning)** | Tận dụng AI strength 2026, né uncanny |
-| **Q9** | Độ dài đích M5 (mục tiêu cuối) | **Feature 60–90 min** (qua ladder F0→F5) | Vision của user |
-| **Q10** | Genre M1 | **Drama character-driven, dialogue moderate, fantasy nhẹ** | Né action / crowd / sustained physical — gap-list của AI |
-| **Q11** | Casting | **100 % synthetic personas** (không clone người thật) | Tránh rủi ro pháp lý voice/likeness; consistency dễ kiểm soát |
-| **Q12** | Music + score | **AI-only (Suno/ACE-Step), leitmotif workflow** | Cost + control; pháp lý sạch hơn license |
-| **Q13** | Distribution M5 target | **YouTube 4K + festival DCP-lite** (không theatrical Atmos full) | Realistic cho 1 người + AI 2026 |
-| **Q14** | Budget cap cho 1 feature pilot | **$5 000 hard cap** (gồm retakes) | Phù hợp một cá nhân; đủ rộng cho F4+F5 |
+| # | Decision (locked) | Note |
+|---|---|---|
+| **Q8** | **Both lanes first-class** (`stylized` + `photoreal` + `mixed`). Default lane at create = `stylized`. | Style Bible gains `lane`. Routing policy gains `lane_to_models`. M1 stays stylized; photoreal opted-in per scene in F1+. |
+| **Q9** | **Open-ended ladder.** Climb F0 → F5; "làm tới đâu hay tới đó". No hard length target. | F-phase exit criteria are capability gates, not length gates. |
+| **Q10** | **Drama character-driven, dialogue moderate, fantasy nhẹ.** | Shot-list grammar leans dialogue + tableau. |
+| **Q11** | **100 % synthetic personas.** No voice or likeness clone. | `audio.tts` adapters in P0 ship library voices only. No likeness-license module. |
+| **Q12** | **AI-only music** (Suno + ACE-Step) with **leitmotif workflow**. | Composer agent persists leitmotif per major char / location. |
+| **Q13** | **YouTube 4K + festival DCP-lite.** | Atmos / 5.1 / theatrical IMAX explicitly out-of-scope. |
+| **Q14** | **No project-level budget cap.** Quality > cost for the pilot. Q4 per-account hard-stop is the only enforced backstop. | `routing_policies.cost_cap_usd` defaults to `null`. UI cost rail is informational only. |
 
-→ **Nếu user agree mọi default**: mình lock cùng `decisions.md` cùng style với Q1–Q7. Nếu khác, sửa ô cụ thể.
+→ Cost / time numbers in §10 are **projections, not budgets.** They feed the UI cost rail and the showrunner's situational awareness, but they do not gate a render.
+→ User reserves the right to override any locked Q8–Q14 row later via the procedure in `decisions.md` → "How to change a decision later".
 
 ---
 
@@ -778,12 +789,11 @@ Mỗi cuối phase, đánh giá Sora/Veo/Runway versions hiện tại. Khi:
 - **Photoreal Hollywood-grade 90 min một người** — **CHƯA.** Nhưng kiến trúc v5 đã chuẩn bị sẵn để swap lane khi tooling chạm tới — không phải đập lại nhà.
 
 **Con đường:**
-1. Lock 7 quyết định mới (Q8–Q14).
+1. ~~Lock 7 quyết định mới (Q8–Q14).~~ **Done** — xem `decisions.md`.
 2. F0: backbone hierarchical + bibles, build trên v4 đã chốt.
-3. F1 → F5: episodic ladder, mỗi phase một deliverable thật.
-4. Cuối F5: phim feature đầu tiên, ~$1–2k, stylized.
-5. 2027+: swap photoreal lane khi model bắt kịp.
+3. F1 → F5: episodic ladder, mỗi phase một deliverable thật; photoreal lane available cả ở F1 cho hero shot muốn opt-in.
+4. Cuối F5: phim feature đầu tiên, projection $1–2k (không cap), stylized với photoreal hero shots tuỳ ý.
+5. Photoreal full-feature giữ nguyên là câu hỏi tooling, không câu hỏi calendar.
 
 **Câu hỏi cho user** (để mình tiếp tục):
-- Q8–Q14 default OK hay muốn override ô nào?
-- Sau khi user chốt, mình bổ sung vào `decisions.md` rồi merge cả PR docs. Code thực bắt đầu ở phase P0 (v4) trước khi chạm F0 (v5).
+- Merge PR này để mình bắt đầu P0 scaffold (monorepo + migrations + provider package skeleton), hay còn chỗ nào trong v5 muốn sửa?
