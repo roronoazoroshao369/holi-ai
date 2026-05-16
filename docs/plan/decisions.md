@@ -1,6 +1,8 @@
 # Holi-AI — Locked architectural decisions
 
-These answers turn the open questions in `v4-providers.md §2` into **scaffold inputs**. They are written here once and referenced from every PR description that follows.
+These answers turn the open questions in `v4-providers.md §2` (and `v5-hollywood.md §11`) into **scaffold inputs**. They are written here once and referenced from every PR description that follows.
+
+## Locked (Q1 – Q7) — drive M1 / P0 scaffold
 
 | # | Question | **Decision** | Implication |
 |---|---|---|---|
@@ -29,11 +31,27 @@ These answers turn the open questions in `v4-providers.md §2` into **scaffold i
 - Any non-AES encryption backend in M1.
 - A "soft only" budget mode and a "hard-stop only" mode — we always do both thresholds.
 
+## Open (Q8 – Q14) — drive M5 / feature ladder, NOT YET LOCKED
+
+These come from `v5-hollywood.md §11`. They do **not** block M1 / P0 scaffold (M1 sits inside whatever lane / genre / cast we eventually pick), but they **do** block F1 onwards. Defaults below are proposals — user must confirm or override before F0 ends.
+
+| # | Question | **Default proposal** | If overridden, what changes |
+|---|---|---|---|
+| **Q8** | Lane (stylized animation vs photoreal live-action) | **Stylized animation (anime-leaning)** — tận dụng AI strength 2026, né uncanny valley | Adapter defaults in `cinematographer` and `painter` swap; `style.bible.lane` toggle; no workflow change |
+| **Q9** | Target finished length at M5 | **Feature 60–90 min via ladder F0 → F5** | Adjust F-phase milestones; budget cap recalculation |
+| **Q10** | Genre M1 | **Drama character-driven, dialogue moderate, fantasy nhẹ** | Different shot-list grammar; different gap-list to avoid (e.g. action genre needs Wonder-Dynamics-style hybrid) |
+| **Q11** | Casting strategy | **100 % synthetic personas** (no real-person clone) | Voice clone workflow + likeness-license gating only needed if changed |
+| **Q12** | Music & score | **AI-only (Suno + ACE-Step), leitmotif workflow** | Adds licensing module if AI + library or AI + human composer is chosen |
+| **Q13** | Distribution target at M5 | **YouTube 4K + festival DCP-lite** (no theatrical Atmos) | Master spec branches (5.1 / Atmos / DCP / HDR) |
+| **Q14** | Hard budget cap per feature pilot | **$5 000** (inclusive of retakes) | Recalibrate per-scene budget caps in `routing_policies.cost_cap_usd` |
+
+> When any of Q8–Q14 are locked, move the row up into the "Locked" table, add a knock-on entry below, and bump the relevant section in `v5-hollywood.md`.
+
 ## How to change a decision later
 
 Open a PR that:
 1. Updates the relevant row in this table.
 2. Adds a "knock-on consequences" entry describing the migration.
-3. Bumps the affected sections in `v4-providers.md`.
+3. Bumps the affected sections in `v4-providers.md` and / or `v5-hollywood.md`.
 
-Every PR that touches the provider/routing/workflow layer should link back to this file.
+Every PR that touches the provider / routing / workflow / bible / film-unit layer should link back to this file.
