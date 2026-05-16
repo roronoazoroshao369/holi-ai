@@ -8,9 +8,10 @@ This repo is in **planning phase**. No application code yet — only the archite
 
 | Doc | Purpose |
 |---|---|
-| [`docs/plan/v3-film-first.md`](docs/plan/v3-film-first.md) | Product north star — film-first M1 scope, pipeline, cost model, week-by-week roadmap |
-| [`docs/plan/v4-providers.md`](docs/plan/v4-providers.md) | Architecture for managing many AI providers and many accounts per provider |
-| [`docs/plan/decisions.md`](docs/plan/decisions.md) | Locked answers (Q1–Q7) that drive the scaffold |
+| [`docs/plan/v3-film-first.md`](docs/plan/v3-film-first.md) | Product north star — film-first M1 scope (60 s short), pipeline, cost model, week-by-week roadmap |
+| [`docs/plan/v4-providers.md`](docs/plan/v4-providers.md) | Architecture for managing many AI providers and many accounts per provider — capability registry, router, custom workflow runtime |
+| [`docs/plan/v5-hollywood.md`](docs/plan/v5-hollywood.md) | Long-horizon vision — one person + AI building a complete, Hollywood-grade feature film. Hierarchical 5-tier (Film → Act → Sequence → Scene → Shot), department system, bibles, episodic ladder F0 → F5 |
+| [`docs/plan/decisions.md`](docs/plan/decisions.md) | Locked answers (Q1–Q7) and open questions (Q8–Q14) that drive the scaffold |
 
 ## What this thing does (one paragraph)
 
@@ -34,9 +35,11 @@ The pipeline spans LLM, image, video, TTS, music, and STT — no single vendor c
 
 ## Status
 
+### M1 — Short film (v3 + v4 scope)
+
 | Phase | What | Status |
 |---|---|---|
-| Plan | v3 film-first + v4 multi-provider | this PR |
+| Plan | v3 film-first + v4 multi-provider | merged (PR #1) |
 | P0 | Monorepo scaffold, migrations, provider package skeleton | next |
 | P1 | UI for provider accounts | after P0 |
 | P2 | Async job runner + fallback chain | after P1 |
@@ -44,6 +47,19 @@ The pipeline spans LLM, image, video, TTS, music, and STT — no single vendor c
 | P4 | Polish (health monitor, key rotation) | last |
 
 See `docs/plan/v3-film-first.md` §4 and `docs/plan/v4-providers.md` §8 for the detailed week-by-week plan.
+
+### M5 — Hollywood-grade feature (v5 scope)
+
+| Phase | What | Deliverable | Status |
+|---|---|---|---|
+| F0 | Hierarchical tables + Bible CRUD + pick-take UI | demo MP4 5 s w/ ref bible | after P0–P2 |
+| F1 | Teaser 60–90 s through v5 hierarchy | parity with v3 quality | — |
+| F2 | Short 5 min + continuity check capability | 5 scene / ~60 shot | — |
+| F3 | Episode 15 min + sound design + score | 3-act compressed | — |
+| F4 | Short feature 30 min + trailer-first workflow | "pilot episode" | — |
+| F5 | Feature 60–90 min | full feature, $1–2k | — |
+
+See `docs/plan/v5-hollywood.md` §9 for the F-ladder details and §11 for the seven new decisions still to lock.
 
 ## Contributing
 
