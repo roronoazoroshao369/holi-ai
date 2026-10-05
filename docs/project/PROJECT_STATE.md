@@ -3,7 +3,7 @@
 Updated: 2026-10-05. Phase: v0.3 versioned local practice persistence verified and merged; browser integration CI next.
 Package version: 0.1.0 (no release tag).
 Verified main: d748e05f9579be6f5b89922b70557f820f88f124.
-Product PR #9 merged as d748e05f9579be6f5b89922b70557f820f88f124. Final PR head: 60f0708d7d0fb631d30827c4b00fcc8fc0c45f97; CI 37252591065 succeeded. Resulting main and persistence files re-read and confirmed. Current branch: docs/v03-persistence-handoff.
+Product PR #9 merged as d748e05f9579be6f5b89922b70557f820f88f124. Final PR head: 60f0708d7d0fb631d30827c4b00fcc8fc0c45f97; CI 37252591065 succeeded. Resulting main and persistence files re-read and confirmed. Documentation checkpoint branch: docs/v03-persistence-handoff.
 
 ## Goal contract
 GOAL: persist and resume the SIMULATED Linux practice safely across refresh without turning client state into trusted mastery.
