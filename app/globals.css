@@ -106,3 +106,25 @@ footer strong { color:var(--text); }
 .learningLab .terminalPrompt input { min-width: 0; }
 .learningLab .terminalPrompt button { flex-shrink: 0; white-space: nowrap; }
 .learningLab .terminalBody { overflow-wrap: anywhere; min-height: 260px; }
+
+
+.practicePersistence {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  padding: 14px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+.practicePersistence strong { color: var(--accent); font-size: 12px; letter-spacing: .08em; }
+.practicePersistence p { margin: 6px 0 0; font-size: 12px; }
+.practicePersistence .persistenceNotice { color: var(--text); }
+.persistenceActions { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+.learningLab .secondaryButton { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+@media (max-width: 700px) {
+  .practicePersistence { flex-direction: column; }
+  .persistenceActions { width: 100%; }
+  .persistenceActions button { flex: 1 1 auto; }
+}

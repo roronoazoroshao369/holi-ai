@@ -1,14 +1,63 @@
 "use client";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { execute, explain, initialLabState, recordHypothesis, scenarios, type Line as ReplyLine } from "../lib/linux-simulator";
+import { clearPractice, loadPractice, savePractice, type PracticeStorage } from "../lib/practice-persistence";
+
 type Line = ReplyLine | { kind: "input"; text: string };
+type PersistenceState = "checking" | "saved" | "unavailable";
 const welcome: Line[] = [{ kind: "output", text: "SIMULATED — Type cat README.txt. No commands run on a Linux host." }];
+
+function browserStorage(): PracticeStorage | null {
+  try { return window.localStorage; } catch { return null; }
+}
+
 export function LabTerminal() {
   const [lines, setLines] = useState<Line[]>(welcome);
   const [state, setState] = useState(() => initialLabState());
   const [command, setCommand] = useState("");
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+  const [storageUsable, setStorageUsable] = useState(false);
+  const [persistence, setPersistence] = useState<PersistenceState>("checking");
+  const [persistenceNotice, setPersistenceNotice] = useState("");
+
+  useEffect(() => {
+    const storage = browserStorage();
+    if (!storage) {
+      setStorageUsable(false);
+      setPersistence("unavailable");
+      setPersistenceNotice("Trình duyệt không cho truy cập localStorage; lab vẫn chạy nhưng tiến trình chỉ tồn tại trong tab hiện tại.");
+      setHydrated(true);
+      return;
+    }
+    const loaded = loadPractice(storage);
+    setState(loaded.state);
+    if (loaded.status === "restored") {
+      setLines([...welcome, { kind: "output", text: "Đã phục hồi checkpoint cục bộ. Transcript lệnh không được lưu; dùng các chỉ báo evidence bên dưới để tiếp tục." }]);
+      setPersistenceNotice("Đã phục hồi checkpoint hợp lệ cho đúng phiên bản fixture.");
+    } else if (loaded.status === "discarded") {
+      setPersistenceNotice("Checkpoint cũ/hỏng đã bị loại bỏ an toàn; lab bắt đầu lại từ trạng thái sạch.");
+    } else if (loaded.status === "unavailable") {
+      setStorageUsable(false);
+      setPersistence("unavailable");
+      setPersistenceNotice("Không thể đọc/xóa localStorage; lab chuyển sang chế độ tạm thời và không khẳng định đã lưu tiến trình.");
+    }
+    if (loaded.status !== "unavailable") setStorageUsable(true);
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || !storageUsable) return;
+    const storage = browserStorage();
+    if (!storage || !savePractice(storage, state)) {
+      setStorageUsable(false);
+      setPersistence("unavailable");
+      return;
+    }
+    setPersistence("saved");
+  }, [hydrated, state, storageUsable]);
+
   function submit(event: FormEvent) {
     event.preventDefault();
     const cmd = command.trim();
@@ -19,9 +68,57 @@ export function LabTerminal() {
     if (cmd === "reset") { setAnswer(""); setFeedback(""); }
     setCommand("");
   }
+
+  function restartPractice() {
+    const storage = browserStorage();
+    const cleared = storage ? clearPractice(storage) : false;
+    setState(initialLabState());
+    setLines(welcome);
+    setCommand("");
+    setAnswer("");
+    setFeedback("");
+    if (cleared) {
+      setStorageUsable(true);
+      setPersistenceNotice("Đã xóa checkpoint cũ và bắt đầu lại từ tình huống có hướng dẫn.");
+    } else {
+      setStorageUsable(false);
+      setPersistence("unavailable");
+      setPersistenceNotice("Đã đặt lại lab trong tab này, nhưng không thể xác nhận checkpoint cục bộ đã được xóa.");
+    }
+  }
+
+  function retryPersistence() {
+    const storage = browserStorage();
+    if (storage && savePractice(storage, state)) {
+      const verification = loadPractice(storage);
+      if (verification.status === "restored") {
+        setStorageUsable(true);
+        setPersistence("saved");
+        setPersistenceNotice("Đã ghi và đọc lại checkpoint cục bộ hiện tại.");
+        return;
+      }
+    }
+    setStorageUsable(false);
+    setPersistence("unavailable");
+    setPersistenceNotice("localStorage vẫn không khả dụng; tiếp tục ở chế độ tạm thời.");
+  }
+
   const evidenceReady = state.observed && state.identityObserved && state.symptomObserved;
   return (
     <div className="learningLab">
+      <div className="practicePersistence" aria-live="polite">
+        <div>
+          <strong>Checkpoint cục bộ · KHÔNG PHẢI MASTERY</strong>
+          <p>{persistence === "checking" ? "Đang kiểm tra checkpoint…" : persistence === "saved"
+            ? "Tiến trình thực hành được lưu trên trình duyệt này và có thể tiếp tục sau refresh. Dữ liệu phía client vẫn có thể bị sửa, nên không dùng làm chứng nhận tin cậy."
+            : "Không xác nhận được lưu bền vững; lab vẫn dùng state tạm thời trong phiên hiện tại."}</p>
+          {persistenceNotice && <p className="persistenceNotice">{persistenceNotice}</p>}
+        </div>
+        <div className="persistenceActions">
+          {persistence === "unavailable" && <button type="button" onClick={retryPersistence}>Thử lưu lại</button>}
+          <button type="button" className="secondaryButton" onClick={restartPractice}>Học lại từ đầu</button>
+        </div>
+      </div>
       <details>
         <summary>Mô hình: Linux quyết định quyền đọc như thế nào?</summary>
         <p>Process chạy với UID và các GID. File có owner, group và ba bộ quyền r/w/x.
@@ -80,7 +177,7 @@ export function LabTerminal() {
         setState(initialLabState("transfer")); setLines(welcome); setCommand(""); setAnswer(""); setFeedback("");
       }}>Thử tình huống mới</button>}
       {state.explained && state.scenario === "transfer" && <p role="status">Hoàn tất hai tình huống luyện tập. Đây là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
-      <p>Tiến trình chỉ nằm trong phiên trang; tải lại sẽ bắt đầu lại. Lệnh reset xóa toàn bộ bằng chứng của tình huống hiện tại.</p>
+      <p>Lệnh <code>reset</code> xóa evidence của tình huống hiện tại và checkpoint mới sẽ ghi trạng thái reset. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn. Transcript terminal không được persist.</p>
     </div>
   );
 }
