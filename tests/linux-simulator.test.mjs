@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { execute, initialLabState, recordHypothesis, explain, scenarios } from "../lib/linux-simulator.ts";
+import { differentialScenario, execute, initialLabState, recordHypothesis, explain, scenarios } from "../lib/linux-simulator.ts";
 
 function run(state, command) {
   return execute(state, command).state;
@@ -81,6 +81,27 @@ test("same-symptom differential cases have neutral learner-facing identity and i
   const processHelp = execute(initialLabState("differential-process"), "help").lines[0].text;
   assert.equal(listenerHelp, processHelp);
   assert.doesNotMatch(listenerHelp, /Repair syntax|configure|start api-server/i);
+});
+
+test("explicit differential assignment deterministically supports both orderings and reset preserves it", () => {
+  for (const [order, expected] of [
+    ["listener-first", ["differential-listener", "differential-process"]],
+    ["process-first", ["differential-process", "differential-listener"]]
+  ]) {
+    assert.equal(differentialScenario(order, 0), expected[0]);
+    assert.equal(differentialScenario(order, 1), expected[1]);
+
+    for (const step of [0, 1]) {
+      const scenario = expected[step];
+      const initial = initialLabState(scenario, order, step);
+      assert.equal(initial.differentialOrder, order);
+      assert.equal(initial.differentialStep, step);
+      assert.equal(initial.scenario, scenario);
+
+      const changed = run(initial, scenarios[scenario].commands.repair);
+      assert.deepEqual(run(changed, "reset"), initial);
+    }
+  }
 });
 
 test("process and socket observations discriminate the competing connection-refused causes", () => {
