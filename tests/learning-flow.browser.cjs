@@ -33,6 +33,24 @@ test("production flow differentiates same connection symptom using process and s
   collectRuntimeErrors(page, runtimeErrors);
 
   await page.goto("/");
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
+    schemaVersion: 4,
+    fixtureVersion: 4,
+    state: {
+      scenario: "guided",
+      differentialOrder: "listener-first",
+      differentialStep: 0,
+      incident: { kind: "file-access", mode: "600" },
+      observations: { symptom: false, resource: false, identity: false },
+      hypothesis: "",
+      repairedWithEvidence: false,
+      verified: false,
+      explained: false
+    },
+    completed: { guided: false, transfer: false, differential: false }
+  })), storageKey);
+  await page.reload();
+
   const hypothesis = page.getByRole("textbox", { name: "Giả thuyết" });
   await expect(page.getByRole("textbox", { name: "Lab terminal command" })).toBeVisible();
   await expect(hypothesis).toBeDisabled();
@@ -148,17 +166,80 @@ test("production flow differentiates same connection symptom using process and s
   expect(runtimeErrors).toEqual([]);
 });
 
-test("browser persistence and resilience fail closed with differential schema v3", async ({ page, browser }) => {
+test("production browser exercises the reversed process-first differential order", async ({ page }) => {
+  const runtimeErrors = [];
+  collectRuntimeErrors(page, runtimeErrors);
+  await page.goto("/");
+
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
+    schemaVersion: 4,
+    fixtureVersion: 4,
+    state: {
+      scenario: "differential-process",
+      differentialOrder: "process-first",
+      differentialStep: 0,
+      incident: { kind: "tcp-service", processRunning: false, listenerPort: null },
+      observations: { symptom: false, resource: false, identity: false },
+      hypothesis: "",
+      repairedWithEvidence: false,
+      verified: false,
+      explained: false
+    },
+    completed: { guided: true, transfer: true, differential: false }
+  })), storageKey);
+  await page.reload();
+
+  const differentialHeading = page.getByRole("heading", { name: "Health endpoint differential diagnosis" });
+  await expect(differentialHeading).toBeVisible();
+  for (const command of [
+    "curl 127.0.0.1:8080/health",
+    "ps -o pid,user,comm -C api-server",
+    "ss -ltnp"
+  ]) {
+    await runCommand(page, command);
+  }
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("no matching api-server process");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("No LISTEN socket owned by api-server");
+  await submitHypothesis(page, "process");
+  await runCommand(page, "start api-server --listen 127.0.0.1:8080");
+  await runCommand(page, "curl 127.0.0.1:8080/health");
+  await explainWith(page, "process-started");
+  await page.getByRole("button", { name: "Thử case cùng symptom" }).click();
+
+  await expect(differentialHeading).toBeVisible();
+  for (const command of [
+    "curl 127.0.0.1:8080/health",
+    "ps -o pid,user,comm -C api-server",
+    "ss -ltnp"
+  ]) {
+    await runCommand(page, command);
+  }
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("842 app api-server");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("127.0.0.1:9090");
+  await submitHypothesis(page, "network");
+  await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
+  await runCommand(page, "curl 127.0.0.1:8080/health");
+  await explainWith(page, "listener-port-match");
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+  expect(runtimeErrors).toEqual([]);
+});
+
+test("browser persistence and resilience fail closed with differential schema v4", async ({ page, browser }) => {
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 3,
-    fixtureVersion: 3,
+    schemaVersion: 4,
+    fixtureVersion: 4,
     state: {
       scenario: "differential-listener",
+      differentialOrder: "listener-first",
+      differentialStep: 0,
       incident: { kind: "tcp-service", processRunning: true, listenerPort: 9090 },
       observations: { symptom: false, resource: false, identity: false },
       hypothesis: "",
@@ -184,6 +265,28 @@ test("browser persistence and resilience fail closed with differential schema v3
   await page.reload();
   await expect(page.getByRole("heading", { name: "Health endpoint differential diagnosis" })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Giả thuyết" })).toBeDisabled();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.differentialOrder, storageKey)).toBe("listener-first");
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.differentialStep, storageKey)).toBe(0);
+
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
+    schemaVersion: 4,
+    fixtureVersion: 4,
+    state: {
+      scenario: "differential-listener",
+      differentialOrder: "process-first",
+      differentialStep: 0,
+      incident: { kind: "tcp-service", processRunning: true, listenerPort: 9090 },
+      observations: { symptom: false, resource: false, identity: false },
+      hypothesis: "",
+      repairedWithEvidence: false,
+      verified: false,
+      explained: false
+    },
+    completed: { guided: true, transfer: true, differential: false }
+  })), storageKey);
+  await page.reload();
+  await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "1. Chẩn đoán có hướng dẫn" })).toBeVisible();
 
   await page.getByRole("button", { name: "Học lại từ đầu" }).click();
   await expect(page.getByRole("heading", { name: "1. Chẩn đoán có hướng dẫn" })).toBeVisible();
@@ -195,8 +298,8 @@ test("browser persistence and resilience fail closed with differential schema v3
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 2,
-    fixtureVersion: 2,
+    schemaVersion: 3,
+    fixtureVersion: 3,
     state: {},
     completed: {}
   })), storageKey);
