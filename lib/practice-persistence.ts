@@ -1,8 +1,17 @@
-import { initialLabState, scenarios, targetReached, type LabState } from "./linux-simulator.ts";
+import {
+  DEFAULT_DIFFERENTIAL_ORDER,
+  differentialScenario,
+  initialLabState,
+  isDifferentialScenario,
+  scenarios,
+  targetReached,
+  type DifferentialOrder,
+  type LabState
+} from "./linux-simulator.ts";
 
 export const PRACTICE_STORAGE_KEY = "holi.devops.linux-practice";
-export const PRACTICE_SCHEMA_VERSION = 3 as const;
-export const LINUX_FIXTURE_VERSION = 3 as const;
+export const PRACTICE_SCHEMA_VERSION = 4 as const;
+export const LINUX_FIXTURE_VERSION = 4 as const;
 
 type Completion = { guided: boolean; transfer: boolean; differential: boolean };
 export type PracticeCheckpoint = {
@@ -20,11 +29,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function expectedCompletion(state: LabState): Completion {
-  const inDifferential = state.scenario === "differential-listener" || state.scenario === "differential-process";
+  const inDifferential = isDifferentialScenario(state.scenario);
   return {
     guided: state.scenario !== "guided" || state.explained,
     transfer: inDifferential || (state.scenario === "transfer" && state.explained),
-    differential: state.scenario === "differential-process" && state.explained
+    differential: inDifferential && state.differentialStep === 1 && state.explained
   };
 }
 
@@ -61,6 +70,13 @@ export function isValidLabState(value: unknown): value is LabState {
   if (!isRecord(value)) return false;
   if (value.scenario !== "guided" && value.scenario !== "transfer" &&
       value.scenario !== "differential-listener" && value.scenario !== "differential-process") return false;
+  if (value.differentialOrder !== "listener-first" && value.differentialOrder !== "process-first") return false;
+  if (value.differentialStep !== 0 && value.differentialStep !== 1) return false;
+  if (isDifferentialScenario(value.scenario)) {
+    if (differentialScenario(value.differentialOrder, value.differentialStep) !== value.scenario) return false;
+  } else if (value.differentialStep !== 0) {
+    return false;
+  }
   if (!isRecord(value.observations)) return false;
   for (const key of ["symptom", "resource", "identity"] as const) {
     if (typeof value.observations[key] !== "boolean") return false;
@@ -111,11 +127,14 @@ export function parseCheckpoint(raw: string): PracticeCheckpoint | null {
   return value as PracticeCheckpoint;
 }
 
-export function loadPractice(storage: PracticeStorage): PracticeLoadResult {
+export function loadPractice(
+  storage: PracticeStorage,
+  freshOrder: DifferentialOrder = DEFAULT_DIFFERENTIAL_ORDER
+): PracticeLoadResult {
   let raw: string | null;
   try { raw = storage.getItem(PRACTICE_STORAGE_KEY); }
-  catch { return { status: "unavailable", state: initialLabState() }; }
-  if (raw === null) return { status: "empty", state: initialLabState() };
+  catch { return { status: "unavailable", state: initialLabState("guided", freshOrder) }; }
+  if (raw === null) return { status: "empty", state: initialLabState("guided", freshOrder) };
 
   const checkpoint = parseCheckpoint(raw);
   if (checkpoint) {
@@ -130,8 +149,8 @@ export function loadPractice(storage: PracticeStorage): PracticeLoadResult {
   }
 
   try { storage.removeItem(PRACTICE_STORAGE_KEY); }
-  catch { return { status: "unavailable", state: initialLabState() }; }
-  return { status: "discarded", state: initialLabState() };
+  catch { return { status: "unavailable", state: initialLabState("guided", freshOrder) }; }
+  return { status: "discarded", state: initialLabState("guided", freshOrder) };
 }
 
 export function savePractice(storage: PracticeStorage, state: LabState): boolean {
