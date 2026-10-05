@@ -10,7 +10,7 @@ Four SIMULATED incidents cover file-access and same-symptom TCP-service diagnosi
 
 Versioned localStorage (practice schema 7 / Linux fixture 5) restores valid snapshots, drafts, both counterfactual states and randomized differential assignments after refresh. Schema-v6 and older incompatible checkpoints or internally inconsistent states are discarded. Client state is inspectable and forgeable; current-case reset preserves assignment, full restart chooses a fresh assignment, and storage failure falls back to ephemeral practice.
 
-Production Chromium regression is mandatory in CI. The pinned Playwright 1.63.0 runtime is installed outside the app lock/audit workflow (known dependency debt). With that runtime available, run `playwright test --config=playwright.config.cjs` after `npm run build`; Playwright owns production startup/readiness/cleanup on loopback port 3100. The suite explicitly exercises both differential orderings.
+Production Chromium regression is mandatory in CI. `@playwright/test` is exact-pinned at 1.63.0 in the repository dependency graph and package lock, so `npm ci` and the normal high-severity npm audit cover the mandatory Node-side browser test runtime. CI installs the Chromium revision selected by that locked Playwright version and runs the local binary after `npm run build`; Playwright owns production startup/readiness/cleanup on loopback port 3100. The suite explicitly exercises both differential orderings.
 
 The current implementation contains:
 
@@ -38,7 +38,7 @@ npm run build
 
 ## Verification
 
-Run `npm run typecheck`, `npm test`, `npm audit --audit-level=high` and `npm run build`. CI runs the same checks.
+Run `npm run typecheck`, `npm test`, `npm audit --audit-level=high` and `npm run build`. CI runs the same checks, installs Chromium through the locked local Playwright runtime, then executes `./node_modules/.bin/playwright test --config=playwright.config.cjs`.
 
 Read [project state](docs/project/PROJECT_STATE.md) and [roadmap](docs/project/ROADMAP.md) before continuing implementation. Simulator progress is local and untrusted; compatible checkpoints survive refresh.
 
