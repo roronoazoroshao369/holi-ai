@@ -22,6 +22,31 @@ async function submitHypothesis(page, value) {
   await expect(input).toBeDisabled();
 }
 
+async function fillCausalTransfer(page, overrides = {}) {
+  const values = {
+    processEvidenceId: "differential-listener:before:identity",
+    processFact: "present",
+    socketEvidenceId: "differential-listener:before:resource",
+    socketFact: "9090",
+    predictedSymptom: "200",
+    repairNeed: "none",
+    causalClaim: "listener-target-match",
+    ...overrides
+  };
+  await page.getByRole("combobox", { name: "Nguồn process gốc", exact: true }).selectOption(values.processEvidenceId);
+  await page.getByRole("textbox", { name: "Fact process gốc", exact: true }).fill(values.processFact);
+  await page.getByRole("combobox", { name: "Nguồn socket gốc", exact: true }).selectOption(values.socketEvidenceId);
+  await page.getByRole("textbox", { name: "Fact socket gốc", exact: true }).fill(values.socketFact);
+  await page.getByRole("textbox", { name: "Dự đoán symptom", exact: true }).fill(values.predictedSymptom);
+  await page.getByRole("textbox", { name: "Repair còn cần", exact: true }).fill(values.repairNeed);
+  await page.getByRole("textbox", { name: "Quan hệ nhân quả", exact: true }).fill(values.causalClaim);
+}
+
+async function submitCausalTransfer(page, overrides = {}) {
+  await fillCausalTransfer(page, overrides);
+  await page.getByRole("button", { name: "Kiểm tra dự đoán" }).click();
+}
+
 async function fillReasoning(page, mechanism) {
   const scenario = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.scenario, storageKey);
   const file = scenario === "guided" || scenario === "transfer";
@@ -52,7 +77,7 @@ test("production flow differentiates same connection symptom using process and s
   await page.goto("/");
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 5,
+    schemaVersion: 6,
     fixtureVersion: 5,
     state: {
       scenario: "guided",
@@ -62,6 +87,8 @@ test("production flow differentiates same connection symptom using process and s
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      causalTransfer: null,
+      causalTransferPassed: false,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -177,6 +204,19 @@ test("production flow differentiates same connection symptom using process and s
   await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
   await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
   await explainWith(page, "listener-port-match");
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Dự đoán counterfactual" })).toBeVisible();
+
+  await submitCausalTransfer(page, { processEvidenceId: "differential-listener:before:resource" });
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
+  await submitCausalTransfer(page, { predictedSymptom: "refused" });
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
+  await submitCausalTransfer(page);
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toBeVisible();
+
+  await page.getByRole("textbox", { name: "Dự đoán symptom", exact: true }).fill("refused");
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
+  await submitCausalTransfer(page);
   await page.getByRole("button", { name: "Thử case cùng symptom" }).click();
 
   await expect(differentialHeading).toBeVisible();
@@ -213,12 +253,12 @@ test("production flow differentiates same connection symptom using process and s
   await runCommand(page, "start api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
   await explainWith(page, "listener-port-match");
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toHaveCount(0);
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
   await explainWith(page, "process-started");
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
   await expect(page.getByText(/Đã phục hồi checkpoint hợp lệ/)).toBeVisible();
   await page.evaluate(key => {
     const checkpoint = JSON.parse(localStorage.getItem(key));
@@ -239,7 +279,7 @@ test("production browser exercises the reversed process-first differential order
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 5,
+    schemaVersion: 6,
     fixtureVersion: 5,
     state: {
       scenario: "differential-process",
@@ -249,6 +289,8 @@ test("production browser exercises the reversed process-first differential order
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      causalTransfer: null,
+      causalTransferPassed: false,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -289,10 +331,14 @@ test("production browser exercises the reversed process-first differential order
   await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
   await explainWith(page, "listener-port-match");
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
+  await submitCausalTransfer(page, { causalClaim: "process-started" });
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
+  await submitCausalTransfer(page);
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
 
@@ -303,7 +349,7 @@ test("browser persistence and resilience fail closed with reasoning schema v5", 
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 5,
+    schemaVersion: 6,
     fixtureVersion: 5,
     state: {
       scenario: "differential-listener",
@@ -313,6 +359,8 @@ test("browser persistence and resilience fail closed with reasoning schema v5", 
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      causalTransfer: null,
+      causalTransferPassed: false,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -340,7 +388,7 @@ test("browser persistence and resilience fail closed with reasoning schema v5", 
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.differentialStep, storageKey)).toBe(0);
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 5,
+    schemaVersion: 6,
     fixtureVersion: 5,
     state: {
       scenario: "differential-listener",
@@ -350,6 +398,8 @@ test("browser persistence and resilience fail closed with reasoning schema v5", 
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      causalTransfer: null,
+      causalTransferPassed: false,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -371,8 +421,8 @@ test("browser persistence and resilience fail closed with reasoning schema v5", 
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 4,
-    fixtureVersion: 4,
+    schemaVersion: 5,
+    fixtureVersion: 5,
     state: {},
     completed: {}
   })), storageKey);
@@ -404,7 +454,7 @@ test("browser persistence and resilience fail closed with reasoning schema v5", 
   await blockedPage.goto("/");
   await expect(blockedPage.getByRole("button", { name: "Thử lưu lại" })).toBeVisible();
   await expect(blockedPage.getByText(/Không xác nhận được lưu bền vững/)).toBeVisible();
-  await expect(blockedPage.getByText(/Hoàn tất bốn tình huống luyện tập/)).toHaveCount(0);
+  await expect(blockedPage.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
   expect(blockedErrors).toEqual([]);
   await blockedContext.close();
 
