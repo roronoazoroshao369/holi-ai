@@ -39,14 +39,16 @@ function completed(scenario = "guided") {
   return explain(state, fixture.explanation);
 }
 
-test("valid partial and completed checkpoints round-trip across both incident families", () => {
+test("valid partial and completed checkpoints round-trip across all incident cases", () => {
   for (const state of [
     evidence("guided"),
     completed("guided"),
     evidence("transfer"),
     completed("transfer"),
-    evidence("listener"),
-    completed("listener")
+    evidence("differential-listener"),
+    completed("differential-listener"),
+    evidence("differential-process"),
+    completed("differential-process")
   ]) {
     const storage = memoryStorage();
     assert.equal(savePractice(storage, state), true);
@@ -56,12 +58,13 @@ test("valid partial and completed checkpoints round-trip across both incident fa
   }
 });
 
-test("completion flags are derived through guided, transfer and unfamiliar listener progression", () => {
-  assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, listener: false });
-  assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, listener: false });
-  const checkpoint = checkpointFor(completed("listener"));
-  assert.deepEqual(checkpoint.completed, { guided: true, transfer: true, listener: true });
-  checkpoint.completed.listener = false;
+test("completion is derived from sequence position and final differential explanation", () => {
+  assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, differential: false });
+  assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, differential: false });
+  assert.deepEqual(checkpointFor(completed("differential-listener")).completed, { guided: true, transfer: true, differential: false });
+  const checkpoint = checkpointFor(completed("differential-process"));
+  assert.deepEqual(checkpoint.completed, { guided: true, transfer: true, differential: true });
+  checkpoint.completed.differential = false;
   assert.equal(parseCheckpoint(JSON.stringify(checkpoint)), null);
 });
 
@@ -73,23 +76,39 @@ test("corrupt JSON is discarded and starts clean", () => {
   assert.equal(storage.peek(PRACTICE_STORAGE_KEY), undefined);
 });
 
-test("schema and fixture version mismatches fail closed", () => {
+test("schema and fixture version mismatches including v2 fail closed", () => {
   const checkpoint = checkpointFor(evidence());
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
     { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
-    { ...checkpoint, schemaVersion: 1, fixtureVersion: 1 }
+    { ...checkpoint, schemaVersion: 2, fixtureVersion: 2 }
   ]) {
     const storage = memoryStorage({ [PRACTICE_STORAGE_KEY]: JSON.stringify(changed) });
     assert.equal(loadPractice(storage).status, "discarded");
   }
 });
 
-test("scenario-family mismatches and impossible completion states are rejected", () => {
-  const mismatch = checkpointFor(evidence("listener"));
-  mismatch.state = { ...mismatch.state, incident: { kind: "file-access", mode: "644" } };
-  assert.equal(parseCheckpoint(JSON.stringify(mismatch)), null);
+test("scenario-family and competing-case state mismatches are rejected", () => {
+  const familyMismatch = checkpointFor(evidence("differential-listener"));
+  familyMismatch.state = { ...familyMismatch.state, incident: { kind: "file-access", mode: "644" } };
+  assert.equal(parseCheckpoint(JSON.stringify(familyMismatch)), null);
 
+  const crossCase = checkpointFor(evidence("differential-listener"));
+  crossCase.state = {
+    ...crossCase.state,
+    incident: { kind: "tcp-service", processRunning: false, listenerPort: null }
+  };
+  assert.equal(parseCheckpoint(JSON.stringify(crossCase)), null);
+
+  const impossibleSocket = checkpointFor(evidence("differential-process"));
+  impossibleSocket.state = {
+    ...impossibleSocket.state,
+    incident: { kind: "tcp-service", processRunning: false, listenerPort: 9090 }
+  };
+  assert.equal(parseCheckpoint(JSON.stringify(impossibleSocket)), null);
+});
+
+test("impossible verified, explained or untouched-repaired states are rejected", () => {
   const impossible = checkpointFor(initialLabState());
   impossible.state = {
     ...impossible.state,
@@ -97,14 +116,12 @@ test("scenario-family mismatches and impossible completion states are rejected",
     verified: true,
     explained: true
   };
-  impossible.completed = { guided: true, transfer: false, listener: false };
+  impossible.completed = { guided: true, transfer: false, differential: false };
   assert.equal(parseCheckpoint(JSON.stringify(impossible)), null);
-});
 
-test("repaired provenance cannot exist on an untouched fixture", () => {
-  const impossible = checkpointFor(evidence("listener"));
-  impossible.state = { ...impossible.state, repairedWithEvidence: true };
-  assert.equal(parseCheckpoint(JSON.stringify(impossible)), null);
+  const untouched = checkpointFor(evidence("differential-process"));
+  untouched.state = { ...untouched.state, repairedWithEvidence: true };
+  assert.equal(parseCheckpoint(JSON.stringify(untouched)), null);
 });
 
 test("unavailable storage falls back to ephemeral clean practice", () => {
