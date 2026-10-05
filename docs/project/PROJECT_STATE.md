@@ -1,33 +1,33 @@
 # Project state
 
-Updated: 2026-10-05. Phase: v0.2 Linux learning vertical slice verified and merged; v0.3 practice persistence next.
+Updated: 2026-10-05. Phase: v0.3 versioned local practice persistence verified and merged; browser integration CI next.
 Package version: 0.1.0 (no release tag).
-Baseline main: 7f66238ffb3818adf2b63d8ab2cb5f2f6bdbdfa0; latest prior merged PR #6.
-Product PR #7 merged as 715fc3087572a28dc6257662743b3798d4414463. Last verified PR head: 70596cbd541e4371b1de49ea4675e28c62de5801 (CI 37251372370 success). Resulting main re-read and expected learning state confirmed. Current branch: docs/linux-learning-handoff (documentation checkpoint).
-Last verified main CI: 37250572331 success on baseline above.
+Verified main: d748e05f9579be6f5b89922b70557f820f88f124.
+Product PR #9 merged as d748e05f9579be6f5b89922b70557f820f88f124. Final PR head: 60f0708d7d0fb631d30827c4b00fcc8fc0c45f97; CI 37252591065 succeeded. Resulting main and persistence files re-read and confirmed. Current branch: docs/v03-persistence-handoff.
 
 ## Goal contract
-GOAL: deliver one Linux lesson → evidence → hypothesis → minimal repair → HTTP verification → explanation → changed scenario.
-WHY NOW: v0.1 only checks a fixed permission-command sequence; it does not test transfer.
-USER VALUE: reason about UID/GID and permissions instead of memorizing chmod 644.
-SCOPE: two clearly SIMULATED fixtures, deterministic assessment, accessible browser controls, behavioral and production browser tests.
-NON-GOALS: persistent progress, trusted certification, accounts, arbitrary shell execution, real sandbox or broad curriculum.
-ACCEPTANCE: three pre-repair observations and a supported hypothesis are required; repair alone cannot pass; HTTP verification and correct access-class explanation unlock transfer; transfer changes file group and worker supplementary groups; 644 restores transfer HTTP but fails least-access criterion, 640 passes; reset clears evidence/explanation; refresh starts guided fixture; unsupported input is inert; keyboard/mobile flow works; local and PR build/tests/audit succeed before merge.
-TEST PLAN: missing evidence, wrong hypothesis, blind repair, mode changes after verification, wrong explanation, overbroad access, fixture isolation/reset, production browser guided/transfer/reset/refresh/mobile/focus, GitHub CI.
-SECURITY: pure browser state machine, exact command allowlist, no subprocess/network execution. DevTools can forge state; completion is untrusted local practice.
-LEARNING: mechanism notes plus access-class reasoning; multiple-choice explanation is limited evidence and can be guessed. Two fixed fixtures are a narrow transfer exercise, not proof of general production competence.
-ROLLBACK: revert focused PR. No migrations or persisted data.
+GOAL: persist and resume the SIMULATED Linux practice safely across refresh without turning client state into trusted mastery.
+WHY NOW: v0.2 taught evidence → hypothesis → minimal repair → verify → explain → transfer, but refresh discarded the attempt.
+USER VALUE: resume local practice on the same browser, reset/retry predictably and recover safely from stale/corrupt storage.
+SCOPE: versioned localStorage checkpoint, schema/fixture validation, LabState invariants, derived completion consistency, corrupt/version-mismatch recovery, unavailable-storage fallback/retry, current-fixture reset and full restart.
+NON-GOALS: accounts, cross-device sync, authoritative mastery/certification, terminal transcript persistence, browser E2E as a CI gate, arbitrary shell execution or real sandbox.
+ACCEPTANCE: valid current-version state resumes; impossible/corrupt/stale state cannot manufacture completion; unavailable storage remains usable but explicitly ephemeral; reset persists a clean retry of the current fixture; full restart returns to guided; local completion remains visibly untrusted; install/typecheck/tests/audit/build pass on final PR head.
+TEST PLAN: persistence round-trip for partial/completed guided+transfer states; contradictory completion flags; corrupt JSON; schema/fixture mismatch; impossible verified/explained state; blocked storage; existing simulator bypass tests; browser regression script updated for restore/reset/restart/corrupt/unavailable storage.
+SECURITY: localStorage is attacker-controlled. Validation protects state-machine integrity against stale/corrupt data, not deliberate DevTools forgery. No persisted value authorizes execution, secrets, privileges or certification.
+LEARNING: persistence is continuity of practice, not stronger evidence of competence. Two fixtures and multiple-choice explanation remain narrow signals.
+ROLLBACK: revert PR #9. No migrations, accounts or server data.
 
 ## Product truth
-Works: executable shell, curriculum skeleton, guided Linux incident and changed group-access incident with gated explanation.
-Partial: only one skill and two fixtures; no free-form explanation grading or broad assessment.
-Broken: no known in-scope failure after local verification; product PR CI passed and merge confirmed.
-Known risks: no durable progress; reload resets; client assessment untrusted; parent directories, ACL/SELinux and other server configuration are assumed healthy. Guided world-read applies only to this public page fixture.
-Current highest-value frontier: versioned local practice progress with safe refresh/reset/retry semantics and explicit trust boundary; retain no certification claims.
-Next candidate goals: browser regression CI; persistent practice attempts; broader Linux diagnosis with less prompted transfer.
-External blockers: none established. Direct git mirror checkout lacks credentials; authenticated GitHub API supports source and changes.
+Works: executable product shell; guided and transfer Linux permission practice; evidence/hypothesis/repair/verification/explanation gates; versioned local checkpoint that resumes valid state after refresh; safe clean fallback for corrupt/stale storage; explicit ephemeral mode when storage is unavailable; reset/current retry and full restart.
+Partial: only one skill and two fixed fixtures; local checkpoint is same-browser/device only; terminal transcript is intentionally not persisted; no authoritative mastery model.
+Broken: no known in-scope failure after final PR CI and main re-read.
+Known risks: client progress is forgeable; browser persistence/hydration regression script is still manual and was not executed in this run; parent-directory traversal, ACL/SELinux and other server configuration remain assumed healthy in fixtures; curriculum breadth is still mostly planned.
+Current highest-value frontier: make the production browser regression a real CI gate, especially refresh/hydration, corrupt-storage and unavailable-storage behavior.
+Next candidate goals: broaden Linux/OS/network diagnosis with less-prompted unfamiliar fixtures; then revisit trusted mastery/accounts only when server-side identity or cross-device state is justified.
+External blockers: none established. Direct local dependency install timed out in this run, but GitHub CI completed the full install/typecheck/test/audit/build gate.
 
 ## Verification evidence
-Local npm ci succeeded. Typecheck, 8 behavioral tests, npm audit (0 vulnerabilities), production build passed.
-Production Chromium/Playwright flow passed: blind repair denied, guided observation/hypothesis/repair/verify/explanation, wrong explanation denied, transfer 644 denied and 640 accepted, reset, refresh, 390px width, visible input focus, no page errors. Mobile screenshot inspected; button wrapping corrected and final build/browser rerun passed.
-GitHub CI 37251372370 passed all install/typecheck/test/audit/build steps on final product head 70596cbd541e4371b1de49ea4675e28c62de5801. GitHub confirmed PR #7 squash merge 715fc3087572a28dc6257662743b3798d4414463; resulting main state re-read. Goal complete. This documentation checkpoint does not implement persistence. Inspect live GitHub before trusting these SHAs.
+Local checks actually executed this run: 14/14 Node behavioral tests passed; strict TypeScript check passed for linux-simulator + practice-persistence; browser regression script passed node --check. Local dependency install timed out, so no local claim is made for full app install/build or production browser execution.
+GitHub CI 37252591065 succeeded on final PR head 60f0708d7d0fb631d30827c4b00fcc8fc0c45f97: npm ci, full app typecheck, 14 tests, npm audit --audit-level=high and production build all passed.
+GitHub confirmed PR #9 squash merge as d748e05f9579be6f5b89922b70557f820f88f124. Main was re-read and lib/practice-persistence.ts plus LabTerminal changes were confirmed. Browser script now covers persistence flows but remains manually runnable; it was syntax-checked, not executed against a production server in this run.
+Inspect live GitHub before trusting these SHAs.
