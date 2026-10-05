@@ -25,3 +25,8 @@ Next candidates: learning-domain model and lesson flow; durable progress; CI bro
 External blockers: none established at inspection.
 Verification: local clean install, typecheck, 4 behavioral tests, zero-findings dependency audit, production build and production Chromium critical flow passed (see RUN_LOG). GitHub CI 37250188062 passed all gates on 9db0e24e6ef47299f7d7ff142469409c38f8e703; PR #4 squash merged as b30f7a02522757f25f7621e54c5c24b771a7ec03 and resulting main confirmed. Goal completed. Next primary goal: Linux lesson plus explanation and changed-scenario assessment. Handoff metadata changes do not implement that goal. Inspect live GitHub before trusting these SHAs.
 
+
+## Reconciliation after concurrent merge
+PR #4 was independently merged while a second execution was reviewing the same baseline. Confirmed main b30f7a02522757f25f7621e54c5c24b771a7ec03 and successful PR CI run 37250188062 on head 9db0e24e6ef47299f7d7ff142469409c38f8e703. Redundant stabilization work was not applied.
+
+Follow-up goal: label unavailable curriculum labs and transfer exercises as planned, and reconcile the durable handoff. Scope is page copy and this checkpoint only. Acceptance: UI no longer claims every lab/transfer exercise exists; current simulator and CI remain unchanged; typecheck/tests/build and PR CI pass. Security/data impact: none. Rollback: revert follow-up commit. v0.1 foundation is merged; v0.2 remains next.

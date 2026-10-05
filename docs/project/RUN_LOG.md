@@ -6,3 +6,5 @@ Local verification passed: clean npm ci; TypeScript; 4/4 behavioral tests; npm a
 
 
 GitHub CI 37250188062 passed on 9db0e24e6ef47299f7d7ff142469409c38f8e703: install, typecheck, tests, audit, build. PR #4 merged successfully as b30f7a02522757f25f7621e54c5c24b771a7ec03. Re-read main and confirmed expected simulator/lockfile/project files. Primary goal complete. Documentation checkpoint records the verified product baseline; next frontier is a Linux learning vertical slice with explanation and transfer, not more curriculum cards.
+
+Reconciliation: PR #4 merged concurrently as b30f7a02522757f25f7621e54c5c24b771a7ec03; GitHub confirmed successful CI 37250188062 for final head 9db0e24e6ef47299f7d7ff142469409c38f8e703. The second execution preserved merged implementation and discarded its redundant unpublished branch work. Independent review found remaining homepage claims implying all curriculum labs and transfer exercises existed. Follow-up marks these planned and identifies the first exercise as permissions practice. No simulator/dependency implementation is replaced.
