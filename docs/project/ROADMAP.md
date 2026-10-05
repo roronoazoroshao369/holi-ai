@@ -6,13 +6,14 @@
 - Quality gate: delivered mandatory production Chromium E2E in CI, including persistence hydration, reset/restart, corrupt/stale storage, unavailable Storage API, responsive overflow, keyboard focus and runtime-error checks.
 - Breadth gate A: delivered an unfamiliar SIMULATED OS/network causal family beyond file permissions, with observations separated from inferred hypotheses.
 - Breadth gate B: delivered same-symptom competing root causes: wrong listener port versus absent service process under the same learner-facing health prompt.
-- Transfer-hardening gate A: delivered explicit persisted differential order/step so either health cause may appear first; reset preserves assignment, full restart reassigns, and CI deterministically exercises both orderings. Persistence schema/fixture versions are now 5 following the structured-explanation slice.
-- Transfer-hardening gate B: implemented evidence-linked structured explanation; final-head verification/merge status is recorded in PROJECT_STATE.
-- Transfer-hardening gate C: next, evaluate causal understanding through narrow changed-evidence/counterfactual transfer before broad curriculum expansion.
+- Transfer-hardening gate A: delivered explicit persisted differential order/step so either health cause may appear first; reset preserves assignment, full restart reassigns, and CI deterministically exercises both orderings.
+- Transfer-hardening gate B: delivered evidence-linked structured explanation with immutable pre-repair source snapshots, explicit facts, two-source mechanism and minimal target.
+- Transfer-hardening gate C: delivered one listener changed-evidence counterfactual with deterministic source/fact/prediction/repair/causal-link rubric. Practice schema is now 6; Linux fixture version remains 5.
+- Transfer-hardening gate D: next, test generalization with one second narrow perturbation using a different causal relation before broad curriculum expansion. Prefer a permission/group identity perturbation so success cannot be reduced to memorizing listener tokens.
+- Dependency-hygiene gate: move the exact-pinned Playwright runtime into a reproducible lock/audit workflow before E2E scope becomes materially larger.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
 - v0.5-v0.7: Docker, Kubernetes, CI/CD and IaC vertical slices with verifiers and cost budgets.
 - v0.8-v0.9: observability/SRE and unfamiliar cross-domain incidents.
 - v1.0: coherent zero-to-production curriculum with demonstrated transfer, accessibility and operational readiness.
 
 No version is complete solely because its code exists. Consult PROJECT_STATE for actual verification/merge status.
-
