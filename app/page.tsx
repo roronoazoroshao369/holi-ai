@@ -1,4 +1,5 @@
 import { LabTerminal } from "../components/LabTerminal";
+import { CiLab } from "../components/CiLab";
 import { curriculum } from "../lib/curriculum";
 
 export default function Home() {
@@ -75,6 +76,17 @@ export default function Home() {
           </ol>
         </div>
         <LabTerminal />
+      </section>
+
+      <section className="section ciLearningSection" id="git-ci-lab">
+        <div className="sectionHeading">
+          <div>
+            <span className="kicker">FOUNDATION VERTICAL SLICE</span>
+            <h2>Git & CI: artifact handoff dưới áp lực.</h2>
+          </div>
+          <p>Điều tra pipeline từ workflow và job evidence, khóa causal hypothesis trước repair, rerun rồi chứng minh quan hệ producer/consumer bằng source thực tế.</p>
+        </div>
+        <CiLab />
       </section>
 
       <section className="principles" id="principles">
