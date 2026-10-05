@@ -12,6 +12,19 @@ import {
   savePractice
 } from "../lib/practice-persistence.ts";
 
+
+function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) {
+  const scenario = state.scenario;
+  const file = scenarios[scenario].family === "file-access";
+  return {
+    symptom: { evidenceId: scenario + ":before:symptom", claim: file ? "403" : "refused" },
+    identity: { evidenceId: scenario + ":before:identity", claim: file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent") },
+    resource: { evidenceId: scenario + ":before:resource", claim: file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
+    mechanism: { evidenceIds: [scenario + ":before:resource", scenario + ":before:identity"], claim: mechanism },
+    target: file ? scenarios[scenario].targetMode : "8080"
+  };
+}
+
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
   return {
@@ -36,7 +49,7 @@ function completed(scenario = "guided", order, step) {
   let state = evidence(scenario, order, step);
   state = execute(state, fixture.commands.repair).state;
   state = execute(state, fixture.commands.symptom).state;
-  return explain(state, fixture.explanation);
+  return explain(state, reasoningFor(state));
 }
 
 test("valid partial and completed checkpoints round-trip across all incident cases", () => {
@@ -89,6 +102,7 @@ test("schema and fixture version mismatches including v3 fail closed", () => {
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
     { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
+    { ...checkpoint, schemaVersion: 4, fixtureVersion: 4 },
     { ...checkpoint, schemaVersion: 3, fixtureVersion: 3 },
     { ...checkpoint, schemaVersion: 2, fixtureVersion: 2 }
   ]) {
@@ -152,4 +166,48 @@ test("unavailable storage falls back to ephemeral clean practice", () => {
   assert.deepEqual(loaded.state, initialLabState("guided", "process-first"));
   assert.equal(savePractice(blocked, evidence()), false);
   assert.equal(clearPractice(blocked), false);
+});
+
+
+test("snapshot provenance and explained reasoning contradictions are rejected on restore", () => {
+  const valid = checkpointFor(completed("differential-listener"));
+  for (const mutate of [
+    checkpoint => { checkpoint.state.preRepairEvidence.resource.output = "LISTEN on 8080"; },
+    checkpoint => { checkpoint.state.preRepairEvidence.resource.scenario = "differential-process"; },
+    checkpoint => { checkpoint.state.preRepairEvidence.resource.phase = "after-repair"; },
+    checkpoint => { delete checkpoint.state.preRepairEvidence.identity; },
+    checkpoint => { checkpoint.state.reasoning.identity.claim = "absent"; },
+    checkpoint => { checkpoint.state.reasoning.resource.evidenceId = checkpoint.state.reasoning.symptom.evidenceId; },
+    checkpoint => { checkpoint.state.reasoning.mechanism.evidenceIds.push(checkpoint.state.reasoning.symptom.evidenceId); },
+    checkpoint => { checkpoint.state.reasoning.target = "9090"; },
+    checkpoint => { checkpoint.state.preRepairEvidence.other = {}; }
+  ]) {
+    const corrupted = structuredClone(valid);
+    mutate(corrupted);
+    assert.equal(parseCheckpoint(JSON.stringify(corrupted)), null);
+  }
+});
+
+test("failed structured attempts restore and checkpoint copies do not alias nested evidence", () => {
+  let state = completed("transfer");
+  const wrong = reasoningFor(state);
+  wrong.target = "644";
+  state = explain(state, wrong);
+  const cp = checkpointFor(state);
+  assert.ok(parseCheckpoint(JSON.stringify(cp)));
+  const storage = memoryStorage({ [PRACTICE_STORAGE_KEY]: JSON.stringify(cp) });
+  assert.deepEqual(loadPractice(storage).state, state);
+  cp.state.preRepairEvidence.resource.output = "changed";
+  cp.state.reasoning.mechanism.evidenceIds[0] = "changed";
+  assert.notEqual(state.preRepairEvidence.resource.output, "changed");
+  assert.notEqual(state.reasoning.mechanism.evidenceIds[0], "changed");
+});
+
+test("initial observation flags without captured evidence and extra reasoning keys are rejected", () => {
+  const cp = checkpointFor(initialLabState());
+  cp.state.observations.identity = true;
+  assert.equal(parseCheckpoint(JSON.stringify(cp)), null);
+  const extra = checkpointFor(completed());
+  extra.state.reasoning.allEvidence = Object.values(extra.state.preRepairEvidence);
+  assert.equal(parseCheckpoint(JSON.stringify(extra)), null);
 });

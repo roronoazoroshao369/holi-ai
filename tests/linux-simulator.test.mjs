@@ -1,6 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { differentialScenario, execute, initialLabState, recordHypothesis, explain, scenarios } from "../lib/linux-simulator.ts";
+import { differentialScenario, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
+
+
+function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) {
+  const scenario = state.scenario;
+  const file = scenarios[scenario].family === "file-access";
+  return {
+    symptom: { evidenceId: scenario + ":before:symptom", claim: file ? "403" : "refused" },
+    identity: { evidenceId: scenario + ":before:identity", claim: file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent") },
+    resource: { evidenceId: scenario + ":before:resource", claim: file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
+    mechanism: { evidenceIds: [scenario + ":before:resource", scenario + ":before:identity"], claim: mechanism },
+    target: file ? scenarios[scenario].targetMode : "8080"
+  };
+}
 
 function run(state, command) {
   return execute(state, command).state;
@@ -53,8 +66,8 @@ test("permission scenarios require the evidence-backed access-class explanation"
     let state = repaired(scenario);
     state = run(state, fixture.commands.symptom);
     assert.equal(state.verified, true);
-    assert.equal(explain(state, "owner-read").explained, false);
-    assert.equal(explain(state, fixture.explanation).explained, true);
+    assert.equal(explain(state, reasoningFor(state, "owner-read")).explained, false);
+    assert.equal(explain(state, reasoningFor(state)).explained, true);
   }
 });
 
@@ -140,8 +153,8 @@ test("differential cases require distinct mechanism explanations after diagnosis
     state = run(state, fixture.commands.symptom);
     assert.equal(state.verified, true);
     const wrong = scenario === "differential-listener" ? "process-started" : "listener-port-match";
-    assert.equal(explain(state, wrong).explained, false);
-    assert.equal(explain(state, fixture.explanation).explained, true);
+    assert.equal(explain(state, reasoningFor(state, wrong)).explained, false);
+    assert.equal(explain(state, reasoningFor(state)).explained, true);
   }
 });
 
@@ -221,4 +234,93 @@ test("unsupported hostile input is inert and no arbitrary execution is introduce
       assert.equal(execute(state, command).lines[0].kind, "error");
     }
   }
+});
+
+
+test("structured explanation rejects mismatched sources, facts, causal links and minimal targets", () => {
+  for (const scenario of Object.keys(scenarios)) {
+    const state = run(repaired(scenario), scenarios[scenario].commands.symptom);
+    const correct = reasoningFor(state);
+    assert.equal(explain(state, correct).explained, true);
+    for (const slot of ["symptom", "identity", "resource"]) {
+      const source = structuredClone(correct);
+      source[slot].evidenceId = correct[slot === "identity" ? "resource" : "identity"].evidenceId;
+      assert.equal(explain(state, source).explained, false);
+      const fact = structuredClone(correct);
+      fact[slot].claim = "incorrect";
+      assert.equal(explain(state, fact).explained, false);
+    }
+    const duplicate = structuredClone(correct);
+    duplicate.mechanism.evidenceIds = [correct.identity.evidenceId, correct.identity.evidenceId];
+    assert.equal(explain(state, duplicate).explained, false);
+    const irrelevant = structuredClone(correct);
+    irrelevant.mechanism.evidenceIds = [correct.identity.evidenceId, correct.symptom.evidenceId];
+    assert.equal(explain(state, irrelevant).explained, false);
+    const all = structuredClone(correct);
+    all.mechanism.evidenceIds.push(correct.symptom.evidenceId);
+    assert.equal(explain(state, all).explained, false);
+    const target = structuredClone(correct);
+    target.target = scenario === "transfer" ? "644" : "777";
+    assert.equal(explain(state, target).explained, false);
+    assert.equal(explain(state, "other-read").explained, false);
+  }
+});
+
+test("before-repair snapshots are immutable and cannot be collected retrospectively", () => {
+  for (const scenario of Object.keys(scenarios)) {
+    const fixture = scenarios[scenario];
+    let state = diagnosed(scenario);
+    const snapshots = structuredClone(state.preRepairEvidence);
+    state = run(state, fixture.commands.repair);
+    for (const command of [fixture.commands.resource, fixture.commands.identity, fixture.commands.symptom]) {
+      state = run(state, command);
+    }
+    assert.deepEqual(state.preRepairEvidence, snapshots);
+    let blind = run(initialLabState(scenario), fixture.commands.repair);
+    for (const command of [fixture.commands.resource, fixture.commands.identity, fixture.commands.symptom]) {
+      blind = run(blind, command);
+    }
+    assert.deepEqual(blind.preRepairEvidence, {});
+    assert.equal(explain(blind, reasoningFor(blind)).explained, false);
+    assert.deepEqual(recordHypothesis(blind, fixture.correctHypothesis), blind);
+  }
+});
+
+test("hypothesis lock, explanation reset and cross-case sources fail closed", () => {
+  let state = diagnosed("differential-listener", "process");
+  assert.deepEqual(recordHypothesis(state, "network"), state);
+  state = run(run(state, scenarios[state.scenario].commands.repair), scenarios[state.scenario].commands.symptom);
+  assert.equal(explain(state, reasoningFor(state)).explained, false);
+  state = run(repaired("differential-listener"), scenarios["differential-listener"].commands.symptom);
+  const cross = reasoningFor(state);
+  cross.resource.evidenceId = "differential-process:before:resource";
+  assert.equal(explain(state, cross).explained, false);
+  state = explain(state, reasoningFor(state));
+  assert.deepEqual(run(state, "reset"), initialLabState("differential-listener"));
+  const repairedAgain = run(state, scenarios[state.scenario].commands.repair);
+  assert.equal(repairedAgain.reasoning, null);
+  assert.equal(repairedAgain.explained, false);
+});
+
+test("captured snapshot output matches the actual initial command output", () => {
+  for (const scenario of Object.keys(scenarios)) {
+    for (const slot of ["symptom", "identity", "resource"]) {
+      const response = execute(initialLabState(scenario), scenarios[scenario].commands[slot]);
+      assert.equal(response.state.preRepairEvidence[slot].output, response.lines[0].text);
+      assert.equal(response.state.preRepairEvidence[slot].command, scenarios[scenario].commands[slot]);
+    }
+  }
+});
+
+test("editing a completed reasoning draft revokes completion until deterministic recheck", () => {
+  let state = run(repaired("guided"), scenarios.guided.commands.symptom);
+  state = explain(state, reasoningFor(state));
+  assert.equal(state.explained, true);
+  const draft = reasoningFor(state);
+  draft.symptom.claim = "200";
+  const edited = editReasoning(state, draft);
+  assert.equal(edited.explained, false);
+  assert.equal(explain(edited, edited.reasoning).explained, false);
+  assert.equal(explain(edited, reasoningFor(edited)).explained, true);
+  assert.equal(state.reasoning.symptom.claim, "403");
 });

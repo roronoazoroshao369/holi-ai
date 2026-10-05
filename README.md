@@ -6,9 +6,11 @@ This repository is being repurposed from the earlier Holi-AI film-planning exper
 
 ## Current slice — Linux learning and transfer
 
-The Linux exercise now includes HTTP/file/identity evidence, a pre-repair hypothesis, minimal repair, HTTP verification and access-class explanation. A second group-scoped fixture rejects copying the public-page repair. This is ephemeral, untrusted browser practice; reload resets it.
+Four SIMULATED incidents cover file-access and same-symptom TCP-service diagnosis. Learners collect before-repair command/output snapshots, lock a causal hypothesis, repair minimally, verify the endpoint and submit source-linked facts plus a two-source mechanism. This uses a finite deterministic rubric, not free-form prose grading or trusted mastery.
 
-Production browser regression: start the built app with npm start, then run node tests/learning-flow.browser.cjs with Playwright installed externally. Optional environment variables: PLAYWRIGHT_MODULE, CHROMIUM_PATH, BASE_URL and SCREENSHOT_PATH. This suite is currently manual; CI runs the pure behavioral tests, typecheck, dependency audit and production build.
+Versioned localStorage (schema 5 / fixture 5) restores valid snapshots, drafts and randomized differential assignments after refresh. v4/older or internally inconsistent checkpoints are discarded. Client state is inspectable and forgeable; current-case reset preserves assignment, full restart chooses a fresh assignment, and storage failure falls back to ephemeral practice.
+
+Production Chromium regression is mandatory in CI. The pinned Playwright 1.63.0 runtime is installed outside the app lock/audit workflow (known dependency debt). With that runtime available, run `playwright test --config=playwright.config.cjs` after `npm run build`; Playwright owns production startup/readiness/cleanup on loopback port 3100. The suite explicitly exercises both differential orderings.
 
 The current implementation contains:
 
@@ -38,7 +40,7 @@ npm run build
 
 Run `npm run typecheck`, `npm test`, `npm audit --audit-level=high` and `npm run build`. CI runs the same checks.
 
-Read [project state](docs/project/PROJECT_STATE.md) and [roadmap](docs/project/ROADMAP.md) before continuing implementation. Simulator practice is ephemeral and is not a mastery assessment; refresh resets it.
+Read [project state](docs/project/PROJECT_STATE.md) and [roadmap](docs/project/ROADMAP.md) before continuing implementation. Simulator progress is local and untrusted; compatible checkpoints survive refresh.
 
 ## Product direction
 
@@ -48,7 +50,7 @@ The learning loop is:
 MODEL → OBSERVE → HYPOTHESIZE → ACT → VERIFY → EXPLAIN
 ```
 
-A learner should not pass because they watched content. A learner passes when they can diagnose and repair a changed scenario and explain why the fix works.
+A learner should not pass because they watched content. The current local practice gate requires diagnosis, minimal repair, verification and linked explanation. It does not establish general competence or authoritative mastery.
 
 ## Lab strategy
 
@@ -69,7 +71,7 @@ See [docs/DEVOPS_PLATFORM_ARCHITECTURE.md](docs/DEVOPS_PLATFORM_ARCHITECTURE.md)
 1. Learning domain model: course/module/lesson/scenario/mastery
 2. Lesson + checkpoint UI
 3. Scenario engine and evidence-based grading
-4. User progress persistence/auth
+4. Local practice continuity (delivered); server persistence/auth only if justified
 5. Ephemeral Linux sandbox service
 6. Docker lab runtime
 7. Kubernetes lab runtime
@@ -77,5 +79,6 @@ See [docs/DEVOPS_PLATFORM_ARCHITECTURE.md](docs/DEVOPS_PLATFORM_ARCHITECTURE.md)
 
 ## Legacy documents
 
-The existing `docs/plan/` files belong to the previous AI-film concept. They are retained temporarily on this feature branch for history and safe rollback; they are **not** the specification for the new product and should be archived or removed once the repurpose PR is accepted.
+The existing `docs/plan/` files belong to the previous AI-film concept. They are retained as historical documents; they are **not** the specification for the current product.
+
 

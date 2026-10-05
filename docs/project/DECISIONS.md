@@ -1,5 +1,12 @@
 # Decisions
 
+2026-10-05: replace the mechanism dropdown with evidence-linked structured reasoning. Capture immutable scenario-scoped command/output snapshots only before repair. Require three explicit source-linked facts, exactly two distinct identity/resource sources supporting the mechanism, and a minimally sufficient target. Keep a finite typed grammar and deterministic rubric; do not describe this as arbitrary prose assessment. Permission UID/groups are facts from identity output; access class is inferred from identity plus file ownership.
+
+2026-10-05: bump PRACTICE_SCHEMA_VERSION from 4 to 5 for persisted snapshots/reasoning. Independently bump LINUX_FIXTURE_VERSION from 4 to 5 for changed explanation/completion semantics. Reject v4 rather than silently restore older multiple-choice completion. Persist drafts on edit, revoke explained until recheck, validate explained states against the full rubric, and deep-copy nested state.
+
+2026-10-05: enforce hypothesis locking in the pure simulator as well as the UI. Post-repair observations cannot create or overwrite pre-repair evidence. Initial observation flags must match snapshot presence during checkpoint hydration. Source IDs/payloads remain client-forgeable convenience, never trusted learner evidence.
+
+
 2026-10-05: remove deterministic sequence-position leakage from the same-symptom differential pair before expanding curriculum. Persist an explicit `differentialOrder` plus `differentialStep`, derive the active concrete case from those values, and keep simulator transitions pure once assignment is supplied. Choose a fresh assignment only at the browser/UI boundary with Web Crypto. Current-case reset preserves assignment; full restart chooses a fresh assignment. This is randomized assignment, not guaranteed alternation or statistical counterbalancing.
 
 2026-10-05: bump PRACTICE_SCHEMA_VERSION from 3 to 4 because LabState now persists differential order/step. Bump LINUX_FIXTURE_VERSION from 3 to 4 because assessment-order semantics changed. Discard v3 checkpoints and reject order/step/scenario contradictions rather than silently reinterpreting them.
@@ -29,3 +36,4 @@ Use npm lockfile + npm ci; typecheck, behavioral tests, dependency audit and pro
 Patch Next 15.5 within its current minor and React 19.1 within its current minor. Override PostCSS 8.5.28 and sharp 0.35.5 because registry audit still identifies vulnerable transitives in Next's dependency constraints; revalidate after framework updates, prefer upstream fixes when available.
 Replace fixed terminal responses with a pure state machine. Require pre-repair evidence and post-repair HTTP verification for practice completion. This is pedagogical guidance, not tamper-proof mastery; client state is untrusted.
 Keep real execution disabled and defer persistence/auth until learning assessment exists.
+

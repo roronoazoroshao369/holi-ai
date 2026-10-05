@@ -22,9 +22,26 @@ async function submitHypothesis(page, value) {
   await expect(input).toBeDisabled();
 }
 
+async function fillReasoning(page, mechanism) {
+  const scenario = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.scenario, storageKey);
+  const file = scenario === "guided" || scenario === "transfer";
+  const claims = {
+    symptom: file ? "403" : "refused",
+    identity: file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent"),
+    resource: file ? "600" : (scenario === "differential-listener" ? "9090" : "none")
+  };
+  for (const slot of ["symptom", "identity", "resource"]) {
+    await page.getByRole("combobox", { name: "Nguồn " + slot, exact: true }).selectOption(scenario + ":before:" + slot);
+    await page.getByRole("textbox", { name: "Nhận định " + slot, exact: true }).fill(claims[slot]);
+  }
+  await page.getByRole("combobox", { name: "Bằng chứng cơ chế 1", exact: true }).selectOption(scenario + ":before:resource");
+  await page.getByRole("combobox", { name: "Bằng chứng cơ chế 2", exact: true }).selectOption(scenario + ":before:identity");
+  await page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true }).fill(mechanism);
+  await page.getByRole("textbox", { name: "Đích sửa tối thiểu", exact: true }).fill(file ? (scenario === "guided" ? "644" : "640") : "8080");
+}
+
 async function explainWith(page, value) {
-  const explanation = page.getByRole("combobox", { name: "Giải thích cơ chế" });
-  await explanation.selectOption(value);
+  await fillReasoning(page, value);
   await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
 }
 
@@ -33,15 +50,18 @@ test("production flow differentiates same connection symptom using process and s
   collectRuntimeErrors(page, runtimeErrors);
 
   await page.goto("/");
+  await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 4,
-    fixtureVersion: 4,
+    schemaVersion: 5,
+    fixtureVersion: 5,
     state: {
       scenario: "guided",
       differentialOrder: "listener-first",
       differentialStep: 0,
       incident: { kind: "file-access", mode: "600" },
       observations: { symptom: false, resource: false, identity: false },
+      preRepairEvidence: {},
+      reasoning: null,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -57,12 +77,42 @@ test("production flow differentiates same connection symptom using process and s
 
   await runCommand(page, "chmod 644 /srv/site/index.html");
   await runCommand(page, "curl localhost");
-  await expect(page.getByRole("combobox", { name: "Giải thích cơ chế" })).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true })).toHaveCount(0);
 
   await runCommand(page, "reset");
   for (const command of ["curl localhost", "ls -l /srv/site/index.html", "id www-data"]) {
     await runCommand(page, command);
   }
+  await submitHypothesis(page, "permission");
+  await runCommand(page, "chmod 644 /srv/site/index.html");
+  await runCommand(page, "curl localhost");
+  await fillReasoning(page, "other-read");
+  await page.getByRole("combobox", { name: "Nguồn resource", exact: true }).selectOption("guided:before:symptom");
+  await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
+  await expect(page.getByRole("button", { name: "Thử tình huống permission mới" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("combobox", { name: "Nguồn resource", exact: true })).toHaveValue("guided:before:symptom");
+  await expect(page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true })).toHaveValue("other-read");
+  await expect(page.getByRole("region", { name: "Lập luận từ bằng chứng" })).toContainText("-rw-------");
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  const reasoningInput = page.getByRole("textbox", { name: "Nhận định identity", exact: true });
+  await reasoningInput.focus();
+  expect(await reasoningInput.evaluate(element => {
+    const style = getComputedStyle(element);
+    return style.outlineStyle !== "none" && style.outlineWidth !== "0px";
+  })).toBe(true);
+  await page.getByRole("region", { name: "Lập luận từ bằng chứng" }).screenshot({ path: "test-results/reasoning-mobile.png" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.getByRole("region", { name: "Lập luận từ bằng chứng" }).screenshot({ path: "test-results/reasoning-desktop.png" });
+  await runCommand(page, "ls -l /srv/site/index.html");
+  await expect(page.getByRole("region", { name: "Lập luận từ bằng chứng" })).toContainText("-rw-------");
+  await runCommand(page, "reset");
+  await expect(page.getByRole("region", { name: "Lập luận từ bằng chứng" })).toHaveCount(0);
+  const resetState = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state, storageKey);
+  expect(resetState.preRepairEvidence).toEqual({});
+  expect(resetState.reasoning).toBeNull();
+  for (const command of ["curl localhost", "ls -l /srv/site/index.html", "id www-data"]) await runCommand(page, command);
   await submitHypothesis(page, "permission");
   await runCommand(page, "chmod 644 /srv/site/index.html");
   await runCommand(page, "curl localhost");
@@ -75,7 +125,7 @@ test("production flow differentiates same connection symptom using process and s
   await submitHypothesis(page, "permission");
   await runCommand(page, "chmod 644 /srv/reports/status.html");
   await runCommand(page, "curl localhost");
-  await expect(page.getByRole("combobox", { name: "Giải thích cơ chế" })).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true })).toHaveCount(0);
   await runCommand(page, "chmod 640 /srv/reports/status.html");
   await runCommand(page, "curl localhost");
   await explainWith(page, "group-read");
@@ -101,7 +151,7 @@ test("production flow differentiates same connection symptom using process and s
   await submitHypothesis(page, "process");
   await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
-  await expect(page.getByRole("combobox", { name: "Giải thích cơ chế" })).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true })).toHaveCount(0);
 
   await runCommand(page, "reset");
   for (const command of [
@@ -117,6 +167,14 @@ test("production flow differentiates same connection symptom using process and s
   await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
   await explainWith(page, "process-started");
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
+  await fillReasoning(page, "listener-port-match");
+  await page.getByRole("textbox", { name: "Nhận định identity", exact: true }).fill("absent");
+  await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
+  await fillReasoning(page, "listener-port-match");
+  await page.getByRole("combobox", { name: "Bằng chứng cơ chế 2", exact: true }).selectOption("differential-listener:before:resource");
+  await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
   await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
   await explainWith(page, "listener-port-match");
   await page.getByRole("button", { name: "Thử case cùng symptom" }).click();
@@ -139,7 +197,7 @@ test("production flow differentiates same connection symptom using process and s
   await submitHypothesis(page, "network");
   await runCommand(page, "start api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
-  await expect(page.getByRole("combobox", { name: "Giải thích cơ chế" })).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true })).toHaveCount(0);
 
   await runCommand(page, "reset");
   for (const command of [
@@ -162,6 +220,14 @@ test("production flow differentiates same connection symptom using process and s
   await page.reload();
   await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
   await expect(page.getByText(/Đã phục hồi checkpoint hợp lệ/)).toBeVisible();
+  await page.evaluate(key => {
+    const checkpoint = JSON.parse(localStorage.getItem(key));
+    checkpoint.state.reasoning.resource.claim = "9090";
+    localStorage.setItem(key, JSON.stringify(checkpoint));
+  }, storageKey);
+  await page.reload();
+  await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "1. Chẩn đoán có hướng dẫn" })).toBeVisible();
   await expect(page.getByText(/KHÔNG PHẢI MASTERY/)).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
@@ -170,16 +236,19 @@ test("production browser exercises the reversed process-first differential order
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
+  await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 4,
-    fixtureVersion: 4,
+    schemaVersion: 5,
+    fixtureVersion: 5,
     state: {
       scenario: "differential-process",
       differentialOrder: "process-first",
       differentialStep: 0,
       incident: { kind: "tcp-service", processRunning: false, listenerPort: null },
       observations: { symptom: false, resource: false, identity: false },
+      preRepairEvidence: {},
+      reasoning: null,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -227,21 +296,23 @@ test("production browser exercises the reversed process-first differential order
   expect(runtimeErrors).toEqual([]);
 });
 
-test("browser persistence and resilience fail closed with differential schema v4", async ({ page, browser }) => {
+test("browser persistence and resilience fail closed with reasoning schema v5", async ({ page, browser }) => {
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 4,
-    fixtureVersion: 4,
+    schemaVersion: 5,
+    fixtureVersion: 5,
     state: {
       scenario: "differential-listener",
       differentialOrder: "listener-first",
       differentialStep: 0,
       incident: { kind: "tcp-service", processRunning: true, listenerPort: 9090 },
       observations: { symptom: false, resource: false, identity: false },
+      preRepairEvidence: {},
+      reasoning: null,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -269,14 +340,16 @@ test("browser persistence and resilience fail closed with differential schema v4
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.differentialStep, storageKey)).toBe(0);
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 4,
-    fixtureVersion: 4,
+    schemaVersion: 5,
+    fixtureVersion: 5,
     state: {
       scenario: "differential-listener",
       differentialOrder: "process-first",
       differentialStep: 0,
       incident: { kind: "tcp-service", processRunning: true, listenerPort: 9090 },
       observations: { symptom: false, resource: false, identity: false },
+      preRepairEvidence: {},
+      reasoning: null,
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
@@ -298,8 +371,8 @@ test("browser persistence and resilience fail closed with differential schema v4
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 3,
-    fixtureVersion: 3,
+    schemaVersion: 4,
+    fixtureVersion: 4,
     state: {},
     completed: {}
   })), storageKey);
@@ -337,3 +410,4 @@ test("browser persistence and resilience fail closed with differential schema v4
 
   expect(runtimeErrors).toEqual([]);
 });
+

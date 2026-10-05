@@ -1,6 +1,12 @@
 import {
   DEFAULT_DIFFERENTIAL_ORDER,
   differentialScenario,
+  evidenceReady,
+  evidenceSlots,
+  initialEvidence,
+  reasoningMatches,
+  sameEvidence,
+  validReasoningShape,
   initialLabState,
   isDifferentialScenario,
   scenarios,
@@ -10,8 +16,8 @@ import {
 } from "./linux-simulator.ts";
 
 export const PRACTICE_STORAGE_KEY = "holi.devops.linux-practice";
-export const PRACTICE_SCHEMA_VERSION = 4 as const;
-export const LINUX_FIXTURE_VERSION = 4 as const;
+export const PRACTICE_SCHEMA_VERSION = 5 as const;
+export const LINUX_FIXTURE_VERSION = 5 as const;
 
 type Completion = { guided: boolean; transfer: boolean; differential: boolean };
 export type PracticeCheckpoint = {
@@ -86,15 +92,24 @@ export function isValidLabState(value: unknown): value is LabState {
   }
   if (typeof value.hypothesis !== "string" || !["", "permission", "network", "process"].includes(value.hypothesis)) return false;
 
+  if (!isRecord(value.preRepairEvidence)) return false;
+  if (Object.keys(value.preRepairEvidence).some(key => !evidenceSlots.includes(key as typeof evidenceSlots[number]))) return false;
+  for (const slot of evidenceSlots) {
+    const record = value.preRepairEvidence[slot];
+    if (record !== undefined && (!value.observations[slot] || !sameEvidence(record, initialEvidence(value.scenario, slot)))) return false;
+  }
+  if (value.reasoning !== null && !validReasoningShape(value.reasoning)) return false;
   const state = value as LabState;
   if (!validIncident(state)) return false;
+  if (incidentIsInitial(state) && evidenceSlots.some(slot => state.observations[slot] !== Boolean(state.preRepairEvidence[slot]))) return false;
 
-  const evidenceReady = state.observations.symptom && state.observations.resource && state.observations.identity;
-  if (state.hypothesis && !evidenceReady) return false;
+  const ready = evidenceReady(state);
+  if (state.hypothesis && !ready) return false;
   if (state.repairedWithEvidence &&
-      (!evidenceReady || incidentIsInitial(state) || state.hypothesis !== scenarios[state.scenario].correctHypothesis)) return false;
+      (!ready || incidentIsInitial(state) || state.hypothesis !== scenarios[state.scenario].correctHypothesis)) return false;
   if (state.verified && (!state.repairedWithEvidence || !targetReached(state))) return false;
-  if (state.explained && !state.verified) return false;
+  if (state.reasoning !== null && !state.verified) return false;
+  if (state.explained && (!state.verified || !reasoningMatches(state, state.reasoning))) return false;
   return true;
 }
 
@@ -105,7 +120,9 @@ export function checkpointFor(state: LabState): PracticeCheckpoint {
     state: {
       ...state,
       incident: { ...state.incident },
-      observations: { ...state.observations }
+      observations: { ...state.observations },
+      preRepairEvidence: structuredClone(state.preRepairEvidence),
+      reasoning: state.reasoning ? structuredClone(state.reasoning) : null
     },
     completed: expectedCompletion(state)
   };
@@ -143,7 +160,9 @@ export function loadPractice(
       state: {
         ...checkpoint.state,
         incident: { ...checkpoint.state.incident },
-        observations: { ...checkpoint.state.observations }
+        observations: { ...checkpoint.state.observations },
+        preRepairEvidence: structuredClone(checkpoint.state.preRepairEvidence),
+        reasoning: checkpoint.state.reasoning ? structuredClone(checkpoint.state.reasoning) : null
       }
     };
   }
@@ -170,3 +189,4 @@ export function clearPractice(storage: PracticeStorage): boolean {
     return false;
   }
 }
+

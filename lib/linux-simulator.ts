@@ -21,7 +21,6 @@ export type IncidentState =
   | { kind: "tcp-service"; processRunning: boolean; listenerPort: 8080 | 9090 | null };
 export type ObservationState = { symptom: boolean; resource: boolean; identity: boolean };
 
-type ExplanationOption = { value: string; label: string };
 type ScenarioBase = {
   title: string;
   family: "file-access" | "tcp-service";
@@ -31,7 +30,6 @@ type ScenarioBase = {
   correctHypothesis: Exclude<Hypothesis, "">;
   explanation: string;
   explanationPrompt: string;
-  explanationOptions: readonly ExplanationOption[];
   readme: string;
   repairSyntax: string;
   commands: {
@@ -64,12 +62,6 @@ type ScenarioDefinition = FileScenario | TcpServiceScenario;
 const differentialTitle = "Health endpoint differential diagnosis";
 const differentialSummary = "Client cannot connect to 127.0.0.1:8080. Diagnose from process and socket evidence before choosing a causal class.";
 const differentialReadme = "Symptom: connection refused at http://127.0.0.1:8080/health. Collect client symptom, process state and listening-socket evidence before changing service state. The same symptom can have different causes, so infer the causal layer only from observations.";
-const differentialOptions = [
-  { value: "listener-port-match", label: "A running process must own a LISTEN socket on the exact address/port the client calls" },
-  { value: "process-started", label: "The service process must exist and own the expected LISTEN socket before clients can connect" },
-  { value: "file-mode", label: "File read mode determines which TCP port accepts the connection" }
-] as const;
-
 export const scenarios = {
   guided: {
     title: "1. Chẩn đoán có hướng dẫn",
@@ -86,11 +78,6 @@ export const scenarios = {
     targetMode: "644",
     explanation: "other-read",
     explanationPrompt: "Vì sao worker đọc được file sau sửa?",
-    explanationOptions: [
-      { value: "owner-read", label: "UID worker trùng owner, nên dùng quyền owner" },
-      { value: "group-read", label: "GID worker thuộc group file, nên dùng quyền group" },
-      { value: "other-read", label: "UID và GID không khớp file, nên dùng quyền other" }
-    ],
     readme: "Symptom: HTTP 403 for /srv/site/index.html. Worker: www-data. Collect HTTP, file and identity evidence, record a hypothesis, repair with the least read access needed, then verify. Directory traversal and all other configuration are healthy in this fixture.",
     repairSyntax: "chmod MODE PATH",
     commands: {
@@ -115,11 +102,6 @@ export const scenarios = {
     targetMode: "640",
     explanation: "group-read",
     explanationPrompt: "Vì sao report-worker đọc được file với quyền tối thiểu?",
-    explanationOptions: [
-      { value: "owner-read", label: "UID worker trùng owner, nên dùng quyền owner" },
-      { value: "group-read", label: "GID worker thuộc group file, nên dùng quyền group" },
-      { value: "other-read", label: "Worker cần quyền other để đọc file" }
-    ],
     readme: "Symptom: HTTP 403 for /srv/reports/status.html. Worker: report-worker. This report is private to group web. Collect HTTP, file and identity evidence, record a hypothesis, repair with the least read access needed, then verify.",
     repairSyntax: "chmod MODE PATH",
     commands: {
@@ -144,7 +126,6 @@ export const scenarios = {
     repairAction: "configure-listener",
     explanation: "listener-port-match",
     explanationPrompt: "Cơ chế nào được evidence hỗ trợ sau khi endpoint hoạt động?",
-    explanationOptions: differentialOptions,
     readme: differentialReadme,
     repairSyntax: "configure SERVICE --listen ADDRESS:PORT",
     commands: {
@@ -169,7 +150,6 @@ export const scenarios = {
     repairAction: "start-service",
     explanation: "process-started",
     explanationPrompt: "Cơ chế nào được evidence hỗ trợ sau khi endpoint hoạt động?",
-    explanationOptions: differentialOptions,
     readme: differentialReadme,
     repairSyntax: "start SERVICE --listen ADDRESS:PORT",
     commands: {
@@ -187,6 +167,8 @@ export type LabState = {
   differentialStep: DifferentialStep;
   incident: IncidentState;
   observations: ObservationState;
+  preRepairEvidence: Partial<Record<EvidenceSlot, EvidenceRecord>>;
+  reasoning: ReasoningAnswer | null;
   hypothesis: Hypothesis;
   repairedWithEvidence: boolean;
   verified: boolean;
@@ -225,6 +207,8 @@ export function initialLabState(
     differentialStep: resolvedStep,
     incident: initialIncident(scenario),
     observations: { symptom: false, resource: false, identity: false },
+    preRepairEvidence: {},
+    reasoning: null,
     hypothesis: "",
     repairedWithEvidence: false,
     verified: false,
@@ -233,7 +217,8 @@ export function initialLabState(
 }
 
 export function evidenceReady(state: LabState): boolean {
-  return state.observations.symptom && state.observations.resource && state.observations.identity;
+  return evidenceSlots.every(slot => state.observations[slot] &&
+    sameEvidence(state.preRepairEvidence[slot], initialEvidence(state.scenario, slot)));
 }
 
 function incidentIsInitial(state: LabState): boolean {
@@ -257,17 +242,111 @@ export function targetReached(state: LabState): boolean {
 }
 
 export function recordHypothesis(state: LabState, hypothesis: string): LabState {
-  if (!incidentIsInitial(state) || !evidenceReady(state)) return state;
+  if (state.hypothesis || !incidentIsInitial(state) || !evidenceReady(state)) return state;
   if (!["permission", "network", "process"].includes(hypothesis)) return state;
   return { ...state, hypothesis: hypothesis as Hypothesis };
 }
 
-export function explain(state: LabState, answer: string): LabState {
-  return { ...state, explained: state.verified && answer === scenarios[state.scenario].explanation };
+export const evidenceSlots = ["symptom", "identity", "resource"] as const;
+export type EvidenceSlot = typeof evidenceSlots[number];
+export type EvidenceRecord = {
+  id: string;
+  scenario: ScenarioId;
+  slot: EvidenceSlot;
+  phase: "before-repair";
+  command: string;
+  output: string;
+};
+export type EvidenceClaim = { evidenceId: string; claim: string };
+export type ReasoningAnswer = {
+  symptom: EvidenceClaim;
+  identity: EvidenceClaim;
+  resource: EvidenceClaim;
+  mechanism: { evidenceIds: [string, string]; claim: string };
+  target: string;
+};
+
+export function emptyReasoning(): ReasoningAnswer {
+  return {
+    symptom: { evidenceId: "", claim: "" },
+    identity: { evidenceId: "", claim: "" },
+    resource: { evidenceId: "", claim: "" },
+    mechanism: { evidenceIds: ["", ""], claim: "" },
+    target: ""
+  };
 }
 
-function withObservation(state: LabState, key: keyof ObservationState): LabState {
-  return { ...state, observations: { ...state.observations, [key]: true } };
+// Canonical immutable fixture output, captured only by a diagnostic command before repair.
+// An ID identifies a source, not a trusted learner or an anti-cheat credential.
+export function initialEvidence(scenario: ScenarioId, slot: EvidenceSlot): EvidenceRecord {
+  const fixture = scenarios[scenario];
+  let output: string;
+  if (fixture.family === "file-access") {
+    output = slot === "symptom" ? "HTTP/1.1 403 Forbidden"
+      : slot === "identity" ? fixture.identity
+      : "-rw------- 1 " + fixture.owner + " " + fixture.group + " 1842 Oct 5 " + fixture.path;
+  } else {
+    output = slot === "symptom" ? "curl: (7) Failed to connect to 127.0.0.1 port 8080: Connection refused"
+      : slot === "identity" ? (fixture.initialProcessRunning ? "842 app api-server" : "no matching api-server process")
+      : fixture.initialPort === null ? "No LISTEN socket owned by api-server"
+      : 'LISTEN 0 128 127.0.0.1:9090 0.0.0.0:* users:(("api-server",pid=842,fd=7))';
+  }
+  return { id: scenario + ":before:" + slot, scenario, slot, phase: "before-repair", command: fixture.commands[slot], output };
+}
+
+export function sameEvidence(value: unknown, expected: EvidenceRecord): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return Object.keys(record).length === Object.keys(expected).length &&
+    (Object.keys(expected) as (keyof EvidenceRecord)[]).every(key => record[key] === expected[key]);
+}
+
+export function validReasoningShape(value: unknown): value is ReasoningAnswer {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const exactKeys = (v: unknown, keys: string[]) => v !== null && typeof v === "object" && !Array.isArray(v) &&
+    Object.keys(v).length === keys.length && keys.every(key => Object.hasOwn(v, key));
+  if (!exactKeys(value, ["symptom", "identity", "resource", "mechanism", "target"])) return false;
+  const answer = value as ReasoningAnswer;
+  if (!evidenceSlots.every(slot => exactKeys(answer[slot], ["evidenceId", "claim"])) ||
+      !exactKeys(answer.mechanism, ["evidenceIds", "claim"])) return false;
+  const text = (v: unknown) => typeof v === "string" && v.length <= 100;
+  return evidenceSlots.every(slot => answer[slot] && text(answer[slot].evidenceId) && text(answer[slot].claim)) &&
+    Boolean(answer.mechanism && Array.isArray(answer.mechanism.evidenceIds) &&
+      answer.mechanism.evidenceIds.length === 2 && answer.mechanism.evidenceIds.every(text) &&
+      text(answer.mechanism.claim) && text(answer.target));
+}
+
+export function reasoningMatches(state: LabState, answer: unknown): boolean {
+  if (!validReasoningShape(answer) || !evidenceReady(state)) return false;
+  const fixture = scenarios[state.scenario];
+  const claims = fixture.family === "file-access"
+    ? { symptom: "403", identity: state.scenario === "guided" ? "33:www-data" : "1001:report-worker,web", resource: "600" }
+    : { symptom: "refused", identity: fixture.initialProcessRunning ? "present" : "absent", resource: fixture.initialPort === null ? "none" : "9090" };
+  const normalized = (s: string) => s.trim().toLowerCase();
+  if (!evidenceSlots.every(slot => answer[slot].evidenceId === state.preRepairEvidence[slot]?.id &&
+      normalized(answer[slot].claim) === claims[slot])) return false;
+  const supportingIds = [state.preRepairEvidence.identity?.id, state.preRepairEvidence.resource?.id];
+  return new Set(answer.mechanism.evidenceIds).size === 2 &&
+    supportingIds.every(id => answer.mechanism.evidenceIds.includes(id!)) &&
+    normalized(answer.mechanism.claim) === fixture.explanation &&
+    normalized(answer.target) === (fixture.family === "file-access" ? fixture.targetMode : String(fixture.targetPort));
+}
+
+export function editReasoning(state: LabState, answer: ReasoningAnswer): LabState {
+  if (!state.verified || !validReasoningShape(answer)) return state;
+  return { ...state, reasoning: structuredClone(answer), explained: false };
+}
+
+export function explain(state: LabState, answer: ReasoningAnswer): LabState {
+  if (!state.verified || !state.repairedWithEvidence || !targetReached(state) || !validReasoningShape(answer)) return state;
+  return { ...state, reasoning: structuredClone(answer), explained: reasoningMatches(state, answer) };
+}
+
+function withObservation(state: LabState, key: EvidenceSlot): LabState {
+  const snapshot = incidentIsInitial(state) && !state.preRepairEvidence[key]
+    ? { ...state.preRepairEvidence, [key]: initialEvidence(state.scenario, key) }
+    : state.preRepairEvidence;
+  return { ...state, preRepairEvidence: snapshot, observations: { ...state.observations, [key]: true } };
 }
 
 function fileHealthy(scenario: "guided" | "transfer", mode: FileMode): boolean {
@@ -297,7 +376,8 @@ function executeFileScenario(state: LabState, command: string, fixture: FileScen
         incident: { kind: "file-access", mode: nextMode },
         repairedWithEvidence,
         verified: false,
-        explained: false
+        explained: false,
+        reasoning: null
       },
       lines: [{ kind: "output", text: "Permissions updated. Verify HTTP; a healthy service alone does not prove a minimal repair." }]
     };
@@ -356,7 +436,8 @@ function executeTcpServiceScenario(state: LabState, command: string, fixture: Tc
         incident: { kind: "tcp-service", processRunning: true, listenerPort: fixture.targetPort },
         repairedWithEvidence,
         verified: false,
-        explained: false
+        explained: false,
+        reasoning: null
       },
       lines: [{
         kind: "output",
@@ -415,3 +496,4 @@ export function execute(state: LabState, command: string): { state: LabState; li
 
   return { state, lines: [{ kind: "error", text: "Command unavailable in this SIMULATED environment. Type help." }] };
 }
+
