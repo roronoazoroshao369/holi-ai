@@ -461,7 +461,7 @@ export function LabTerminal() {
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
       {state.explained && state.scenario === "transfer" && permissionSatisfied &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 0), 0)}>Thử differential diagnosis</button>}
-      {state.explained && inDifferential && state.differentialStep === 0 &&
+      {state.explained && inDifferential && state.differentialStep === 0 && permissionSatisfied &&
         (state.scenario !== "differential-listener" || transferSatisfied) &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 1), 1)}>Thử case cùng symptom</button>}
       {state.explained && inDifferential && state.differentialStep === 1 && permissionSatisfied && transferSatisfied &&
