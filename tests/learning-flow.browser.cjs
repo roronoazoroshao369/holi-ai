@@ -342,7 +342,7 @@ test("production browser exercises the reversed process-first differential order
   expect(runtimeErrors).toEqual([]);
 });
 
-test("browser persistence and resilience fail closed with reasoning schema v5", async ({ page, browser }) => {
+test("browser persistence and resilience fail closed with practice schema v6", async ({ page, browser }) => {
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
