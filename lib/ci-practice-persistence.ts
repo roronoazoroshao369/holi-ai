@@ -11,8 +11,10 @@ import {
 } from "./ci-simulator.ts";
 
 export const CI_PRACTICE_STORAGE_KEY = "holi.devops.git-ci-practice";
-export const CI_PRACTICE_SCHEMA_VERSION = 1 as const;
-export const CI_FIXTURE_VERSION = 1 as const;
+import { isValidRevisionState } from "./git-revision-simulator.ts";
+
+export const CI_PRACTICE_SCHEMA_VERSION = 2 as const;
+export const CI_FIXTURE_VERSION = 2 as const;
 
 export type CiStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 export type CiLoadStatus = "empty" | "restored" | "discarded" | "unavailable";
@@ -34,6 +36,7 @@ function sameJson(a: unknown, b: unknown): boolean {
 
 export function isValidCiLabState(value: unknown): value is CiLabState {
   if (!isRecord(value) || !isRecord(value.evidenceSeen) || !isRecord(value.preRepairEvidence)) return false;
+  if (!isValidRevisionState(value.revisionPractice)) return false;
   for (const slot of CI_EVIDENCE_SLOTS) {
     if (typeof value.evidenceSeen[slot] !== "boolean") return false;
     const record = value.preRepairEvidence[slot];

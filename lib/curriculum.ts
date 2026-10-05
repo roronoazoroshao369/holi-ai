@@ -21,7 +21,7 @@ export const curriculum: Module[] = [
     title: "Git & CI",
     description: "Từ commit đến pipeline có kiểm thử, artifact và quality gate.",
     skills: ["git", "branching", "CI", "artifacts", "quality gates"],
-    lab: "Sửa pipeline thất bại và đưa build về trạng thái xanh.",
+    lab: "Điều tra artifact delivery và release acceptance trong mô phỏng; pipeline xanh chưa đủ để hoàn tất.",
     level: "Foundation"
   },
   {

@@ -1,3 +1,5 @@
+import { initialRevisionState, type RevisionState } from "./git-revision-simulator.ts";
+
 export type CiEvidenceSlot = "workflow" | "producer" | "consumer";
 export type CiHypothesis = "" | "artifact-contract" | "test-regression" | "runner-permission";
 export type CiRepair = "" | "map-current-artifact-output" | "rename-built-files" | "chmod-workspace" | "rerun-only";
@@ -32,6 +34,7 @@ export type CiTransferAnswer = {
 };
 
 export type CiLabState = {
+  revisionPractice: RevisionState;
   evidenceSeen: Record<CiEvidenceSlot, boolean>;
   preRepairEvidence: Partial<Record<CiEvidenceSlot, CiEvidenceRecord>>;
   hypothesis: CiHypothesis;
@@ -99,6 +102,7 @@ export const CI_TRANSFER_EVIDENCE = {
 
 export function initialCiLabState(): CiLabState {
   return {
+    revisionPractice: initialRevisionState(),
     evidenceSeen: { workflow: false, producer: false, consumer: false },
     preRepairEvidence: {},
     hypothesis: "",

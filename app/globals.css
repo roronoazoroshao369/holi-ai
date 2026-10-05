@@ -143,6 +143,11 @@ footer strong { color:var(--text); }
 
 
 .ciLearningSection { max-width: 1500px; }
+.revisionLab { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line); min-width: 0; }
+.revisionLab p { overflow-wrap: anywhere; line-height: 1.65; color: var(--muted); }
+.revisionLab .ciStatus, .revisionLab details { margin-top: 20px; }
+.revisionLab summary { cursor: pointer; color: var(--accent); }
+.revisionOutput { white-space: pre-wrap; overflow-wrap: anywhere; }
 .ciLab { border: 1px solid var(--line); background: var(--panel2); padding: 28px; min-width: 0; }
 .ciLabHeader { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, .7fr); gap: 28px; align-items: start; margin-bottom: 20px; }
 .ciLabHeader h3 { font-family: Arial, Helvetica, sans-serif; letter-spacing: -.04em; font-size: clamp(30px, 4vw, 48px); margin: 10px 0; }
