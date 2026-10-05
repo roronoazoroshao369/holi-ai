@@ -105,9 +105,9 @@ export const scenarios = {
     }
   },
   listener: {
-    title: "3. Incident lạ: process sống nhưng endpoint chết",
+    title: "3. Incident lạ: health endpoint không truy cập được",
     family: "tcp-listener",
-    summary: "Health endpoint phải ở 127.0.0.1:8080. Đừng giả định process tồn tại đồng nghĩa socket đang lắng nghe đúng nơi.",
+    summary: "Health endpoint phải ở 127.0.0.1:8080 nhưng client đang bị từ chối kết nối. Hãy xác định causal layer từ evidence trước khi sửa.",
     resourceLabel: "socket listener",
     identityLabel: "trạng thái process",
     correctHypothesis: "network",
@@ -122,7 +122,7 @@ export const scenarios = {
       { value: "listener-port-match", label: "Socket phải LISTEN đúng địa chỉ/port mà client đang gọi" },
       { value: "file-mode", label: "Quyền đọc file quyết định TCP port mà process lắng nghe" }
     ],
-    readme: "Symptom: connection refused at http://127.0.0.1:8080/health. The service should answer on port 8080. Collect client symptom, process state and listening-socket evidence before changing configuration. Do not assume a running process proves the expected port is bound.",
+    readme: "Symptom: connection refused at http://127.0.0.1:8080/health. The service should answer on port 8080. Collect client symptom, process state and listening-socket evidence before changing configuration. Decide from those observations whether the causal layer is process state or network/listener state.",
     repairSyntax: "configure SERVICE --listen ADDRESS:PORT",
     commands: {
       symptom: "curl 127.0.0.1:8080/health",
