@@ -1,11 +1,13 @@
 # Risks
 
 - Current labs are SIMULATED exact-match state machines, not Linux or a real network stack. They teach diagnostic structure but cannot establish production-system competence.
-- Four deterministic incidents exist across two causal families. The two health cases share the same learner-facing prompt and symptom, but their order is fixed, so repeated learners can still map sequence position to `network` versus `process`.
+- Four incidents exist across two causal families. The two health cases share learner-facing prompt/symptom/diagnostic vocabulary and no longer have a fixed cause order, but the corpus is still tiny and deterministic once an assignment is chosen.
+- Differential order is selected with browser Web Crypto at the UI boundary. Either cause may appear first, but independent random selection can repeat the same ordering across restarts; this is not statistical counterbalancing.
+- Differential order and step are persisted in client localStorage. They are not exposed by normal learner-facing labels/buttons, but a learner using developer tools can inspect or forge them. Treat them as untrusted practice mechanics, never secret or authoritative assessment evidence.
 - Mechanism explanation remains multiple-choice. The typed hypothesis is less prompted than a select, but it still accepts only three known causal classes and is not free-form reasoning assessment.
 - Versioned localStorage improves continuity only. It is client-editable, same-browser/device state and must never be trusted for certification, authorization or execution privileges.
-- Schema version 3 / fixture version 3 intentionally discard v2 checkpoints. Future state, ordering or semantic changes must explicitly review versioning rather than reinterpret old client state.
-- Production persistence/hydration and both differential cases are covered by two mandatory Chromium tests, but this is one browser engine and a narrow current flow rather than broad compatibility evidence.
+- Schema version 4 / fixture version 4 intentionally discard v3 checkpoints. Future state, ordering-policy or semantic changes must explicitly review versioning rather than reinterpret old client state.
+- Production persistence/hydration and both explicit differential orderings are covered by three mandatory Chromium tests, but this is one browser engine and a narrow current flow rather than broad compatibility evidence.
 - The CI-only @playwright/test runtime is pinned to 1.63.0 but installed outside package-lock.json after the normal app npm audit; registry/CDN availability and test-runtime supply-chain health remain explicit CI dependencies.
 - Parent directory permissions, ACL/SELinux and other configuration are assumed healthy in file-access fixtures, so they do not model the full Linux access path.
 - The TCP-service fixtures omit namespaces, firewall policy, bind-address complexity, service-manager behavior and real kernel/socket interactions.
