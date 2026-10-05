@@ -1,16 +1,16 @@
 export type Line = { kind: "output" | "success" | "error"; text: string };
-export type ScenarioId = "guided" | "transfer" | "listener";
+export type ScenarioId = "guided" | "transfer" | "differential-listener" | "differential-process";
 export type Hypothesis = "" | "permission" | "network" | "process";
 export type FileMode = "600" | "644" | "640";
 export type IncidentState =
   | { kind: "file-access"; mode: FileMode }
-  | { kind: "tcp-listener"; listenerPort: 8080 | 9090 };
+  | { kind: "tcp-service"; processRunning: boolean; listenerPort: 8080 | 9090 | null };
 export type ObservationState = { symptom: boolean; resource: boolean; identity: boolean };
 
 type ExplanationOption = { value: string; label: string };
 type ScenarioBase = {
   title: string;
-  family: "file-access" | "tcp-listener";
+  family: "file-access" | "tcp-service";
   summary: string;
   resourceLabel: string;
   identityLabel: string;
@@ -36,14 +36,25 @@ type FileScenario = ScenarioBase & {
   identity: string;
   targetMode: "644" | "640";
 };
-type ListenerScenario = ScenarioBase & {
-  family: "tcp-listener";
+type TcpServiceScenario = ScenarioBase & {
+  family: "tcp-service";
   service: string;
   healthEndpoint: string;
-  initialPort: 9090;
+  initialProcessRunning: boolean;
+  initialPort: 9090 | null;
   targetPort: 8080;
+  repairAction: "configure-listener" | "start-service";
 };
-type ScenarioDefinition = FileScenario | ListenerScenario;
+type ScenarioDefinition = FileScenario | TcpServiceScenario;
+
+const differentialTitle = "Health endpoint differential diagnosis";
+const differentialSummary = "Client cannot connect to 127.0.0.1:8080. Diagnose from process and socket evidence before choosing a causal class.";
+const differentialReadme = "Symptom: connection refused at http://127.0.0.1:8080/health. Collect client symptom, process state and listening-socket evidence before changing service state. The same symptom can have different causes, so infer the causal layer only from observations.";
+const differentialOptions = [
+  { value: "listener-port-match", label: "A running process must own a LISTEN socket on the exact address/port the client calls" },
+  { value: "process-started", label: "The service process must exist and own the expected LISTEN socket before clients can connect" },
+  { value: "file-mode", label: "File read mode determines which TCP port accepts the connection" }
+] as const;
 
 export const scenarios = {
   guided: {
@@ -104,31 +115,54 @@ export const scenarios = {
       repair: "chmod 640 /srv/reports/status.html"
     }
   },
-  listener: {
-    title: "3. Incident lạ: health endpoint không truy cập được",
-    family: "tcp-listener",
-    summary: "Health endpoint phải ở 127.0.0.1:8080 nhưng client đang bị từ chối kết nối. Hãy xác định causal layer từ evidence trước khi sửa.",
-    resourceLabel: "socket listener",
-    identityLabel: "trạng thái process",
+  "differential-listener": {
+    title: differentialTitle,
+    family: "tcp-service",
+    summary: differentialSummary,
+    resourceLabel: "socket state",
+    identityLabel: "process state",
     correctHypothesis: "network",
     service: "api-server",
     healthEndpoint: "http://127.0.0.1:8080/health",
+    initialProcessRunning: true,
     initialPort: 9090,
     targetPort: 8080,
+    repairAction: "configure-listener",
     explanation: "listener-port-match",
-    explanationPrompt: "Cơ chế nào giải thích vì sao health endpoint hoạt động sau sửa?",
-    explanationOptions: [
-      { value: "process-exists", label: "Chỉ cần process tồn tại thì mọi TCP port đều nhận kết nối" },
-      { value: "listener-port-match", label: "Socket phải LISTEN đúng địa chỉ/port mà client đang gọi" },
-      { value: "file-mode", label: "Quyền đọc file quyết định TCP port mà process lắng nghe" }
-    ],
-    readme: "Symptom: connection refused at http://127.0.0.1:8080/health. The service should answer on port 8080. Collect client symptom, process state and listening-socket evidence before changing configuration. Decide from those observations whether the causal layer is process state or network/listener state.",
+    explanationPrompt: "Cơ chế nào được evidence hỗ trợ sau khi endpoint hoạt động?",
+    explanationOptions: differentialOptions,
+    readme: differentialReadme,
     repairSyntax: "configure SERVICE --listen ADDRESS:PORT",
     commands: {
       symptom: "curl 127.0.0.1:8080/health",
       resource: "ss -ltnp",
       identity: "ps -o pid,user,comm -C api-server",
       repair: "configure api-server --listen 127.0.0.1:8080"
+    }
+  },
+  "differential-process": {
+    title: differentialTitle,
+    family: "tcp-service",
+    summary: differentialSummary,
+    resourceLabel: "socket state",
+    identityLabel: "process state",
+    correctHypothesis: "process",
+    service: "api-server",
+    healthEndpoint: "http://127.0.0.1:8080/health",
+    initialProcessRunning: false,
+    initialPort: null,
+    targetPort: 8080,
+    repairAction: "start-service",
+    explanation: "process-started",
+    explanationPrompt: "Cơ chế nào được evidence hỗ trợ sau khi endpoint hoạt động?",
+    explanationOptions: differentialOptions,
+    readme: differentialReadme,
+    repairSyntax: "start SERVICE --listen ADDRESS:PORT",
+    commands: {
+      symptom: "curl 127.0.0.1:8080/health",
+      resource: "ss -ltnp",
+      identity: "ps -o pid,user,comm -C api-server",
+      repair: "start api-server --listen 127.0.0.1:8080"
     }
   }
 } satisfies Record<ScenarioId, ScenarioDefinition>;
@@ -147,7 +181,11 @@ function initialIncident(scenario: ScenarioId): IncidentState {
   const fixture = scenarios[scenario];
   return fixture.family === "file-access"
     ? { kind: "file-access", mode: "600" }
-    : { kind: "tcp-listener", listenerPort: fixture.initialPort };
+    : {
+        kind: "tcp-service",
+        processRunning: fixture.initialProcessRunning,
+        listenerPort: fixture.initialPort
+      };
 }
 
 export function initialLabState(scenario: ScenarioId = "guided"): LabState {
@@ -168,8 +206,12 @@ export function evidenceReady(state: LabState): boolean {
 
 function incidentIsInitial(state: LabState): boolean {
   const fixture = scenarios[state.scenario];
-  if (fixture.family === "file-access") return state.incident.kind === "file-access" && state.incident.mode === "600";
-  return state.incident.kind === "tcp-listener" && state.incident.listenerPort === fixture.initialPort;
+  if (fixture.family === "file-access") {
+    return state.incident.kind === "file-access" && state.incident.mode === "600";
+  }
+  return state.incident.kind === "tcp-service" &&
+    state.incident.processRunning === fixture.initialProcessRunning &&
+    state.incident.listenerPort === fixture.initialPort;
 }
 
 export function targetReached(state: LabState): boolean {
@@ -177,7 +219,9 @@ export function targetReached(state: LabState): boolean {
   if (fixture.family === "file-access") {
     return state.incident.kind === "file-access" && state.incident.mode === fixture.targetMode;
   }
-  return state.incident.kind === "tcp-listener" && state.incident.listenerPort === fixture.targetPort;
+  return state.incident.kind === "tcp-service" &&
+    state.incident.processRunning &&
+    state.incident.listenerPort === fixture.targetPort;
 }
 
 export function recordHypothesis(state: LabState, hypothesis: string): LabState {
@@ -229,8 +273,7 @@ function executeFileScenario(state: LabState, command: string, fixture: FileScen
   if (command === fixture.commands.symptom) {
     const healthy = fileHealthy(state.scenario as "guided" | "transfer", state.incident.mode);
     if (!healthy) {
-      const next = withObservation(state, "symptom");
-      return { state: next, lines: [{ kind: "error", text: "HTTP/1.1 403 Forbidden" }] };
+      return { state: withObservation(state, "symptom"), lines: [{ kind: "error", text: "HTTP/1.1 403 Forbidden" }] };
     }
     const verified = state.repairedWithEvidence && targetReached(state);
     return {
@@ -246,17 +289,30 @@ function executeFileScenario(state: LabState, command: string, fixture: FileScen
   return null;
 }
 
-function executeListenerScenario(state: LabState, command: string, fixture: ListenerScenario): { state: LabState; lines: Line[] } | null {
-  if (state.incident.kind !== "tcp-listener") return null;
+function executeTcpServiceScenario(state: LabState, command: string, fixture: TcpServiceScenario): { state: LabState; lines: Line[] } | null {
+  if (state.incident.kind !== "tcp-service") return null;
 
   if (command === fixture.commands.identity) {
     const next = withObservation(state, "identity");
-    return { state: next, lines: [{ kind: "output", text: "842 app api-server" }] };
+    return {
+      state: next,
+      lines: [{
+        kind: "output",
+        text: state.incident.processRunning ? "842 app api-server" : "no matching api-server process"
+      }]
+    };
   }
   if (command === fixture.commands.resource) {
     const next = withObservation(state, "resource");
-    const port = state.incident.listenerPort;
-    return { state: next, lines: [{ kind: "output", text: "LISTEN 0 128 127.0.0.1:" + port + " 0.0.0.0:* users:((\"api-server\",pid=842,fd=7))" }] };
+    return {
+      state: next,
+      lines: [{
+        kind: "output",
+        text: state.incident.listenerPort === null
+          ? "No LISTEN socket owned by api-server"
+          : "LISTEN 0 128 127.0.0.1:" + state.incident.listenerPort + " 0.0.0.0:* users:((\"api-server\",pid=842,fd=7))"
+      }]
+    };
   }
   if (command === fixture.commands.repair) {
     const repairedWithEvidence = incidentIsInitial(state)
@@ -265,18 +321,26 @@ function executeListenerScenario(state: LabState, command: string, fixture: List
     return {
       state: {
         ...state,
-        incident: { kind: "tcp-listener", listenerPort: fixture.targetPort },
+        incident: { kind: "tcp-service", processRunning: true, listenerPort: fixture.targetPort },
         repairedWithEvidence,
         verified: false,
         explained: false
       },
-      lines: [{ kind: "output", text: "Listener configuration updated. Verify the exact health endpoint before concluding the incident is fixed." }]
+      lines: [{
+        kind: "output",
+        text: fixture.repairAction === "start-service"
+          ? "Service process started with the requested listener. Verify the exact health endpoint."
+          : "Listener configuration updated. Verify the exact health endpoint."
+      }]
     };
   }
   if (command === fixture.commands.symptom) {
-    if (state.incident.listenerPort !== fixture.targetPort) {
-      const next = withObservation(state, "symptom");
-      return { state: next, lines: [{ kind: "error", text: "curl: (7) Failed to connect to 127.0.0.1 port 8080: Connection refused" }] };
+    const healthy = state.incident.processRunning && state.incident.listenerPort === fixture.targetPort;
+    if (!healthy) {
+      return {
+        state: withObservation(state, "symptom"),
+        lines: [{ kind: "error", text: "curl: (7) Failed to connect to 127.0.0.1 port 8080: Connection refused" }]
+      };
     }
     const verified = state.repairedWithEvidence && targetReached(state);
     return {
@@ -284,8 +348,8 @@ function executeListenerScenario(state: LabState, command: string, fixture: List
       lines: [{
         kind: "success",
         text: "HTTP/1.1 200 OK\n" + (verified
-          ? "Client endpoint and listening socket now match. Explain the network mechanism."
-          : "Endpoint healthy, but diagnosis evidence is incomplete. Reset if configuration changed before the hypothesis gate.")
+          ? "Evidence-backed repair verified. Now explain the mechanism."
+          : "Endpoint healthy, but diagnosis is incomplete. Reset if service state changed before the correct hypothesis gate.")
       }]
     };
   }
@@ -303,14 +367,15 @@ export function execute(state: LabState, command: string): { state: LabState; li
   if (cmd === "ls") return { state, lines: [{ kind: "output", text: "README.txt" }] };
   if (cmd === "cat README.txt") return { state, lines: [{ kind: "output", text: fixture.readme }] };
   if (cmd === "help") {
+    const repair = state.hypothesis ? " Repair syntax: " + fixture.repairSyntax + "." : " Record a hypothesis before repair.";
     const text = "Mission: cat README.txt. Symptom: " + fixture.commands.symptom + ". Resource: " + fixture.commands.resource +
-      ". Identity/process: " + fixture.commands.identity + ". Repair syntax: " + fixture.repairSyntax + ". Reset: reset.";
+      ". Identity/process: " + fixture.commands.identity + "." + repair + " Reset: reset.";
     return { state, lines: [{ kind: "output", text }] };
   }
 
   const result = fixture.family === "file-access"
     ? executeFileScenario(state, cmd, fixture)
-    : executeListenerScenario(state, cmd, fixture);
+    : executeTcpServiceScenario(state, cmd, fixture);
   if (result) return result;
 
   return { state, lines: [{ kind: "error", text: "Command unavailable in this SIMULATED environment. Type help." }] };
