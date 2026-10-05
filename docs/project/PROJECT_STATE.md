@@ -1,32 +1,33 @@
 # Project state
 
-Updated: 2026-10-05. Phase: v0.1 verified bootstrap delivered; v0.2 learning engine next. Package version: 0.1.0.
-Product PR #4 merged into main as b30f7a02522757f25f7621e54c5c24b771a7ec03. Last verified implementation head: 9db0e24e6ef47299f7d7ff142469409c38f8e703 (CI 37250188062 success). Resulting main re-read and expected files confirmed. Current follow-up: docs/verified-bootstrap-handoff (documentation checkpoint). At inspection, main dd417fbd97e61f00cca60cbc40a4608000726953 contained film-planning docs only; PR head 5bdf5c2a5f9dc13d6ea1a7fd90560849b53ce78b introduced the platform. This is an inspection baseline, not proof subsequent commits passed.
+Updated: 2026-10-05. Phase: v0.2 Linux learning vertical slice implemented; remote CI and merge pending.
+Package version: 0.1.0 (no release tag).
+Baseline main: 7f66238ffb3818adf2b63d8ab2cb5f2f6bdbdfa0; latest prior merged PR #6.
+Branch: feat/linux-learning-transfer. Current PR: pending creation.
+Last verified main CI: 37250572331 success on baseline above.
 
 ## Goal contract
-GOAL: make the existing bootstrap reproducibly verifiable and eliminate false simulator health before admitting it to main.
-WHY NOW: CI fails in setup-node because cache requires a missing lockfile. Audit flags vulnerable runtime dependencies. Fixed responses incorrectly return healthy before repair.
-USER VALUE: a runnable honest foundation for later learning features.
-SCOPE: lockfile, patched dependencies, audit/typecheck/test/build CI, stateful simulated incident, durable project handoff.
-NON-GOALS: trusted mastery, persistence, authentication, real shell, broad curriculum implementation.
-ACCEPTANCE: npm ci succeeds; audit has no high/critical findings; typecheck/tests/build pass; HTTP is 403 before repair and 200 only after; pre-repair evidence required for practice completion; reset clears state; unsupported commands inert; production UI labels SIMULATED; CI confirms final PR head.
-TEST PLAN: pure transition tests, fresh install, audit/typecheck/build, production browser flow and GitHub CI. Report only executed checks.
-SECURITY: no host execution; patched/overridden dependencies audited. Client practice remains untrusted.
-LEARNING: evidence ordering improved; explanations and transfer still missing.
-ROLLBACK: revert this focused commit; do not rewrite main. No migrations/data loss.
+GOAL: deliver one Linux lesson → evidence → hypothesis → minimal repair → HTTP verification → explanation → changed scenario.
+WHY NOW: v0.1 only checks a fixed permission-command sequence; it does not test transfer.
+USER VALUE: reason about UID/GID and permissions instead of memorizing chmod 644.
+SCOPE: two clearly SIMULATED fixtures, deterministic assessment, accessible browser controls, behavioral and production browser tests.
+NON-GOALS: persistent progress, trusted certification, accounts, arbitrary shell execution, real sandbox or broad curriculum.
+ACCEPTANCE: three pre-repair observations and a supported hypothesis are required; repair alone cannot pass; HTTP verification and correct access-class explanation unlock transfer; transfer changes file group and worker supplementary groups; 644 restores transfer HTTP but fails least-access criterion, 640 passes; reset clears evidence/explanation; refresh starts guided fixture; unsupported input is inert; keyboard/mobile flow works; local and PR build/tests/audit succeed before merge.
+TEST PLAN: missing evidence, wrong hypothesis, blind repair, mode changes after verification, wrong explanation, overbroad access, fixture isolation/reset, production browser guided/transfer/reset/refresh/mobile/focus, GitHub CI.
+SECURITY: pure browser state machine, exact command allowlist, no subprocess/network execution. DevTools can forge state; completion is untrusted local practice.
+LEARNING: mechanism notes plus access-class reasoning; multiple-choice explanation is limited evidence and can be guessed. Two fixed fixtures are a narrow transfer exercise, not proof of general production competence.
+ROLLBACK: revert focused PR. No migrations or persisted data.
 
 ## Product truth
-Works: bootstrap landing/curriculum shell and one narrow browser simulator.
-Partial: Linux diagnostic practice; curriculum content is a skeleton.
-Broken at baseline: missing lockfile blocked CI; terminal gave unconditional 200.
-Risks: see RISKS.md. No persistence or real sandbox; refresh resets progress.
-Highest-value frontier: full Linux lesson with explanation and transfer assessment, then durable progress.
-Next candidates: learning-domain model and lesson flow; durable progress; CI browser regression suite.
-External blockers: none established at inspection.
-Verification: local clean install, typecheck, 4 behavioral tests, zero-findings dependency audit, production build and production Chromium critical flow passed (see RUN_LOG). GitHub CI 37250188062 passed all gates on 9db0e24e6ef47299f7d7ff142469409c38f8e703; PR #4 squash merged as b30f7a02522757f25f7621e54c5c24b771a7ec03 and resulting main confirmed. Goal completed. Next primary goal: Linux lesson plus explanation and changed-scenario assessment. Handoff metadata changes do not implement that goal. Inspect live GitHub before trusting these SHAs.
+Works: executable shell, curriculum skeleton, guided Linux incident and changed group-access incident with gated explanation.
+Partial: only one skill and two fixtures; no free-form explanation grading or broad assessment.
+Broken: no known in-scope failure after local verification; remote gates pending.
+Known risks: no durable progress; reload resets; client assessment untrusted; parent directories, ACL/SELinux and other server configuration are assumed healthy. Guided world-read applies only to this public page fixture.
+Current highest-value frontier: versioned local practice progress with safe refresh/reset/retry semantics and explicit trust boundary; retain no certification claims.
+Next candidate goals: browser regression CI; persistent practice attempts; broader Linux diagnosis with less prompted transfer.
+External blockers: none established. Direct git mirror checkout lacks credentials; authenticated GitHub API supports source and changes.
 
-
-## Reconciliation after concurrent merge
-PR #4 was independently merged while a second execution was reviewing the same baseline. Confirmed main b30f7a02522757f25f7621e54c5c24b771a7ec03 and successful PR CI run 37250188062 on head 9db0e24e6ef47299f7d7ff142469409c38f8e703. Redundant stabilization work was not applied.
-
-Follow-up goal: label unavailable curriculum labs and transfer exercises as planned, and reconcile the durable handoff. Scope is page copy and this checkpoint only. Acceptance: UI no longer claims every lab/transfer exercise exists; current simulator and CI remain unchanged; typecheck/tests/build and PR CI pass. Security/data impact: none. Rollback: revert follow-up commit. v0.1 foundation is merged; v0.2 remains next.
+## Verification evidence
+Local npm ci succeeded. Typecheck, 8 behavioral tests, npm audit (0 vulnerabilities), production build passed.
+Production Chromium/Playwright flow passed: blind repair denied, guided observation/hypothesis/repair/verify/explanation, wrong explanation denied, transfer 644 denied and 640 accepted, reset, refresh, 390px width, visible input focus, no page errors. Mobile screenshot inspected; button wrapping corrected before final rerun.
+Remote CI and merge: pending; do not interpret local success as merge confirmation.
