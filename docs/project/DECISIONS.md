@@ -50,3 +50,14 @@ Patch Next 15.5 within its current minor and React 19.1 within its current minor
 Replace fixed terminal responses with a pure state machine. Require pre-repair evidence and post-repair HTTP verification for practice completion. This is pedagogical guidance, not tamper-proof mastery; client state is untrusted.
 Keep real execution disabled and defer persistence/auth until learning assessment exists.
 
+
+
+2026-10-05: implement the first Git & CI learning slice as a separate deterministic simulator and persistence contract rather than expanding the Linux scenario union. The new semantics are unrelated to Linux checkpoint shape, so keep Linux practice schema 7 / fixture 5 unchanged and use Git/CI schema 1 / fixture 1 under its own localStorage key.
+
+2026-10-05: require workflow, producer and consumer pre-repair evidence before a Git/CI causal hypothesis can be locked. Permit the simulated pipeline to become green after the minimal config repair even when the learner chose the wrong causal class, but do not set verified completion unless the pre-repair diagnosis was the artifact producer/consumer contract. Operational success alone is not learning evidence.
+
+2026-10-05: remove the initial `legacy_meta` naming clue during learning red-team because a step name should not reveal the hidden root cause before evidence synthesis. The workflow source now exposes only job-output plumbing; producer and consumer logs establish the mismatched resolved names.
+
+2026-10-05: make the changed Git/CI transfer materially different from the original literal artifact-name mismatch. The transfer keeps the artifact name aligned and tests extraction-path semantics with a nested report path. Treat this as bounded assisted transfer, not mastery.
+
+2026-10-05: when the new Git/CI unavailable-storage copy made an existing Linux Playwright selector ambiguous, fix the product copy instead of weakening the established Linux regression. Cross-module additions must preserve existing browser tests without broad selectors becoming false positives.
