@@ -1,5 +1,7 @@
 # Decisions
 
+2026-10-05: make the mandatory production-browser runtime a normal exact-pinned devDependency instead of installing it into RUNNER_TEMP after audit. Lock @playwright/test, playwright and playwright-core at 1.63.0; run the local Playwright binary from node_modules for Chromium installation and regression. This closes the npm lock/audit gap without changing browser assertions. Chromium/FFmpeg remain Playwright-managed CDN downloads and are not described as npm-audited artifacts.
+
 2026-10-05: add a second narrow changed-evidence gate using a permission/group-identity relation rather than another listener token. After the private report case is correctly repaired to mode 640 and explained as group-read, retain the original identity/file sources, hold root:web and mode 640 fixed, hypothetically remove report-worker from supplementary group web, and require prediction of HTTP 403, an access change still being required, and causal relation `group-membership-required`. This tests a distinct relation while changing one causal variable.
 
 2026-10-05: bump PRACTICE_SCHEMA_VERSION from 6 to 7 because permission-transfer draft/pass state and progression/completion semantics are persisted. Keep LINUX_FIXTURE_VERSION at 5 because no incident definition, initial state or command output changed. Reject schema-v6 checkpoints rather than reinterpreting older completion. Every differential checkpoint must carry a canonical passed permission gate; the listener gate remains independently validated.
