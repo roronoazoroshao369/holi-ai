@@ -1,89 +1,158 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execute, initialLabState, recordHypothesis, explain, scenarios } from "../lib/linux-simulator.ts";
-test("health is broken until repair and passing requires pre-repair evidence", () => {
-  let state = initialLabState();
-  state = execute(state, "curl localhost").state;
-  assert.equal(state.symptomObserved, true);
-  state = execute(state, "ls -l /srv/site/index.html").state;
-  state = execute(state, "id www-data").state;
-  state = recordHypothesis(state, "permission");
-  state = execute(state, "chmod 644 /srv/site/index.html").state;
-  assert.equal(state.verified, false);
-  assert.match(execute(state, "ls -l /srv/site/index.html").lines[0].text, /-rw-r--r--/);
-  state = execute(state, "curl localhost").state;
-  assert.equal(state.verified, true);
-});
+
+function run(state, command) {
+  return execute(state, command).state;
+}
+
 function evidence(scenario) {
   let state = initialLabState(scenario);
-  for (const cmd of ["curl localhost", "ls -l " + scenarios[scenario].path, "id " + scenarios[scenario].worker]) state = execute(state, cmd).state;
-  return recordHypothesis(state, "permission");
+  const fixture = scenarios[scenario];
+  for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) {
+    state = run(state, command);
+  }
+  return state;
 }
-test("both scenarios require correct explanation after verified minimal repair", () => {
+
+function diagnosed(scenario) {
+  const fixture = scenarios[scenario];
+  return recordHypothesis(evidence(scenario), fixture.correctHypothesis);
+}
+
+function repaired(scenario) {
+  const fixture = scenarios[scenario];
+  return run(diagnosed(scenario), fixture.commands.repair);
+}
+
+test("guided permission health is broken until evidence, hypothesis, repair and verification", () => {
+  let state = initialLabState("guided");
+  state = run(state, scenarios.guided.commands.symptom);
+  assert.equal(state.observations.symptom, true);
+  state = run(state, scenarios.guided.commands.resource);
+  state = run(state, scenarios.guided.commands.identity);
+  state = recordHypothesis(state, "permission");
+  state = run(state, scenarios.guided.commands.repair);
+  assert.equal(state.verified, false);
+  assert.match(execute(state, scenarios.guided.commands.resource).lines[0].text, /-rw-r--r--/);
+  state = run(state, scenarios.guided.commands.symptom);
+  assert.equal(state.verified, true);
+});
+
+test("permission scenarios require mechanism explanation after verified minimal repair", () => {
   for (const scenario of ["guided", "transfer"]) {
-    let state = evidence(scenario);
-    assert.equal(explain(state, scenarios[scenario].explanation).explained, false);
-    state = execute(state, "chmod " + scenarios[scenario].targetMode + " " + scenarios[scenario].path).state;
-    assert.equal(state.verified, false);
-    state = execute(state, "curl localhost").state;
+    const fixture = scenarios[scenario];
+    let state = diagnosed(scenario);
+    assert.equal(explain(state, fixture.explanation).explained, false);
+    state = run(state, fixture.commands.repair);
+    state = run(state, fixture.commands.symptom);
     assert.equal(state.verified, true);
     assert.equal(explain(state, "owner-read").explained, false);
-    state = explain(state, scenarios[scenario].explanation);
+    state = explain(state, fixture.explanation);
     assert.equal(state.explained, true);
-    assert.deepEqual(execute(state, "reset").state, initialLabState(scenario));
+    assert.deepEqual(run(state, "reset"), initialLabState(scenario));
   }
 });
+
 test("memorized 644 restores transfer HTTP but excessive access fails assessment", () => {
-  let state = execute(evidence("transfer"), "chmod 644 /srv/reports/status.html").state;
-  const response = execute(state, "curl localhost");
+  let state = diagnosed("transfer");
+  state = run(state, "chmod 644 /srv/reports/status.html");
+  const response = execute(state, scenarios.transfer.commands.symptom);
   assert.match(response.lines[0].text, /200 OK/);
   assert.equal(response.state.verified, false);
-  state = execute(response.state, "chmod 640 /srv/reports/status.html").state;
-  assert.equal(execute(state, "curl localhost").state.verified, true);
+  state = run(response.state, scenarios.transfer.commands.repair);
+  assert.equal(run(state, scenarios.transfer.commands.symptom).verified, true);
 });
-test("wrong hypothesis, missing evidence, post-repair hypotheses and unsupported answers fail closed", () => {
-  for (const missing of ["http", "file", "identity"]) {
-    let state = initialLabState();
-    if (missing !== "http") state = execute(state, "curl localhost").state;
-    if (missing !== "file") state = execute(state, "ls -l /srv/site/index.html").state;
-    if (missing !== "identity") state = execute(state, "id www-data").state;
+
+test("unfamiliar listener incident distinguishes process existence from socket binding", () => {
+  let state = evidence("listener");
+  assert.match(execute(initialLabState("listener"), scenarios.listener.commands.identity).lines[0].text, /api-server/);
+  assert.match(execute(initialLabState("listener"), scenarios.listener.commands.resource).lines[0].text, /127\.0\.0\.1:9090/);
+
+  state = recordHypothesis(state, "process");
+  state = run(state, scenarios.listener.commands.repair);
+  state = run(state, scenarios.listener.commands.symptom);
+  assert.equal(state.verified, false);
+
+  state = diagnosed("listener");
+  state = run(state, scenarios.listener.commands.repair);
+  state = run(state, scenarios.listener.commands.symptom);
+  assert.equal(state.verified, true);
+  assert.equal(explain(state, "process-exists").explained, false);
+  assert.equal(explain(state, scenarios.listener.explanation).explained, true);
+});
+
+test("wrong hypotheses, missing observations and post-repair hypotheses fail closed", () => {
+  for (const missing of ["symptom", "resource", "identity"]) {
+    let state = initialLabState("guided");
+    const fixture = scenarios.guided;
+    for (const key of ["symptom", "resource", "identity"]) {
+      if (key !== missing) state = run(state, fixture.commands[key]);
+    }
     state = recordHypothesis(state, "permission");
-    state = execute(state, "chmod 644 /srv/site/index.html").state;
+    state = run(state, fixture.commands.repair);
     state = recordHypothesis(state, "permission");
-    assert.equal(execute(state, "curl localhost").state.verified, false);
+    assert.equal(run(state, fixture.commands.symptom).verified, false);
   }
+
   let state = recordHypothesis(evidence("guided"), "network");
-  state = execute(state, "chmod 644 /srv/site/index.html").state;
-  assert.equal(execute(state, "curl localhost").state.verified, false);
+  state = run(state, scenarios.guided.commands.repair);
+  assert.equal(run(state, scenarios.guided.commands.symptom).verified, false);
   assert.deepEqual(recordHypothesis(evidence("guided"), "unknown"), evidence("guided"));
 });
-test("repair invalidates verification and explanation; fixtures do not leak state", () => {
-  let state = execute(evidence("guided"), "chmod 644 /srv/site/index.html").state;
-  state = explain(execute(state, "curl localhost").state, "other-read");
+
+test("repair invalidates verification and explanation while incident families stay isolated", () => {
+  let state = repaired("guided");
+  state = run(state, scenarios.guided.commands.symptom);
+  state = explain(state, scenarios.guided.explanation);
   assert.equal(state.explained, true);
-  state = execute(state, "chmod 640 /srv/site/index.html").state;
+  state = run(state, "chmod 640 /srv/site/index.html");
   assert.equal(state.explained, false);
   assert.equal(state.verified, false);
-  assert.match(execute(state, "curl localhost").lines[0].text, /403/);
-  assert.deepEqual(execute(initialLabState("transfer"), "chmod 644 /srv/site/index.html").state, initialLabState("transfer"));
+  assert.match(execute(state, scenarios.guided.commands.symptom).lines[0].text, /403/);
+
+  const listener = initialLabState("listener");
+  assert.deepEqual(run(listener, "chmod 644 /srv/site/index.html"), listener);
+  const permission = initialLabState("guided");
+  assert.deepEqual(run(permission, scenarios.listener.commands.repair), permission);
 });
-test("blind repair and inspection after repair cannot bypass the evidence gate", () => {
-  let state = execute(initialLabState(), "chmod 644 /srv/site/index.html").state;
-  state = execute(state, "ls -l /srv/site/index.html").state;
-  state = execute(state, "chmod 644 /srv/site/index.html").state;
-  state = execute(state, "curl localhost").state;
+
+test("blind repairs cannot manufacture diagnostic completion in either incident family", () => {
+  let state = run(initialLabState("guided"), scenarios.guided.commands.repair);
+  state = run(state, scenarios.guided.commands.resource);
+  state = run(state, scenarios.guided.commands.symptom);
   assert.equal(state.verified, false);
+
+  state = run(initialLabState("listener"), scenarios.listener.commands.repair);
+  state = run(state, scenarios.listener.commands.identity);
+  state = run(state, scenarios.listener.commands.resource);
+  state = run(state, scenarios.listener.commands.symptom);
+  assert.equal(state.verified, false);
+  assert.equal(state.observations.symptom, false);
 });
-test("reset clears all evidence and attempts are isolated", () => {
-  const first = execute(initialLabState(), "chmod 644 /srv/site/index.html").state;
-  const second = initialLabState();
-  assert.equal(second.mode, "600");
-  assert.deepEqual(execute(first, "reset").state, second);
+
+test("reset clears observations and attempts are immutable and isolated", () => {
+  const first = run(initialLabState("guided"), scenarios.guided.commands.repair);
+  const second = initialLabState("guided");
+  assert.equal(second.incident.kind, "file-access");
+  assert.deepEqual(run(first, "reset"), second);
+  assert.deepEqual(initialLabState("listener"), initialLabState("listener"));
 });
-test("unsupported hostile input is inert and state is immutable", () => {
-  const state = initialLabState();
-  for (const command of ["curl localhost; id", "chmod 777 /srv/site/index.html", "$(id)", "x".repeat(5000)]) {
-    assert.deepEqual(execute(state, command).state, state);
-    assert.equal(execute(state, command).lines[0].kind, "error");
+
+test("unsupported hostile input is inert and no arbitrary execution is introduced", () => {
+  for (const scenario of ["guided", "listener"]) {
+    const state = initialLabState(scenario);
+    for (const command of ["curl localhost; id", "chmod 777 /srv/site/index.html", "$(id)", "configure api-server --listen 0.0.0.0:22", "x".repeat(5000)]) {
+      assert.deepEqual(run(state, command), state);
+      assert.equal(execute(state, command).lines[0].kind, "error");
+    }
   }
+});
+
+test("help exposes evidence vocabulary and repair syntax without running commands", () => {
+  const state = initialLabState("listener");
+  const result = execute(state, "help");
+  assert.deepEqual(result.state, state);
+  assert.match(result.lines[0].text, /ss -ltnp/);
+  assert.match(result.lines[0].text, /configure SERVICE --listen ADDRESS:PORT/);
 });

@@ -99,7 +99,7 @@ footer strong { color:var(--text); }
 .learningLab details { border: 1px solid var(--line); padding: 14px; }
 .learningLab summary { cursor: pointer; color: var(--accent); }
 .learningLab label { display: block; margin: 16px 0; }
-.learningLab select { display: block; width: 100%; margin-top: 8px; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--line); font: inherit; }
+.learningLab select, .learningLab label > input { display: block; width: 100%; margin-top: 8px; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--line); font: inherit; }
 .learningLab button { padding: 10px 14px; background: var(--accent); color: var(--bg); border: 0; font: inherit; cursor: pointer; }
 .learningLab :disabled { opacity: .6; cursor: default; }
 .learningLab :focus-visible { outline: 2px solid var(--accent2); outline-offset: 3px; }

@@ -1,10 +1,10 @@
-import { initialLabState, scenarios, type LabState } from "./linux-simulator.ts";
+import { initialLabState, scenarios, targetReached, type LabState } from "./linux-simulator.ts";
 
 export const PRACTICE_STORAGE_KEY = "holi.devops.linux-practice";
-export const PRACTICE_SCHEMA_VERSION = 1 as const;
-export const LINUX_FIXTURE_VERSION = 1 as const;
+export const PRACTICE_SCHEMA_VERSION = 2 as const;
+export const LINUX_FIXTURE_VERSION = 2 as const;
 
-type Completion = { guided: boolean; transfer: boolean };
+type Completion = { guided: boolean; transfer: boolean; listener: boolean };
 export type PracticeCheckpoint = {
   schemaVersion: typeof PRACTICE_SCHEMA_VERSION;
   fixtureVersion: typeof LINUX_FIXTURE_VERSION;
@@ -21,26 +21,48 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function expectedCompletion(state: LabState): Completion {
   return {
-    guided: state.scenario === "transfer" || (state.scenario === "guided" && state.explained),
-    transfer: state.scenario === "transfer" && state.explained
+    guided: state.scenario === "transfer" || state.scenario === "listener" || (state.scenario === "guided" && state.explained),
+    transfer: state.scenario === "listener" || (state.scenario === "transfer" && state.explained),
+    listener: state.scenario === "listener" && state.explained
   };
+}
+
+function validIncident(state: LabState): boolean {
+  const fixture = scenarios[state.scenario];
+  if (!isRecord(state.incident) || typeof state.incident.kind !== "string") return false;
+  if (fixture.family === "file-access") {
+    return state.incident.kind === "file-access" &&
+      (state.incident.mode === "600" || state.incident.mode === "644" || state.incident.mode === "640");
+  }
+  return state.incident.kind === "tcp-listener" &&
+    (state.incident.listenerPort === 8080 || state.incident.listenerPort === 9090);
+}
+
+function incidentIsInitial(state: LabState): boolean {
+  const fixture = scenarios[state.scenario];
+  if (fixture.family === "file-access") return state.incident.kind === "file-access" && state.incident.mode === "600";
+  return state.incident.kind === "tcp-listener" && state.incident.listenerPort === fixture.initialPort;
 }
 
 export function isValidLabState(value: unknown): value is LabState {
   if (!isRecord(value)) return false;
-  if (value.scenario !== "guided" && value.scenario !== "transfer") return false;
-  if (value.mode !== "600" && value.mode !== "644" && value.mode !== "640") return false;
-  for (const key of ["observed", "identityObserved", "symptomObserved", "repairedWithEvidence", "verified", "explained"] as const) {
+  if (value.scenario !== "guided" && value.scenario !== "transfer" && value.scenario !== "listener") return false;
+  if (!isRecord(value.observations)) return false;
+  for (const key of ["symptom", "resource", "identity"] as const) {
+    if (typeof value.observations[key] !== "boolean") return false;
+  }
+  for (const key of ["repairedWithEvidence", "verified", "explained"] as const) {
     if (typeof value[key] !== "boolean") return false;
   }
   if (typeof value.hypothesis !== "string" || !["", "permission", "network", "process"].includes(value.hypothesis)) return false;
 
   const state = value as LabState;
-  const evidenceReady = state.observed && state.identityObserved && state.symptomObserved;
+  if (!validIncident(state)) return false;
+
+  const evidenceReady = state.observations.symptom && state.observations.resource && state.observations.identity;
   if (state.hypothesis && !evidenceReady) return false;
-  if (state.mode === "600" && (state.repairedWithEvidence || state.verified || state.explained)) return false;
-  if (state.repairedWithEvidence && (!evidenceReady || state.hypothesis !== "permission")) return false;
-  if (state.verified && (!state.repairedWithEvidence || state.mode !== scenarios[state.scenario].targetMode)) return false;
+  if (state.repairedWithEvidence && (!evidenceReady || incidentIsInitial(state) || state.hypothesis !== scenarios[state.scenario].correctHypothesis)) return false;
+  if (state.verified && (!state.repairedWithEvidence || !targetReached(state))) return false;
   if (state.explained && !state.verified) return false;
   return true;
 }
@@ -49,7 +71,11 @@ export function checkpointFor(state: LabState): PracticeCheckpoint {
   return {
     schemaVersion: PRACTICE_SCHEMA_VERSION,
     fixtureVersion: LINUX_FIXTURE_VERSION,
-    state: { ...state },
+    state: {
+      ...state,
+      incident: { ...state.incident },
+      observations: { ...state.observations }
+    },
     completed: expectedCompletion(state)
   };
 }
@@ -60,9 +86,13 @@ export function parseCheckpoint(raw: string): PracticeCheckpoint | null {
   if (!isRecord(value)) return null;
   if (value.schemaVersion !== PRACTICE_SCHEMA_VERSION || value.fixtureVersion !== LINUX_FIXTURE_VERSION) return null;
   if (!isValidLabState(value.state) || !isRecord(value.completed)) return null;
-  if (typeof value.completed.guided !== "boolean" || typeof value.completed.transfer !== "boolean") return null;
+  for (const key of ["guided", "transfer", "listener"] as const) {
+    if (typeof value.completed[key] !== "boolean") return null;
+  }
   const expected = expectedCompletion(value.state);
-  if (value.completed.guided !== expected.guided || value.completed.transfer !== expected.transfer) return null;
+  if (value.completed.guided !== expected.guided ||
+      value.completed.transfer !== expected.transfer ||
+      value.completed.listener !== expected.listener) return null;
   return value as PracticeCheckpoint;
 }
 
@@ -73,7 +103,16 @@ export function loadPractice(storage: PracticeStorage): PracticeLoadResult {
   if (raw === null) return { status: "empty", state: initialLabState() };
 
   const checkpoint = parseCheckpoint(raw);
-  if (checkpoint) return { status: "restored", state: { ...checkpoint.state } };
+  if (checkpoint) {
+    return {
+      status: "restored",
+      state: {
+        ...checkpoint.state,
+        incident: { ...checkpoint.state.incident },
+        observations: { ...checkpoint.state.observations }
+      }
+    };
+  }
 
   try { storage.removeItem(PRACTICE_STORAGE_KEY); }
   catch { return { status: "unavailable", state: initialLabState() }; }

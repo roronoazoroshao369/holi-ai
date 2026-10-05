@@ -21,20 +21,33 @@ function memoryStorage(initial = {}) {
     peek(key) { return data.get(key); }
   };
 }
+
 function evidence(scenario = "guided") {
   let state = initialLabState(scenario);
-  for (const cmd of ["curl localhost", "ls -l " + scenarios[scenario].path, "id " + scenarios[scenario].worker]) state = execute(state, cmd).state;
-  return recordHypothesis(state, "permission");
-}
-function completed(scenario = "guided") {
-  let state = evidence(scenario);
-  state = execute(state, "chmod " + scenarios[scenario].targetMode + " " + scenarios[scenario].path).state;
-  state = execute(state, "curl localhost").state;
-  return explain(state, scenarios[scenario].explanation);
+  const fixture = scenarios[scenario];
+  for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) {
+    state = execute(state, command).state;
+  }
+  return recordHypothesis(state, fixture.correctHypothesis);
 }
 
-test("valid partial and completed checkpoints round-trip", () => {
-  for (const state of [evidence("guided"), completed("guided"), evidence("transfer"), completed("transfer")]) {
+function completed(scenario = "guided") {
+  const fixture = scenarios[scenario];
+  let state = evidence(scenario);
+  state = execute(state, fixture.commands.repair).state;
+  state = execute(state, fixture.commands.symptom).state;
+  return explain(state, fixture.explanation);
+}
+
+test("valid partial and completed checkpoints round-trip across both incident families", () => {
+  for (const state of [
+    evidence("guided"),
+    completed("guided"),
+    evidence("transfer"),
+    completed("transfer"),
+    evidence("listener"),
+    completed("listener")
+  ]) {
     const storage = memoryStorage();
     assert.equal(savePractice(storage, state), true);
     const loaded = loadPractice(storage);
@@ -43,11 +56,12 @@ test("valid partial and completed checkpoints round-trip", () => {
   }
 });
 
-test("completion flags are derived and cannot contradict lab state", () => {
-  const transfer = completed("transfer");
-  const checkpoint = checkpointFor(transfer);
-  assert.deepEqual(checkpoint.completed, { guided: true, transfer: true });
-  checkpoint.completed.transfer = false;
+test("completion flags are derived through guided, transfer and unfamiliar listener progression", () => {
+  assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, listener: false });
+  assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, listener: false });
+  const checkpoint = checkpointFor(completed("listener"));
+  assert.deepEqual(checkpoint.completed, { guided: true, transfer: true, listener: true });
+  checkpoint.completed.listener = false;
   assert.equal(parseCheckpoint(JSON.stringify(checkpoint)), null);
 });
 
@@ -63,17 +77,33 @@ test("schema and fixture version mismatches fail closed", () => {
   const checkpoint = checkpointFor(evidence());
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
-    { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 }
+    { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
+    { ...checkpoint, schemaVersion: 1, fixtureVersion: 1 }
   ]) {
     const storage = memoryStorage({ [PRACTICE_STORAGE_KEY]: JSON.stringify(changed) });
     assert.equal(loadPractice(storage).status, "discarded");
   }
 });
 
-test("impossible verified or explained state is rejected", () => {
+test("scenario-family mismatches and impossible completion states are rejected", () => {
+  const mismatch = checkpointFor(evidence("listener"));
+  mismatch.state = { ...mismatch.state, incident: { kind: "file-access", mode: "644" } };
+  assert.equal(parseCheckpoint(JSON.stringify(mismatch)), null);
+
   const impossible = checkpointFor(initialLabState());
-  impossible.state = { ...impossible.state, mode: "644", verified: true, explained: true };
-  impossible.completed = { guided: true, transfer: false };
+  impossible.state = {
+    ...impossible.state,
+    incident: { kind: "file-access", mode: "644" },
+    verified: true,
+    explained: true
+  };
+  impossible.completed = { guided: true, transfer: false, listener: false };
+  assert.equal(parseCheckpoint(JSON.stringify(impossible)), null);
+});
+
+test("repaired provenance cannot exist on an untouched fixture", () => {
+  const impossible = checkpointFor(evidence("listener"));
+  impossible.state = { ...impossible.state, repairedWithEvidence: true };
   assert.equal(parseCheckpoint(JSON.stringify(impossible)), null);
 });
 

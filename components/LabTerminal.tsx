@@ -1,6 +1,6 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
-import { execute, explain, initialLabState, recordHypothesis, scenarios, type Line as ReplyLine } from "../lib/linux-simulator";
+import { evidenceReady, execute, explain, initialLabState, recordHypothesis, scenarios, type Line as ReplyLine, type ScenarioId } from "../lib/linux-simulator";
 import { clearPractice, loadPractice, savePractice, type PracticeStorage } from "../lib/practice-persistence";
 
 type Line = ReplyLine | { kind: "input"; text: string };
@@ -15,6 +15,8 @@ export function LabTerminal() {
   const [lines, setLines] = useState<Line[]>(welcome);
   const [state, setState] = useState(() => initialLabState());
   const [command, setCommand] = useState("");
+  const [hypothesisDraft, setHypothesisDraft] = useState("");
+  const [hypothesisFeedback, setHypothesisFeedback] = useState("");
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
   const [hydrated, setHydrated] = useState(false);
@@ -65,8 +67,35 @@ export function LabTerminal() {
     const result = execute(state, cmd);
     setState(result.state);
     setLines(current => [...current.slice(-100), { kind: "input", text: "$ " + cmd }, ...result.lines]);
-    if (cmd === "reset") { setAnswer(""); setFeedback(""); }
+    if (cmd === "reset") {
+      setHypothesisDraft("");
+      setHypothesisFeedback("");
+      setAnswer("");
+      setFeedback("");
+    }
     setCommand("");
+  }
+
+  function submitHypothesis(event: FormEvent) {
+    event.preventDefault();
+    const normalized = hypothesisDraft.trim().toLowerCase();
+    const result = recordHypothesis(state, normalized);
+    setState(result);
+    if (result.hypothesis) {
+      setHypothesisFeedback("Đã khóa hypothesis trước sửa: " + result.hypothesis + ".");
+    } else {
+      setHypothesisFeedback("Hypothesis chưa hợp lệ. Thu đủ evidence rồi nhập một lớp nguyên nhân: permission, process hoặc network.");
+    }
+  }
+
+  function advanceScenario(nextScenario: ScenarioId) {
+    setState(initialLabState(nextScenario));
+    setLines(welcome);
+    setCommand("");
+    setHypothesisDraft("");
+    setHypothesisFeedback("");
+    setAnswer("");
+    setFeedback("");
   }
 
   function restartPractice() {
@@ -75,6 +104,8 @@ export function LabTerminal() {
     setState(initialLabState());
     setLines(welcome);
     setCommand("");
+    setHypothesisDraft("");
+    setHypothesisFeedback("");
     setAnswer("");
     setFeedback("");
     if (cleared) {
@@ -103,7 +134,10 @@ export function LabTerminal() {
     setPersistenceNotice("localStorage vẫn không khả dụng; tiếp tục ở chế độ tạm thời.");
   }
 
-  const evidenceReady = state.observed && state.identityObserved && state.symptomObserved;
+  const fixture = scenarios[state.scenario];
+  const ready = evidenceReady(state);
+  const hypothesisLocked = Boolean(state.hypothesis);
+
   return (
     <div className="learningLab">
       <div className="practicePersistence" aria-live="polite">
@@ -119,19 +153,17 @@ export function LabTerminal() {
           <button type="button" className="secondaryButton" onClick={restartPractice}>Học lại từ đầu</button>
         </div>
       </div>
+
       <details>
-        <summary>Mô hình: Linux quyết định quyền đọc như thế nào?</summary>
-        <p>Process chạy với UID và các GID. File có owner, group và ba bộ quyền r/w/x.
-          Kernel chọn bộ owner nếu UID trùng; nếu không, chọn group khi GID phù hợp; còn lại chọn other.
-          Các bộ quyền không cộng dồn. 4 = read, 2 = write, 1 = execute.</p>
-        <p>HTTP 403 chưa đủ kết luận lỗi quyền file. Đối chiếu symptom, quyền file và danh tính worker.
-          Fixture này giả định thư mục cha cho phép traversal, không có ACL/SELinux hoặc lỗi cấu hình khác.
-          Trong production cần kiểm tra các yếu tố đó. Không dùng 777 để che lỗi.</p>
+        <summary>Mental model: tách observation khỏi conclusion</summary>
+        <p>HTTP/curl chỉ cho biết symptom. Process tồn tại chưa chứng minh socket đang LISTEN đúng port; file tồn tại chưa chứng minh process có access class phù hợp.
+          Hãy thu thập dữ liệu về resource và identity/process trước khi ghi hypothesis.</p>
+        <p>Fixture permission giả định directory traversal, ACL/SELinux và cấu hình khác đang khỏe. Incident listener là simulator TCP, không phải network stack thật.
+          Trong production phải kiểm tra thêm namespace, firewall, bind address, service manager và logs.</p>
       </details>
-      <h3>{state.scenario === "guided" ? "1. Chẩn đoán có hướng dẫn" : "2. Tình huống chuyển giao"}</h3>
-      <p>File: <code>{scenarios[state.scenario].path}</code>. Worker: <code>{scenarios[state.scenario].worker}</code>.
-        Mục tiêu: quyền đọc tối thiểu cho worker, không thêm quyền ghi/chạy.
-        {state.scenario === "guided" ? " Trang này là nội dung công khai." : " Báo cáo chỉ dành cho nhóm web; không mở quyền đọc cho other."}</p>
+
+      <h3>{fixture.title}</h3>
+      <p>{fixture.summary}</p>
       <div className="terminal">
         <div className="terminalTop"><span /><span /><span /><strong>SIMULATED · lab@holi:~</strong></div>
         <div className="terminalBody">
@@ -146,38 +178,41 @@ export function LabTerminal() {
           </form>
         </div>
       </div>
-      <p>Bằng chứng: HTTP {state.symptomObserved ? "✓" : "—"} · quyền file {state.observed ? "✓" : "—"} · danh tính {state.identityObserved ? "✓" : "—"}.</p>
-      <label>Giả thuyết trước khi sửa
-        <select aria-label="Giả thuyết" value={state.hypothesis} disabled={!evidenceReady || state.mode !== "600"}
-          onChange={event => setState(recordHypothesis(state, event.target.value))}>
-          <option value="">Chọn sau khi thu thập đủ bằng chứng</option>
-          <option value="permission">Worker thiếu quyền đọc file</option>
-          <option value="network">Kết nối TCP chưa thiết lập</option>
-          <option value="process">Worker không tồn tại</option>
-        </select>
-      </label>
+
+      <p>Bằng chứng: symptom {state.observations.symptom ? "✓" : "—"} · {fixture.resourceLabel} {state.observations.resource ? "✓" : "—"} · {fixture.identityLabel} {state.observations.identity ? "✓" : "—"}.</p>
+
+      <form onSubmit={submitHypothesis}>
+        <label>Giả thuyết trước khi sửa
+          <input aria-label="Giả thuyết" value={hypothesisLocked ? state.hypothesis : hypothesisDraft}
+            disabled={!ready || hypothesisLocked}
+            onChange={event => { setHypothesisDraft(event.target.value); setHypothesisFeedback(""); }}
+            placeholder="permission / process / network" />
+        </label>
+        <button type="submit" disabled={!ready || hypothesisLocked || !hypothesisDraft.trim()}>Ghi hypothesis</button>
+      </form>
+      <p role="status">{hypothesisFeedback}</p>
+
       {state.verified && <form onSubmit={event => {
         event.preventDefault();
         const result = explain(state, answer);
         setState(result);
-        setFeedback(result.explained ? "Đúng: bạn đã liên hệ danh tính worker với bộ quyền được chọn." : "Chưa đúng. Đối chiếu UID, GID và owner/group của file; HTTP 200 chỉ chứng minh dịch vụ trả lời.");
+        setFeedback(result.explained ? "Đúng: explanation khớp với evidence và cơ chế của incident." : "Chưa đúng. Đối chiếu observation với cơ chế trước khi kết luận.");
       }}>
-        <label>Vì sao worker đọc được file sau sửa?
+        <label>{fixture.explanationPrompt}
           <select aria-label="Giải thích cơ chế" value={answer} onChange={event => { setAnswer(event.target.value); setFeedback(""); }}>
             <option value="">Chọn cơ chế được bằng chứng hỗ trợ</option>
-            <option value="owner-read">UID worker trùng owner, nên dùng quyền owner</option>
-            <option value="group-read">GID worker thuộc group file, nên dùng quyền group</option>
-            <option value="other-read">UID và GID không khớp file, nên dùng quyền other</option>
+            {fixture.explanationOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         </label>
         <button disabled={!answer} type="submit">Kiểm tra giải thích</button>
       </form>}
       <p role="status">{feedback}</p>
-      {state.explained && state.scenario === "guided" && <button onClick={() => {
-        setState(initialLabState("transfer")); setLines(welcome); setCommand(""); setAnswer(""); setFeedback("");
-      }}>Thử tình huống mới</button>}
-      {state.explained && state.scenario === "transfer" && <p role="status">Hoàn tất hai tình huống luyện tập. Đây là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
-      <p>Lệnh <code>reset</code> xóa evidence của tình huống hiện tại và checkpoint mới sẽ ghi trạng thái reset. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn. Transcript terminal không được persist.</p>
+
+      {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
+      {state.explained && state.scenario === "transfer" && <button onClick={() => advanceScenario("listener")}>Thử incident khác cơ chế</button>}
+      {state.explained && state.scenario === "listener" && <p role="status">Hoàn tất ba tình huống luyện tập, gồm một incident listener/port khác cơ chế permission. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
+
+      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại và checkpoint mới sẽ ghi trạng thái reset. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn. Transcript terminal không được persist.</p>
     </div>
   );
 }

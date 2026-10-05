@@ -62,16 +62,16 @@ export default function Home() {
       <section className="labSection" id="lab">
         <div className="labCopy">
           <span className="kicker">PRACTICAL LAB / MVP</span>
-          <h2>Bài thực hành đầu tiên.<br />Chẩn đoán quyền file.</h2>
+          <h2>Không học thuộc một lỗi.<br />Chẩn đoán nhiều cơ chế.</h2>
           <p>
-            Bản đầu dùng simulator deterministic trong browser để dạy quy trình chẩn đoán. Production phase sẽ thay
-            bằng sandbox container cô lập, có quota và reset để chạy Linux/Docker/Kubernetes thật.
+            Lab hiện tại vẫn là simulator deterministic trong browser. Chuỗi thực hành bắt đầu bằng file permission,
+            sau đó chuyển sang incident process/listener khác cơ chế để buộc người học đối chiếu evidence thay vì replay một lệnh chmod.
           </p>
           <ol>
             <li>Đọc symptom, chưa vội sửa.</li>
-            <li>Thu thập evidence bằng command.</li>
-            <li>Tạo hypothesis và loại trừ.</li>
-            <li>Sửa tối thiểu, rồi verify.</li>
+            <li>Tách observation về resource và process/identity.</li>
+            <li>Ghi hypothesis trước khi thay đổi fixture.</li>
+            <li>Sửa tối thiểu, verify đúng endpoint rồi giải thích cơ chế.</li>
           </ol>
         </div>
         <LabTerminal />
@@ -82,9 +82,9 @@ export default function Home() {
         <h2>Kiến thức chỉ được tính là “biết” khi bạn xử lý được tình huống mới.</h2>
         <div className="principleGrid">
           <div><b>Explain</b><p>Giải thích bản chất, không bắt học thuộc command.</p></div>
-          <div><b>Observe</b><p>Đọc metrics, logs, process và network trước khi thay đổi hệ thống.</p></div>
-          <div><b>Repair</b><p>Mục tiêu: mỗi module có failure scenario và verification gate.</p></div>
-          <div><b>Transfer</b><p>Lab Linux đổi danh tính worker và group file để kiểm tra cách suy luận trong tình huống mới.</p></div>
+          <div><b>Observe</b><p>Đọc symptom, resource, process và network trước khi thay đổi hệ thống.</p></div>
+          <div><b>Repair</b><p>Mục tiêu: mỗi incident có evidence gate, repair tối thiểu và verification.</p></div>
+          <div><b>Transfer</b><p>Chuỗi Linux hiện có permission transfer và một listener/port incident khác cơ chế để giảm memorization.</p></div>
         </div>
       </section>
 
