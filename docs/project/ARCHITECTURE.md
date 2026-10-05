@@ -35,7 +35,7 @@ After the `differential-listener` case is repaired, verified and correctly expla
 
 The transfer answer stores explicit original process/socket source IDs and facts separately from the hypothetical prediction. A correct prediction cannot compensate for a wrong source or wrong original fact. Editing either the listener explanation or the transfer answer revokes dependent completion until rechecked. In listener-first order, a passed transfer is carried into the second process case so that resetting that later case does not erase already completed listener work. In process-first order, the listener is second and final completion remains blocked until the transfer gate passes.
 
-These are intentionally two narrow deterministic perturbations across different causal relations. Neither simulates a new runtime state or proves general causal transfer. Adding more fixed token variants now has diminishing learning value; The browser-runtime reproducibility debt is delivered; the next learning frontier is an immutable source-linked Git rationale before repair.
+These are intentionally two narrow deterministic perturbations across different causal relations. Neither simulates a new runtime state or proves general causal transfer. Adding more fixed token variants now has diminishing learning value. The browser-runtime reproducibility debt is delivered; the next learning frontier is an immutable source-linked Git rationale before repair.
 
 
 ## Git & CI simulated vertical slice

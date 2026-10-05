@@ -1,7 +1,7 @@
 # Risks
 
 - Current labs are SIMULATED exact-match state machines, not Linux, a real network stack, Git, or a GitHub Actions runner. They teach diagnostic structure but cannot establish production-system competence.
-- Six primary incidents now exist across Linux permissions, TCP service diagnosis CI artifact handoff and Git revision acceptance. The Linux counterfactuals and Git/CI path transfer are assessment steps, not independent runtime incidents or a broad corpus.
+- Six primary incidents now exist across Linux permissions, TCP service diagnosis, CI artifact handoff and Git revision acceptance. The Linux counterfactuals and Git/CI path/tag transfers are assessment steps, not independent runtime incidents or a broad corpus.
 - Both Linux changed-evidence tasks are fixed, visible and retryable. Using two different causal relations makes single-token memorization less convincing, but their expected grammar can still be learned; passing is evidence of completing these exercises, not proof of general causal transfer.
 - Structured explanation and counterfactual answers use finite typed grammar. Source/fact linkage makes blind label selection harder but remains assisted practice, not arbitrary free-form reasoning or trusted assessment.
 - Differential order is selected with browser Web Crypto at the UI boundary. Either cause may appear first, but independent random selection can repeat the same ordering; this is not statistical counterbalancing.
