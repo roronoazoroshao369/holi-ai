@@ -1,5 +1,11 @@
 # Decisions
 
+2026-10-05: add same-symptom differential diagnosis before broad curriculum expansion. Model TCP service state as both process presence and listening port, then present two learner-neutral connection-refused cases with identical title/summary/README/symptom/evidence commands. One case requires a `network` hypothesis because the process listens on the wrong port; the competing case requires a `process` hypothesis because the service is absent. Evidence, not learner-facing fixture identity, must discriminate them. Keep all behavior SIMULATED and exact-matched.
+
+2026-10-05: hide repair syntax until the learner has collected the required observations and locked a causal hypothesis. Pre-hypothesis `help` may expose diagnostic commands but must not reveal whether the correct repair is `configure` or `start`. A wrong hypothesis may still lead to a healthy endpoint after a repair command, but it cannot produce verified completion without reset and correct pre-repair reasoning.
+
+2026-10-05: bump PRACTICE_SCHEMA_VERSION from 2 to 3 because TCP incident state changes from listener-only to process-plus-listener. Bump LINUX_FIXTURE_VERSION from 2 to 3 because the assessment sequence expands to a same-symptom pair. Discard v2 checkpoints and reject scenario-valid-looking but cross-case process/listener tuples.
+
 2026-10-05: broaden diagnosis with one causal mechanism that is not another chmod variant. Add a SIMULATED TCP-listener incident after the two permission fixtures: the expected endpoint is 127.0.0.1:8080 while the simulated process initially listens elsewhere. Separate raw observations from inferred hypothesis in LabState and dispatch commands by incident family. Replace the hypothesis dropdown with a typed causal class to reduce direct prompting. This remains deterministic practice, not evidence of general Linux/network mastery.
 
 2026-10-05: bump both persistence versions for the multi-family change. PRACTICE_SCHEMA_VERSION moves from 1 to 2 because LabState shape changed; LINUX_FIXTURE_VERSION moves from 1 to 2 because scenario identities/semantics changed. Discard v1 checkpoints instead of silently migrating them into a different assessment model. Future changes must review schema and fixture versions independently.
