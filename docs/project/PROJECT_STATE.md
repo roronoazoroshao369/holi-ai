@@ -3,7 +3,7 @@
 Updated: 2026-10-05. Phase: v0.2 Linux learning vertical slice implemented; remote CI and merge pending.
 Package version: 0.1.0 (no release tag).
 Baseline main: 7f66238ffb3818adf2b63d8ab2cb5f2f6bdbdfa0; latest prior merged PR #6.
-Branch: feat/linux-learning-transfer. Current PR: pending creation.
+Branch: feat/linux-learning-transfer. Current PR: #7. Implementation commit: 6be2f7bde3c76d3643a043a9122784340beb4b7c.
 Last verified main CI: 37250572331 success on baseline above.
 
 ## Goal contract
@@ -29,5 +29,5 @@ External blockers: none established. Direct git mirror checkout lacks credential
 
 ## Verification evidence
 Local npm ci succeeded. Typecheck, 8 behavioral tests, npm audit (0 vulnerabilities), production build passed.
-Production Chromium/Playwright flow passed: blind repair denied, guided observation/hypothesis/repair/verify/explanation, wrong explanation denied, transfer 644 denied and 640 accepted, reset, refresh, 390px width, visible input focus, no page errors. Mobile screenshot inspected; button wrapping corrected before final rerun.
+Production Chromium/Playwright flow passed: blind repair denied, guided observation/hypothesis/repair/verify/explanation, wrong explanation denied, transfer 644 denied and 640 accepted, reset, refresh, 390px width, visible input focus, no page errors. Mobile screenshot inspected; button wrapping corrected and final build/browser rerun passed.
 Remote CI and merge: pending; do not interpret local success as merge confirmation.
