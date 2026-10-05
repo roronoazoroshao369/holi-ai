@@ -6,9 +6,9 @@ This repository is being repurposed from the earlier Holi-AI film-planning exper
 
 ## Current slice — Linux learning and transfer
 
-Four SIMULATED incidents cover file-access and same-symptom TCP-service diagnosis. Learners collect before-repair command/output snapshots, lock a causal hypothesis, repair minimally, verify the endpoint and submit source-linked facts plus a two-source mechanism. The wrong-listener case now adds one changed-evidence counterfactual: keep the running-process fact fixed, hypothetically move the listener to the client target and predict the endpoint/repair consequence. This is a finite deterministic rubric, not free-form prose grading or trusted mastery.
+Four SIMULATED incidents cover file-access and same-symptom TCP-service diagnosis. Learners collect before-repair command/output snapshots, lock a causal hypothesis, repair minimally, verify the endpoint and submit source-linked facts plus a two-source mechanism. Two bounded changed-evidence gates now test different causal relations: the private-report case holds `root:web` at mode `640` while hypothetically removing the worker from group `web`; the wrong-listener case holds process presence fixed while hypothetically moving the listener to the client target. These are finite deterministic rubrics, not free-form prose grading or trusted mastery.
 
-Versioned localStorage (practice schema 6 / Linux fixture 5) restores valid snapshots, drafts, counterfactual state and randomized differential assignments after refresh. Schema-v5 and older incompatible checkpoints or internally inconsistent states are discarded. Client state is inspectable and forgeable; current-case reset preserves assignment, full restart chooses a fresh assignment, and storage failure falls back to ephemeral practice.
+Versioned localStorage (practice schema 7 / Linux fixture 5) restores valid snapshots, drafts, both counterfactual states and randomized differential assignments after refresh. Schema-v6 and older incompatible checkpoints or internally inconsistent states are discarded. Client state is inspectable and forgeable; current-case reset preserves assignment, full restart chooses a fresh assignment, and storage failure falls back to ephemeral practice.
 
 Production Chromium regression is mandatory in CI. The pinned Playwright 1.63.0 runtime is installed outside the app lock/audit workflow (known dependency debt). With that runtime available, run `playwright test --config=playwright.config.cjs` after `npm run build`; Playwright owns production startup/readiness/cleanup on loopback port 3100. The suite explicitly exercises both differential orderings.
 
@@ -50,7 +50,7 @@ The learning loop is:
 MODEL → OBSERVE → HYPOTHESIZE → ACT → VERIFY → EXPLAIN → PREDICT
 ```
 
-A learner should not pass because they watched content. The current local practice gate requires diagnosis, minimal repair, verification, linked explanation and one narrow causal prediction. A single fixed counterfactual can still be memorized and does not establish general competence or authoritative mastery.
+A learner should not pass because they watched content. The current local practice gate requires diagnosis, minimal repair, verification, linked explanation and two narrow causal predictions using different relations. Both fixed perturbations remain visible and memorizable, so passing them does not establish general competence or authoritative mastery.
 
 ## Lab strategy
 
