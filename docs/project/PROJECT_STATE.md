@@ -39,14 +39,21 @@ Mandatory Playwright 1.63.0 is still installed in CI outside package-lock.json a
 Move exact-pinned Playwright into the repository's reproducible lockfile and normal dependency-audit workflow without weakening production browser coverage. This risk now has higher leverage than adding a third fixed counterfactual.
 After dependency hygiene, prefer a genuinely unfamiliar learning-transfer/curriculum slice over another token variant unless a specific learning defect justifies one.
 
-## Active goal — Playwright dependency hygiene
+## Completed goal — Playwright dependency hygiene
 GOAL: move the mandatory @playwright/test 1.63.0 runtime into package.json/package-lock.json and the normal npm ci/audit dependency graph while preserving production Chromium coverage.
 WHY NOW: browser regression is a merge gate, but its runtime is currently installed after npm audit with --no-save and no lockfile, creating a concrete reproducibility and supply-chain blind spot.
 USER VALUE: the mandatory browser gate becomes reproducible from the repository and audited with the rest of the application dependency graph.
 SCOPE: exact-pin @playwright/test 1.63.0; lock its Playwright dependency chain; remove temporary CI runtime/NODE_PATH setup; install Chromium from the locked local CLI; keep the existing production browser suite mandatory.
 NON-GOALS: change Playwright version, broaden browser engines, add curriculum, alter simulator semantics, introduce accounts or real execution.
-ACCEPTANCE CRITERIA: npm ci resolves the locked Playwright runtime; npm audit --audit-level=high covers it and passes; typecheck/tests/build pass; production Chromium tests pass from the repository dependency; CI no longer runs npm install --no-save for Playwright or relies on RUNNER_TEMP/NODE_PATH.
-TEST PLAN: exact final-head CI must run npm ci, typecheck, Node tests, high-severity audit, production build, local Playwright Chromium install and production browser regression.
+ACCEPTANCE CRITERIA: SATISFIED on executable/config head caace34735d202c144934af7dd621206b34ab099. npm ci resolved the locked runtime; typecheck passed; 36/36 Node tests passed; high-severity npm audit found 0 vulnerabilities; production build passed; Chromium installation from the local locked Playwright CLI passed; 3/3 production Chromium tests passed; CI no longer runs npm install --no-save for Playwright or relies on RUNNER_TEMP/NODE_PATH.
+TEST PLAN: executable/config head caace34735d202c144934af7dd621206b34ab099 passed CI run 37314919851 (job 111779118647): npm ci; typecheck; 36/36 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; local Playwright Chromium install; 3/3 production browser tests in 39.6s. Exact final PR head must repeat the same workflow before merge.
 SECURITY IMPACT: reduces un-audited mandatory CI dependency surface; no learner execution boundary changes.
 LEARNING IMPACT: none to learner semantics; preserves the browser regression that protects the current mastery-flow UI.
 ROLLBACK STRATEGY: revert this branch/PR; the prior temporary Playwright installer can be restored without data migration.
+
+## Post-goal project truth
+The mandatory Node-side browser test runtime is now repository-owned: `@playwright/test` is exact-pinned at 1.63.0 and `package-lock.json` locks `@playwright/test -> playwright -> playwright-core` at the same version. CI uses only `./node_modules/.bin/playwright`; the previous temporary `npm install --no-save --package-lock=false`, RUNNER_TEMP runtime and NODE_PATH/GITHUB_PATH indirection are removed.
+
+Residual supply-chain boundary: npm audit now covers the Playwright npm packages, but the Chromium/FFmpeg binaries are still downloaded from Playwright's CDN during CI. Their revision is selected by the locked Playwright package, but they are not independently represented as npm lockfile entries or audited by npm audit. Do not claim that browser binaries themselves are npm-audited.
+
+Highest-value frontier after this goal: prefer a genuinely unfamiliar learning-transfer/curriculum slice with observable competence evidence over a third fixed token counterfactual. Keep all current labs explicitly SIMULATED until a separately isolated execution gateway exists.
