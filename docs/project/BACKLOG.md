@@ -1,8 +1,7 @@
 # Ordered backlog
 
-1. Linux learning vertical slice: permission mental model, hypothesis/explanation checkpoints and changed worker/file/mode transfer scenario. Test bypasses; do not reveal solution initially.
-2. Versioned durable attempt/progress state, corrupted storage and retry behavior; separate self-reported local practice from authoritative assessment.
-3. Browser E2E in CI covering diagnostic order, reset, refresh and responsive access.
-4. Broaden OS/network foundations before presenting the six curriculum cards as A–Z coverage.
-5. Design and verify isolated execution gateway before real Linux labs. No host execution shortcuts.
-
+1. Put the production browser regression in CI, covering guided/transfer gates plus persistence restore, current-fixture reset, full restart, corrupt storage, unavailable storage, responsive width, keyboard focus and runtime errors.
+2. Broaden Linux/OS/network diagnosis with more unfamiliar fixtures and less prompted reasoning; two fixed permission scenarios cannot establish general mastery.
+3. Define an authoritative mastery model only when server identity/storage is justified. Never promote localStorage completion into certification.
+4. Broaden delivered curriculum before presenting Docker/Kubernetes/CI/IaC/observability cards as implemented labs.
+5. Design and verify an isolated execution gateway before real Linux labs: identity, quotas, TTL, cleanup, network deny-by-default and escape tests. No host execution shortcuts.
