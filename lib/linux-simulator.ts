@@ -169,6 +169,8 @@ export type LabState = {
   observations: ObservationState;
   preRepairEvidence: Partial<Record<EvidenceSlot, EvidenceRecord>>;
   reasoning: ReasoningAnswer | null;
+  permissionTransfer: PermissionTransferAnswer | null;
+  permissionTransferPassed: boolean;
   causalTransfer: CausalTransferAnswer | null;
   causalTransferPassed: boolean;
   hypothesis: Hypothesis;
@@ -193,7 +195,9 @@ export function initialLabState(
   differentialOrder: DifferentialOrder = DEFAULT_DIFFERENTIAL_ORDER,
   differentialStep?: DifferentialStep,
   causalTransfer: CausalTransferAnswer | null = null,
-  causalTransferPassed = false
+  causalTransferPassed = false,
+  permissionTransfer: PermissionTransferAnswer | null = null,
+  permissionTransferPassed = false
 ): LabState {
   const resolvedStep: DifferentialStep = differentialStep ??
     (isDifferentialScenario(scenario) && differentialScenario(differentialOrder, 0) !== scenario ? 1 : 0);
@@ -213,6 +217,8 @@ export function initialLabState(
     observations: { symptom: false, resource: false, identity: false },
     preRepairEvidence: {},
     reasoning: null,
+    permissionTransfer: permissionTransfer ? structuredClone(permissionTransfer) : null,
+    permissionTransferPassed,
     causalTransfer: causalTransfer ? structuredClone(causalTransfer) : null,
     causalTransferPassed,
     hypothesis: "",
@@ -343,6 +349,76 @@ export function checkCausalTransfer(state: LabState, answer: CausalTransferAnswe
   };
 }
 
+export type PermissionTransferAnswer = {
+  identityEvidenceId: string;
+  identityFact: string;
+  resourceEvidenceId: string;
+  resourceFact: string;
+  fixedMode: string;
+  hypotheticalIdentity: string;
+  predictedSymptom: string;
+  repairNeed: string;
+  causalClaim: string;
+};
+
+export function emptyPermissionTransfer(): PermissionTransferAnswer {
+  return {
+    identityEvidenceId: "",
+    identityFact: "",
+    resourceEvidenceId: "",
+    resourceFact: "",
+    fixedMode: "",
+    hypotheticalIdentity: "",
+    predictedSymptom: "",
+    repairNeed: "",
+    causalClaim: ""
+  };
+}
+
+export function validPermissionTransferShape(value: unknown): value is PermissionTransferAnswer {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const answer = value as Record<string, unknown>;
+  const keys = [
+    "identityEvidenceId", "identityFact", "resourceEvidenceId", "resourceFact", "fixedMode",
+    "hypotheticalIdentity", "predictedSymptom", "repairNeed", "causalClaim"
+  ];
+  if (Object.keys(answer).length !== keys.length || !keys.every(key => Object.hasOwn(answer, key))) return false;
+  return keys.every(key => typeof answer[key] === "string" && (answer[key] as string).length <= 100);
+}
+
+export function permissionTransferAnswerMatches(answer: unknown): boolean {
+  if (!validPermissionTransferShape(answer)) return false;
+  const normalized = (value: string) => value.trim().toLowerCase();
+  return answer.identityEvidenceId === "transfer:before:identity" &&
+    normalized(answer.identityFact) === "1001:report-worker,web" &&
+    answer.resourceEvidenceId === "transfer:before:resource" &&
+    normalized(answer.resourceFact) === "600:root:web" &&
+    normalized(answer.fixedMode) === "640" &&
+    normalized(answer.hypotheticalIdentity) === "1001:report-worker" &&
+    normalized(answer.predictedSymptom) === "403" &&
+    normalized(answer.repairNeed) === "required" &&
+    normalized(answer.causalClaim) === "group-membership-required";
+}
+
+export function permissionTransferSatisfied(state: LabState): boolean {
+  return state.permissionTransferPassed && permissionTransferAnswerMatches(state.permissionTransfer);
+}
+
+export function editPermissionTransfer(state: LabState, answer: PermissionTransferAnswer): LabState {
+  if (state.scenario !== "transfer" || !state.explained || !validPermissionTransferShape(answer)) return state;
+  return { ...state, permissionTransfer: structuredClone(answer), permissionTransferPassed: false };
+}
+
+export function checkPermissionTransfer(state: LabState, answer: PermissionTransferAnswer): LabState {
+  if (state.scenario !== "transfer" || !state.explained || !reasoningMatches(state, state.reasoning) ||
+      !validPermissionTransferShape(answer)) return state;
+  return {
+    ...state,
+    permissionTransfer: structuredClone(answer),
+    permissionTransferPassed: permissionTransferAnswerMatches(answer)
+  };
+}
+
 // Canonical immutable fixture output, captured only by a diagnostic command before repair.
 // An ID identifies a source, not a trusted learner or an anti-cheat credential.
 export function initialEvidence(scenario: ScenarioId, slot: EvidenceSlot): EvidenceRecord {
@@ -405,6 +481,7 @@ export function editReasoning(state: LabState, answer: ReasoningAnswer): LabStat
     ...state,
     reasoning: structuredClone(answer),
     explained: false,
+    ...(state.scenario === "transfer" ? { permissionTransfer: null, permissionTransferPassed: false } : {}),
     ...(state.scenario === "differential-listener" ? { causalTransfer: null, causalTransferPassed: false } : {})
   };
 }
@@ -412,12 +489,14 @@ export function editReasoning(state: LabState, answer: ReasoningAnswer): LabStat
 export function explain(state: LabState, answer: ReasoningAnswer): LabState {
   if (!state.verified || !state.repairedWithEvidence || !targetReached(state) || !validReasoningShape(answer)) return state;
   const explained = reasoningMatches(state, answer);
-  const revokeTransfer = state.scenario === "differential-listener" && (!explained || !state.explained);
+  const revokePermissionTransfer = state.scenario === "transfer" && (!explained || !state.explained);
+  const revokeCausalTransfer = state.scenario === "differential-listener" && (!explained || !state.explained);
   return {
     ...state,
     reasoning: structuredClone(answer),
     explained,
-    ...(revokeTransfer ? { causalTransfer: null, causalTransferPassed: false } : {})
+    ...(revokePermissionTransfer ? { permissionTransfer: null, permissionTransferPassed: false } : {}),
+    ...(revokeCausalTransfer ? { causalTransfer: null, causalTransferPassed: false } : {})
   };
 }
 
@@ -456,7 +535,8 @@ function executeFileScenario(state: LabState, command: string, fixture: FileScen
         repairedWithEvidence,
         verified: false,
         explained: false,
-        reasoning: null
+        reasoning: null,
+        ...(state.scenario === "transfer" ? { permissionTransfer: null, permissionTransferPassed: false } : {})
       },
       lines: [{ kind: "output", text: "Permissions updated. Verify HTTP; a healthy service alone does not prove a minimal repair." }]
     };
@@ -558,19 +638,22 @@ export function execute(state: LabState, command: string): { state: LabState; li
       state.differentialOrder === "listener-first" &&
       state.differentialStep === 1 &&
       causalTransferSatisfied(state);
+    const preservePermissionTransfer = isDifferentialScenario(state.scenario) && permissionTransferSatisfied(state);
     return {
       state: initialLabState(
         state.scenario,
         state.differentialOrder,
         state.differentialStep,
         preservePriorTransfer ? state.causalTransfer : null,
-        preservePriorTransfer
+        preservePriorTransfer,
+        preservePermissionTransfer ? state.permissionTransfer : null,
+        preservePermissionTransfer
       ),
       lines: [{
         kind: "output",
-        text: preservePriorTransfer
-          ? "Fixture reset. Hidden differential assignment and the already-passed listener counterfactual are preserved; current observations, hypothesis and explanation are cleared."
-          : "Fixture reset. Hidden differential assignment is preserved; current observations, hypothesis, explanation and listener counterfactual draft are cleared."
+        text: preservePriorTransfer || preservePermissionTransfer
+          ? "Fixture reset. Hidden differential assignment and previously passed transfer gates are preserved; current observations, hypothesis and explanation are cleared."
+          : "Fixture reset. Hidden differential assignment is preserved; current observations, hypothesis, explanation and transfer drafts are cleared."
       }]
     };
   }
