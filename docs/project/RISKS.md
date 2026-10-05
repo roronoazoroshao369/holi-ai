@@ -1,7 +1,7 @@
 # Risks
 
-- Current labs are SIMULATED exact-match state machines, not Linux or a real network stack. They teach diagnostic structure but cannot establish production-system competence.
-- Four incidents exist across two causal families. The two counterfactuals are assessment steps on existing permission/listener incidents, not independent incidents or a broad corpus.
+- Current labs are SIMULATED exact-match state machines, not Linux, a real network stack, Git, or a GitHub Actions runner. They teach diagnostic structure but cannot establish production-system competence.
+- Five primary incidents now exist across Linux permissions, TCP service diagnosis and CI artifact handoff. The Linux counterfactuals and Git/CI path transfer are assessment steps, not independent runtime incidents or a broad corpus.
 - Both changed-evidence tasks are fixed, visible and retryable. Using two different causal relations makes single-token memorization less convincing, but their expected grammar can still be learned; passing is evidence of completing these exercises, not proof of general causal transfer.
 - Structured explanation and counterfactual answers use finite typed grammar. Source/fact linkage makes blind label selection harder but remains assisted practice, not arbitrary free-form reasoning or trusted assessment.
 - Differential order is selected with browser Web Crypto at the UI boundary. Either cause may appear first, but independent random selection can repeat the same ordering; this is not statistical counterbalancing.
@@ -16,3 +16,8 @@
 - Dependency audit reflects registry findings at verification time, not proof of permanent absence of vulnerabilities.
 - Real sandbox architecture remains design-only. No runtime, isolation verification or cost controls are implemented.
 - Concurrent runs must re-read PR/head/main before updating; never force-push main.
+
+
+- The Git/CI slice currently tests one artifact-name contract failure plus one path-semantics transfer. It does not establish Git history/ref competence, general workflow debugging, matrix/reusable-workflow behavior, cache semantics, permissions, secrets or concurrency reasoning.
+- Git/CI answers remain finite, visible and retryable. Source linkage and changed failure shape reduce pure token replay but do not prevent memorization.
+- Separate Linux and Git/CI checkpoints reduce accidental schema coupling but create two client-local persistence contracts that must each be validated and regression-tested. Premature unification would increase migration risk without adding trusted state.

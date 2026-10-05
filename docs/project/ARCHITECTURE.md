@@ -36,3 +36,16 @@ After the `differential-listener` case is repaired, verified and correctly expla
 The transfer answer stores explicit original process/socket source IDs and facts separately from the hypothetical prediction. A correct prediction cannot compensate for a wrong source or wrong original fact. Editing either the listener explanation or the transfer answer revokes dependent completion until rechecked. In listener-first order, a passed transfer is carried into the second process case so that resetting that later case does not erase already completed listener work. In process-first order, the listener is second and final completion remains blocked until the transfer gate passes.
 
 These are intentionally two narrow deterministic perturbations across different causal relations. Neither simulates a new runtime state or proves general causal transfer. Adding more fixed token variants now has diminishing learning value; broader unfamiliar transfer should be preferred after resolving the mandatory browser-runtime reproducibility debt.
+
+
+## Git & CI simulated vertical slice
+
+`lib/ci-simulator.ts` is a second pure browser-side state machine, intentionally separate from `lib/linux-simulator.ts`. It models one CI producer/consumer artifact contract incident rather than pretending a Linux command fixture is a generic DevOps runtime. `components/CiLab.tsx` renders the flow and `lib/ci-practice-persistence.ts` owns a separate versioned localStorage checkpoint.
+
+The Git/CI state stores three canonical pre-repair evidence snapshots (workflow, producer log, consumer failure), an immutable locked causal hypothesis, selected repair, repair provenance, simulated rerun status, derived verified flag, source-linked explanation and one changed transfer answer. Hypothesis locking requires all three canonical sources. A correct mapping repair can make the simulated pipeline pass after a wrong hypothesis, but verified learning requires both the correct pre-repair `artifact-contract` diagnosis and the minimally sufficient repair.
+
+The first explanation links workflow job-output plumbing to producer artifact `web-dist` and consumer resolution `site-dist`. The transfer changes failure shape: artifact name is aligned, but the archive contains nested `reports/coverage.json`; extraction under `workspace/report` therefore requires the consumer to address `workspace/report/reports/coverage.json`. This is a bounded path-semantics transfer, not proof of general CI mastery.
+
+Git/CI checkpoint schema/fixture are both version 1 and use storage key `holi.devops.git-ci-practice`. Restore validates exact evidence payloads, hypothesis/repair ordering, rerun consistency, verified derivation, bounded reasoning shapes and canonical transfer completion. Linux schema 7 / fixture 5 are unchanged.
+
+Playwright now discovers five serial Chromium tests: the existing three Linux production regressions plus two Git/CI tests covering full diagnosis/repair/explanation/transfer persistence and unavailable-localStorage degradation. All still run against the built production app started by Playwright on loopback port 3100.
