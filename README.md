@@ -1,83 +1,77 @@
-# Holi-AI
+# Holi DevOps Lab
 
-> AI film-generation studio — single brief in, short film out.
+> Learn DevOps from fundamentals to production by diagnosing and repairing systems — not by memorizing commands.
 
-This repo is in **planning phase**. No application code yet — only the architecture and roadmap documents that shape the build.
+This repository is being repurposed from the earlier Holi-AI film-planning experiment into a **DevOps learning platform**.
 
-## Current plan
+## Current slice — v0.1 bootstrap
 
-| Doc | Purpose |
-|---|---|
-| [`docs/plan/v3-film-first.md`](docs/plan/v3-film-first.md) | Product north star — film-first M1 scope (60 s short), pipeline, cost model, week-by-week roadmap |
-| [`docs/plan/v4-providers.md`](docs/plan/v4-providers.md) | Architecture for managing many AI providers and many accounts per provider — capability registry, router, custom workflow runtime |
-| [`docs/plan/v5-hollywood.md`](docs/plan/v5-hollywood.md) | Long-horizon vision — one person + AI building a complete, Hollywood-grade feature film. Hierarchical 5-tier (Film → Act → Sequence → Scene → Shot), department system, bibles, episodic ladder F0 → F5 |
-| [`docs/plan/v6-product-roadmap.md`](docs/plan/v6-product-roadmap.md) | Roadmap layer — versioned v0.1 → v1.0 timeline, end-product capability matrix, showrunner user journey, 4-signal health framework (drift / reliability / cost-error / review-flow), red-flag list |
-| [`docs/plan/v7-oss-leverage.md`](docs/plan/v7-oss-leverage.md) | OSS leverage map — 3 ways to inherit (API / self-host / code), layer-by-layer model table, license gotchas, Vietnamese-specific resources, recommended adapter integration order |
-| [`docs/plan/decisions.md`](docs/plan/decisions.md) | Locked answers (Q1–Q14) and open question (Q15 — OSS access strategy) |
+The current implementation contains:
 
-## What this thing does (one paragraph)
+- Next.js + TypeScript application shell
+- DevOps curriculum skeleton from Linux → CI → Docker → Kubernetes → IaC/Cloud → Observability/SRE
+- Responsive learning-oriented landing page
+- Interactive deterministic Linux incident simulator
+- Architecture plan for moving from simulation to isolated real execution labs
+- Explicit security constraints for learner-controlled workloads
 
-User writes a 2-line brief ("60-second short film about the Little Match Girl, set in winter Hanoi"). A chain of automated steps — Director → Writer → Painter (Character Bible + keyframes) → Cinematographer (image-to-video with reference consistency) → Voice + Composer → Editor — turns it into a finished MP4 with VO, subtitles, and music. Three approval gates let the human steer before money is spent on the expensive video generation step.
+## Run locally
 
-## Why "multi-provider, multi-account" matters
+```bash
+npm ci
+npm run dev
+```
 
-The pipeline spans LLM, image, video, TTS, music, and STT — no single vendor covers all of it well. The user needs to plug in their own Anthropic / Google / OpenAI / fal.ai / Runway / ElevenLabs keys, often **more than one key per provider** (free-tier rotation, personal vs work card, fallback). The architecture in `v4-providers.md` makes provider accounts a first-class entity with priority, budget, status, and a router that picks the right account/model per capability.
+Then open http://localhost:3000.
 
-## Stack (locked)
+For a production compile:
 
-- **Next.js 15** (App Router) — UI + API
-- **TypeScript** throughout — single language
-- **Supabase Postgres + pgvector** — data, state, embeddings
-- **Cloudflare R2** — asset storage
-- **Remotion + FFmpeg** — programmatic video compose
-- **Vercel AI SDK** — LLM calls (Anthropic, Google, OpenAI direct adapters)
-- **Custom adapters** — fal.ai, Runway, ElevenLabs (async-job providers)
-- **Custom workflow runtime** — typed step functions + DB state machine (no Mastra / LangGraph / Inngest in M1)
-- **AES-256-GCM** — secret encryption, master key in env
+```bash
+npm run build
+```
 
-## Status
+## Verification
 
-### M1 — Short film (v3 + v4 scope)
+Run `npm run typecheck`, `npm test`, `npm audit --audit-level=high` and `npm run build`. CI runs the same checks.
 
-| Phase | What | Status |
-|---|---|---|
-| Plan | v3 film-first + v4 multi-provider | merged (PR #1) |
-| Plan | v5 Hollywood-grade feature-length | merged (PR #2) |
-| Plan | v6 product roadmap + v7 OSS leverage | this PR |
-| P0 | Monorepo scaffold, migrations, provider package skeleton | next |
-| P1 | UI for provider accounts | after P0 |
-| P2 | Async job runner + fallback chain | after P1 |
-| P3 | Usage dashboard + per-step override | after P2 |
-| P4 | Polish (health monitor, key rotation) | last |
+Read [project state](docs/project/PROJECT_STATE.md) and [roadmap](docs/project/ROADMAP.md) before continuing implementation. Simulator practice is ephemeral and is not a mastery assessment; refresh resets it.
 
-See `docs/plan/v3-film-first.md` §4 and `docs/plan/v4-providers.md` §8 for the detailed week-by-week plan.
+## Product direction
 
-### M5 — Hollywood-grade feature (v5 scope)
+The learning loop is:
 
-| Phase | What | Deliverable | Status |
-|---|---|---|---|
-| F0 | Hierarchical tables + Bible CRUD + pick-take UI | demo MP4 5 s w/ ref bible | after P0–P2 |
-| F1 | Teaser 60–90 s through v5 hierarchy | parity with v3 quality | — |
-| F2 | Short 5 min + continuity check capability | 5 scene / ~60 shot | — |
-| F3 | Episode 15 min + sound design + score | 3-act compressed | — |
-| F4 | Short feature 30 min + trailer-first workflow | "pilot episode" | — |
-| F5 | Feature 60–90 min | full feature, $1–2k | — |
+```
+MODEL → OBSERVE → HYPOTHESIZE → ACT → VERIFY → EXPLAIN
+```
 
-See `docs/plan/v5-hollywood.md` §9 for the F-ladder details and `docs/plan/decisions.md` for the locked Q8–Q14 answers.
+A learner should not pass because they watched content. A learner passes when they can diagnose and repair a changed scenario and explain why the fix works.
 
-### Tracking — what "on track" looks like
+## Lab strategy
 
-| Version | Deliverable | Wall-clock from now | Cost (projection) |
-|---|---|---|---|
-| v0.0 | Plans merged | ✅ now | $0 |
-| v0.1 | 60 s short MP4 + workflow runtime | 6–8 weeks | ~$10 demo |
-| v0.2 | 60–90 s teaser through hierarchy + bibles | +2–3 weeks | ~$15 |
-| v0.5 | 15 min episode + continuity + score | +6–9 weeks | ~$200 |
-| v0.8 | 30 min pilot + trailer-first | +6–8 weeks | ~$400 |
-| v1.0 | 60–90 min feature + DCP-lite master | +3–6 months | ~$1–2k |
+### v0.1 — deterministic simulator
 
-See `docs/plan/v6-product-roadmap.md` §3 for exit gates per version and §4 for the 4 health signals to track each phase.
+The browser terminal in the first slice is intentionally a simulator. It is useful for teaching diagnostic order and command semantics cheaply and safely.
 
-## Contributing
+### Next — real isolated labs
 
-Solo project for now — single user, BYOK, no auth. See `docs/plan/decisions.md` for why.
+Real Linux/Docker/Kubernetes commands require a separate sandbox control plane. The web application must never execute arbitrary learner commands directly on its host.
+
+Non-negotiable controls include CPU/memory/PID/storage/time quotas, restricted networking, disposable state, no privileged workloads, no host Docker socket, audit events and hard TTL cleanup.
+
+See [docs/DEVOPS_PLATFORM_ARCHITECTURE.md](docs/DEVOPS_PLATFORM_ARCHITECTURE.md).
+
+## Near-term build order
+
+1. Learning domain model: course/module/lesson/scenario/mastery
+2. Lesson + checkpoint UI
+3. Scenario engine and evidence-based grading
+4. User progress persistence/auth
+5. Ephemeral Linux sandbox service
+6. Docker lab runtime
+7. Kubernetes lab runtime
+8. IaC/cloud, observability, SRE, security and capstone tracks
+
+## Legacy documents
+
+The existing `docs/plan/` files belong to the previous AI-film concept. They are retained temporarily on this feature branch for history and safe rollback; they are **not** the specification for the new product and should be archived or removed once the repurpose PR is accepted.
+
