@@ -10,8 +10,9 @@
 - Transfer-hardening gate B: delivered evidence-linked structured explanation with immutable pre-repair source snapshots, explicit facts, two-source mechanism and minimal target.
 - Transfer-hardening gate C: delivered listener changed-evidence prediction: process fixed, listener hypothetically changed to 8080, then predict endpoint/repair consequence.
 - Transfer-hardening gate D: delivered in PR #24: permission/group-identity prediction holds root:web at mode 640, removes web membership and requires the learner to predict loss of access. Exact final-head CI and production Chromium passed; practice schema is 7 and Linux fixture remains 5.
-- Dependency-hygiene gate: next, move exact-pinned Playwright into a reproducible lock/audit workflow before E2E scope grows further.
-- Learning breadth gate C: after dependency hygiene, prefer a genuinely unfamiliar transfer or curriculum slice over accumulating additional fixed counterfactual tokens.
+- Dependency-hygiene gate: delivered in PR #26; @playwright/test/playwright/playwright-core are exact-locked at 1.63.0 and included in normal npm ci/audit.
+- Learning breadth gate C: delivered in PR #28 with the first Git & CI SIMULATED vertical slice: workflow/producer/consumer evidence -> locked causal hypothesis -> minimal artifact-contract repair -> green rerun -> source-linked explanation -> changed extraction-path transfer.
+- Git/CI breadth gate D: next, prefer an unfamiliar Git commit/ref causality slice over another artifact token variant; require revision evidence, minimal ref repair and changed transfer.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
 - v0.5-v0.7: Docker, Kubernetes, CI/CD and IaC vertical slices with verifiers and cost budgets.
 - v0.8-v0.9: observability/SRE and unfamiliar cross-domain incidents.
