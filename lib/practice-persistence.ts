@@ -1,5 +1,6 @@
 import {
   DEFAULT_DIFFERENTIAL_ORDER,
+  causalTransferAnswerMatches,
   differentialScenario,
   evidenceReady,
   evidenceSlots,
@@ -11,12 +12,13 @@ import {
   isDifferentialScenario,
   scenarios,
   targetReached,
+  validCausalTransferShape,
   type DifferentialOrder,
   type LabState
 } from "./linux-simulator.ts";
 
 export const PRACTICE_STORAGE_KEY = "holi.devops.linux-practice";
-export const PRACTICE_SCHEMA_VERSION = 5 as const;
+export const PRACTICE_SCHEMA_VERSION = 6 as const;
 export const LINUX_FIXTURE_VERSION = 5 as const;
 
 type Completion = { guided: boolean; transfer: boolean; differential: boolean };
@@ -39,7 +41,7 @@ function expectedCompletion(state: LabState): Completion {
   return {
     guided: state.scenario !== "guided" || state.explained,
     transfer: inDifferential || (state.scenario === "transfer" && state.explained),
-    differential: inDifferential && state.differentialStep === 1 && state.explained
+    differential: inDifferential && state.differentialStep === 1 && state.explained && state.causalTransferPassed
   };
 }
 
@@ -91,6 +93,8 @@ export function isValidLabState(value: unknown): value is LabState {
     if (typeof value[key] !== "boolean") return false;
   }
   if (typeof value.hypothesis !== "string" || !["", "permission", "network", "process"].includes(value.hypothesis)) return false;
+  if (value.causalTransfer !== null && !validCausalTransferShape(value.causalTransfer)) return false;
+  if (typeof value.causalTransferPassed !== "boolean") return false;
 
   if (!isRecord(value.preRepairEvidence)) return false;
   if (Object.keys(value.preRepairEvidence).some(key => !evidenceSlots.includes(key as typeof evidenceSlots[number]))) return false;
@@ -110,6 +114,19 @@ export function isValidLabState(value: unknown): value is LabState {
   if (state.verified && (!state.repairedWithEvidence || !targetReached(state))) return false;
   if (state.reasoning !== null && !state.verified) return false;
   if (state.explained && (!state.verified || !reasoningMatches(state, state.reasoning))) return false;
+
+  if (state.causalTransferPassed && !causalTransferAnswerMatches(state.causalTransfer)) return false;
+  if (state.causalTransfer !== null && !state.causalTransferPassed &&
+      (state.scenario !== "differential-listener" || !state.explained)) return false;
+  if (state.causalTransferPassed) {
+    const currentListener = state.scenario === "differential-listener" && state.explained;
+    const listenerCompletedEarlier = state.scenario === "differential-process" &&
+      state.differentialOrder === "listener-first" && state.differentialStep === 1;
+    if (!currentListener && !listenerCompletedEarlier) return false;
+  }
+  if (state.scenario === "differential-process" &&
+      state.differentialOrder === "listener-first" && state.differentialStep === 1 &&
+      !state.causalTransferPassed) return false;
   return true;
 }
 
@@ -122,7 +139,8 @@ export function checkpointFor(state: LabState): PracticeCheckpoint {
       incident: { ...state.incident },
       observations: { ...state.observations },
       preRepairEvidence: structuredClone(state.preRepairEvidence),
-      reasoning: state.reasoning ? structuredClone(state.reasoning) : null
+      reasoning: state.reasoning ? structuredClone(state.reasoning) : null,
+      causalTransfer: state.causalTransfer ? structuredClone(state.causalTransfer) : null
     },
     completed: expectedCompletion(state)
   };
@@ -162,7 +180,8 @@ export function loadPractice(
         incident: { ...checkpoint.state.incident },
         observations: { ...checkpoint.state.observations },
         preRepairEvidence: structuredClone(checkpoint.state.preRepairEvidence),
-        reasoning: checkpoint.state.reasoning ? structuredClone(checkpoint.state.reasoning) : null
+        reasoning: checkpoint.state.reasoning ? structuredClone(checkpoint.state.reasoning) : null,
+        causalTransfer: checkpoint.state.causalTransfer ? structuredClone(checkpoint.state.causalTransfer) : null
       }
     };
   }

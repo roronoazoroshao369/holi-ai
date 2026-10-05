@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { differentialScenario, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
+import { checkCausalTransfer, differentialScenario, editCausalTransfer, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
 
 
 function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) {
@@ -12,6 +12,19 @@ function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) 
     resource: { evidenceId: scenario + ":before:resource", claim: file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
     mechanism: { evidenceIds: [scenario + ":before:resource", scenario + ":before:identity"], claim: mechanism },
     target: file ? scenarios[scenario].targetMode : "8080"
+  };
+}
+
+function counterfactualFor(overrides = {}) {
+  return {
+    processEvidenceId: "differential-listener:before:identity",
+    processFact: "present",
+    socketEvidenceId: "differential-listener:before:resource",
+    socketFact: "9090",
+    predictedSymptom: "200",
+    repairNeed: "none",
+    causalClaim: "listener-target-match",
+    ...overrides
   };
 }
 
@@ -217,6 +230,61 @@ test("reset restores exact current fixture and attempts remain immutable", () =>
     const changed = run(initialLabState(scenario), scenarios[scenario].commands.repair);
     assert.deepEqual(run(changed, "reset"), initialLabState(scenario));
   }
+});
+
+
+test("listener counterfactual requires canonical sources, observed facts and causal prediction", () => {
+  let state = run(repaired("differential-listener"), scenarios["differential-listener"].commands.symptom);
+  state = explain(state, reasoningFor(state));
+  assert.equal(state.explained, true);
+
+  for (const wrong of [
+    { processEvidenceId: "differential-listener:before:resource" },
+    { processFact: "absent" },
+    { socketEvidenceId: "differential-listener:before:symptom" },
+    { socketFact: "8080" },
+    { predictedSymptom: "refused" },
+    { repairNeed: "listener-change" },
+    { causalClaim: "process-started" }
+  ]) {
+    assert.equal(checkCausalTransfer(state, counterfactualFor(wrong)).causalTransferPassed, false);
+  }
+
+  state = checkCausalTransfer(state, counterfactualFor());
+  assert.equal(state.causalTransferPassed, true);
+  assert.deepEqual(state.causalTransfer, counterfactualFor());
+});
+
+test("editing or resetting the listener counterfactual revokes transfer completion", () => {
+  let state = run(repaired("differential-listener"), scenarios["differential-listener"].commands.symptom);
+  state = explain(state, reasoningFor(state));
+  state = checkCausalTransfer(state, counterfactualFor());
+  assert.equal(state.causalTransferPassed, true);
+
+  const edited = editCausalTransfer(state, counterfactualFor({ predictedSymptom: "refused" }));
+  assert.equal(edited.causalTransferPassed, false);
+  assert.equal(edited.causalTransfer.predictedSymptom, "refused");
+
+  const reset = run(state, "reset");
+  assert.equal(reset.causalTransferPassed, false);
+  assert.equal(reset.causalTransfer, null);
+});
+
+test("listener-first transfer survives only when advancing to and resetting the second process case", () => {
+  let listener = initialLabState("differential-listener", "listener-first", 0);
+  const fixture = scenarios["differential-listener"];
+  for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) listener = run(listener, command);
+  listener = recordHypothesis(listener, "network");
+  listener = run(listener, fixture.commands.repair);
+  listener = run(listener, fixture.commands.symptom);
+  listener = explain(listener, reasoningFor(listener));
+  listener = checkCausalTransfer(listener, counterfactualFor());
+  assert.equal(listener.causalTransferPassed, true);
+
+  const process = initialLabState("differential-process", "listener-first", 1, listener.causalTransfer, true);
+  const reset = run(process, "reset");
+  assert.equal(reset.causalTransferPassed, true);
+  assert.deepEqual(reset.causalTransfer, counterfactualFor());
 });
 
 test("unsupported hostile input is inert and no arbitrary execution is introduced", () => {

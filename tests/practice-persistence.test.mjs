@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { execute, explain, initialLabState, recordHypothesis, scenarios } from "../lib/linux-simulator.ts";
+import { checkCausalTransfer, execute, explain, initialLabState, recordHypothesis, scenarios } from "../lib/linux-simulator.ts";
 import {
   LINUX_FIXTURE_VERSION,
   PRACTICE_SCHEMA_VERSION,
@@ -25,6 +25,19 @@ function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) 
   };
 }
 
+function counterfactualFor(overrides = {}) {
+  return {
+    processEvidenceId: "differential-listener:before:identity",
+    processFact: "present",
+    socketEvidenceId: "differential-listener:before:resource",
+    socketFact: "9090",
+    predictedSymptom: "200",
+    repairNeed: "none",
+    causalClaim: "listener-target-match",
+    ...overrides
+  };
+}
+
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
   return {
@@ -35,8 +48,8 @@ function memoryStorage(initial = {}) {
   };
 }
 
-function evidence(scenario = "guided", order, step) {
-  let state = initialLabState(scenario, order, step);
+function evidence(scenario = "guided", order, step, causalTransfer = null, causalTransferPassed = false) {
+  let state = initialLabState(scenario, order, step, causalTransfer, causalTransferPassed);
   const fixture = scenarios[scenario];
   for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) {
     state = execute(state, command).state;
@@ -44,28 +57,30 @@ function evidence(scenario = "guided", order, step) {
   return recordHypothesis(state, fixture.correctHypothesis);
 }
 
-function completed(scenario = "guided", order, step) {
+function completed(scenario = "guided", order, step, causalTransfer = null, causalTransferPassed = false) {
   const fixture = scenarios[scenario];
-  let state = evidence(scenario, order, step);
+  let state = evidence(scenario, order, step, causalTransfer, causalTransferPassed);
   state = execute(state, fixture.commands.repair).state;
   state = execute(state, fixture.commands.symptom).state;
   return explain(state, reasoningFor(state));
 }
 
 test("valid partial and completed checkpoints round-trip across all incident cases", () => {
+  const listenerPassed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
   for (const state of [
     evidence("guided"),
     completed("guided"),
     evidence("transfer"),
     completed("transfer"),
-    evidence("differential-listener"),
-    completed("differential-listener"),
-    evidence("differential-process"),
-    completed("differential-process"),
+    evidence("differential-listener", "listener-first", 0),
+    completed("differential-listener", "listener-first", 0),
+    listenerPassed,
     evidence("differential-process", "process-first", 0),
     completed("differential-process", "process-first", 0),
+    completed("differential-process", "listener-first", 1, listenerPassed.causalTransfer, true),
     evidence("differential-listener", "process-first", 1),
-    completed("differential-listener", "process-first", 1)
+    completed("differential-listener", "process-first", 1),
+    checkCausalTransfer(completed("differential-listener", "process-first", 1), counterfactualFor())
   ]) {
     const storage = memoryStorage();
     assert.equal(savePractice(storage, state), true);
@@ -75,18 +90,21 @@ test("valid partial and completed checkpoints round-trip across all incident cas
   }
 });
 
-test("completion is derived from sequence position and final differential explanation", () => {
+test("completion requires final differential explanation plus the listener counterfactual gate", () => {
   assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, differential: false });
   assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, differential: false });
-  assert.deepEqual(checkpointFor(completed("differential-listener")).completed, { guided: true, transfer: true, differential: false });
-  const checkpoint = checkpointFor(completed("differential-process"));
-  assert.deepEqual(checkpoint.completed, { guided: true, transfer: true, differential: true });
+  assert.deepEqual(checkpointFor(completed("differential-listener", "listener-first", 0)).completed, { guided: true, transfer: true, differential: false });
 
-  const reversed = checkpointFor(completed("differential-listener", "process-first", 1));
+  const listenerPassed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
+  const finalProcess = checkpointFor(completed("differential-process", "listener-first", 1, listenerPassed.causalTransfer, true));
+  assert.deepEqual(finalProcess.completed, { guided: true, transfer: true, differential: true });
+
+  const finalListenerState = checkCausalTransfer(completed("differential-listener", "process-first", 1), counterfactualFor());
+  const reversed = checkpointFor(finalListenerState);
   assert.deepEqual(reversed.completed, { guided: true, transfer: true, differential: true });
 
-  checkpoint.completed.differential = false;
-  assert.equal(parseCheckpoint(JSON.stringify(checkpoint)), null);
+  finalProcess.completed.differential = false;
+  assert.equal(parseCheckpoint(JSON.stringify(finalProcess)), null);
 });
 
 test("corrupt JSON is discarded and starts clean", () => {
@@ -97,14 +115,14 @@ test("corrupt JSON is discarded and starts clean", () => {
   assert.equal(storage.peek(PRACTICE_STORAGE_KEY), undefined);
 });
 
-test("schema and fixture version mismatches including v3 fail closed", () => {
+test("schema and fixture version mismatches including stale v5 fail closed", () => {
   const checkpoint = checkpointFor(evidence());
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
     { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
+    { ...checkpoint, schemaVersion: 5, fixtureVersion: 5 },
     { ...checkpoint, schemaVersion: 4, fixtureVersion: 4 },
-    { ...checkpoint, schemaVersion: 3, fixtureVersion: 3 },
-    { ...checkpoint, schemaVersion: 2, fixtureVersion: 2 }
+    { ...checkpoint, schemaVersion: 3, fixtureVersion: 3 }
   ]) {
     const storage = memoryStorage({ [PRACTICE_STORAGE_KEY]: JSON.stringify(changed) });
     assert.equal(loadPractice(storage).status, "discarded");
@@ -186,6 +204,33 @@ test("snapshot provenance and explained reasoning contradictions are rejected on
     mutate(corrupted);
     assert.equal(parseCheckpoint(JSON.stringify(corrupted)), null);
   }
+});
+
+
+test("counterfactual persistence rejects forged answers and impossible sequence carry", () => {
+  const passed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
+  const valid = checkpointFor(passed);
+  assert.ok(parseCheckpoint(JSON.stringify(valid)));
+
+  for (const mutate of [
+    checkpoint => { checkpoint.state.causalTransfer.processEvidenceId = "differential-listener:before:resource"; },
+    checkpoint => { checkpoint.state.causalTransfer.predictedSymptom = "refused"; },
+    checkpoint => { checkpoint.state.causalTransferPassed = false; checkpoint.state.scenario = "differential-process"; checkpoint.state.differentialStep = 1; },
+    checkpoint => { checkpoint.state.causalTransfer.extra = "forged"; }
+  ]) {
+    const forged = structuredClone(valid);
+    mutate(forged);
+    assert.equal(parseCheckpoint(JSON.stringify(forged)), null);
+  }
+
+  const processFirst = checkpointFor(completed("differential-process", "process-first", 0));
+  processFirst.state.causalTransfer = counterfactualFor();
+  processFirst.state.causalTransferPassed = true;
+  assert.equal(parseCheckpoint(JSON.stringify(processFirst)), null);
+
+  const listenerPassed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
+  const carried = checkpointFor(completed("differential-process", "listener-first", 1, listenerPassed.causalTransfer, true));
+  assert.ok(parseCheckpoint(JSON.stringify(carried)));
 });
 
 test("failed structured attempts restore and checkpoint copies do not alias nested evidence", () => {

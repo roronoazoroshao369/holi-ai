@@ -1,7 +1,11 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import {
+  causalTransferSatisfied,
+  checkCausalTransfer,
   differentialScenario,
+  editCausalTransfer,
+  emptyCausalTransfer,
   evidenceReady,
   evidenceSlots,
   editReasoning,
@@ -12,6 +16,7 @@ import {
   isDifferentialScenario,
   recordHypothesis,
   scenarios,
+  type CausalTransferAnswer,
   type ReasoningAnswer,
   type DifferentialOrder,
   type DifferentialStep,
@@ -45,6 +50,7 @@ export function LabTerminal() {
   const [hypothesisDraft, setHypothesisDraft] = useState("");
   const [hypothesisFeedback, setHypothesisFeedback] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [transferFeedback, setTransferFeedback] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const [storageUsable, setStorageUsable] = useState(false);
   const [persistence, setPersistence] = useState<PersistenceState>("checking");
@@ -99,6 +105,7 @@ export function LabTerminal() {
       setHypothesisDraft("");
       setHypothesisFeedback("");
       setFeedback("");
+      setTransferFeedback("");
     }
     setCommand("");
   }
@@ -116,12 +123,16 @@ export function LabTerminal() {
   }
 
   function advanceScenario(nextScenario: ScenarioId, differentialStep: DifferentialStep = 0) {
-    setState(initialLabState(nextScenario, state.differentialOrder, differentialStep));
+    const carriedTransfer = causalTransferSatisfied(state) && state.causalTransfer
+      ? structuredClone(state.causalTransfer)
+      : null;
+    setState(initialLabState(nextScenario, state.differentialOrder, differentialStep, carriedTransfer, Boolean(carriedTransfer)));
     setLines(welcome);
     setCommand("");
     setHypothesisDraft("");
     setHypothesisFeedback("");
     setFeedback("");
+    setTransferFeedback("");
   }
 
   function restartPractice() {
@@ -134,6 +145,7 @@ export function LabTerminal() {
     setHypothesisDraft("");
     setHypothesisFeedback("");
     setFeedback("");
+    setTransferFeedback("");
     if (cleared) {
       setStorageUsable(true);
       setPersistenceNotice("Đã xóa checkpoint cũ, chọn lại thứ tự health case ẩn và bắt đầu từ tình huống có hướng dẫn.");
@@ -165,11 +177,19 @@ export function LabTerminal() {
   const hypothesisLocked = Boolean(state.hypothesis);
   const inDifferential = isDifferentialScenario(state.scenario);
   const answer = state.reasoning ?? emptyReasoning();
+  const transferAnswer = state.causalTransfer ?? emptyCausalTransfer();
+  const transferSatisfied = causalTransferSatisfied(state);
   const evidenceLabels = { symptom: "E1 · symptom", identity: "E2 · " + fixture.identityLabel, resource: "E3 · " + fixture.resourceLabel };
 
   function updateAnswer(next: ReasoningAnswer) {
     setState(editReasoning(state, next));
     setFeedback("");
+    if (state.scenario === "differential-listener") setTransferFeedback("");
+  }
+
+  function updateCausalTransfer(next: CausalTransferAnswer) {
+    setState(editCausalTransfer(state, next));
+    setTransferFeedback("");
   }
 
   function evidenceOptions() {
@@ -294,15 +314,70 @@ export function LabTerminal() {
       </section>}
       <p role="status">{feedback}</p>
 
+      {state.scenario === "differential-listener" && state.explained && <section className="reasoningPanel" aria-label="Dự đoán counterfactual">
+        <h4>Counterfactual transfer · đổi evidence, dự đoán hệ quả</h4>
+        <p>Giữ nguyên observation rằng process api-server đang chạy. Trước bất kỳ repair nào, giả sử socket observation đổi từ listener đã quan sát sang <code>127.0.0.1:8080</code>. Dùng đúng hai snapshot gốc để ghi fact ban đầu, rồi dự đoán symptom của curl 8080, repair listener còn cần hay không và quan hệ nhân quả.</p>
+        <form onSubmit={event => {
+          event.preventDefault();
+          const result = checkCausalTransfer(state, transferAnswer);
+          setState(result);
+          setTransferFeedback(result.causalTransferPassed
+            ? "Đúng: prediction thay đổi theo socket evidence trong khi process fact được giữ cố định."
+            : "Chưa đúng. Tách source/fact gốc khỏi prediction và kiểm tra xem listener đã trùng target 8080 thì hệ quả gì thay đổi.");
+        }}>
+          <fieldset>
+            <legend>Evidence gốc được giữ / thay đổi</legend>
+            <label>Nguồn process gốc
+              <select aria-label="Nguồn process gốc" value={transferAnswer.processEvidenceId}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, processEvidenceId: event.target.value })}>
+                {evidenceOptions()}
+              </select>
+            </label>
+            <label>Fact process gốc
+              <input aria-label="Fact process gốc" maxLength={100} value={transferAnswer.processFact}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, processFact: event.target.value })} />
+            </label>
+            <label>Nguồn socket gốc
+              <select aria-label="Nguồn socket gốc" value={transferAnswer.socketEvidenceId}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, socketEvidenceId: event.target.value })}>
+                {evidenceOptions()}
+              </select>
+            </label>
+            <label>Fact socket gốc
+              <input aria-label="Fact socket gốc" maxLength={100} value={transferAnswer.socketFact}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, socketFact: event.target.value })} />
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Causal prediction sau thay đổi socket → 8080</legend>
+            <label>Dự đoán symptom
+              <input aria-label="Dự đoán symptom" maxLength={100} value={transferAnswer.predictedSymptom}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, predictedSymptom: event.target.value })} />
+            </label>
+            <label>Repair listener còn cần
+              <input aria-label="Repair còn cần" maxLength={100} value={transferAnswer.repairNeed}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, repairNeed: event.target.value })} />
+            </label>
+            <label>Quan hệ nhân quả
+              <input aria-label="Quan hệ nhân quả" maxLength={100} value={transferAnswer.causalClaim}
+                onChange={event => updateCausalTransfer({ ...transferAnswer, causalClaim: event.target.value })} />
+            </label>
+          </fieldset>
+          <button type="submit">Kiểm tra dự đoán</button>
+        </form>
+        <p role="status">{transferFeedback}</p>
+      </section>}
+
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
       {state.explained && state.scenario === "transfer" &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 0), 0)}>Thử differential diagnosis</button>}
       {state.explained && inDifferential && state.differentialStep === 0 &&
+        (state.scenario !== "differential-listener" || transferSatisfied) &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 1), 1)}>Thử case cùng symptom</button>}
-      {state.explained && inDifferential && state.differentialStep === 1 &&
-        <p role="status">Hoàn tất bốn tình huống luyện tập, gồm hai health incident có cùng symptom nhưng evidence dẫn tới causal class khác nhau. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
+      {state.explained && inDifferential && state.differentialStep === 1 && transferSatisfied &&
+        <p role="status">Hoàn tất bốn tình huống luyện tập và causal transfer gate: hai health incident có cùng symptom dẫn tới causal class khác nhau, và listener case còn yêu cầu dự đoán hệ quả khi socket evidence đổi. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
 
-      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại nhưng giữ nguyên health-case assignment ẩn. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn và chọn lại assignment cho lần luyện mới. Transcript terminal không được persist.</p>
+      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại; nếu đang ở listener case thì draft counterfactual của case đó cũng bị xóa. Hidden health-case assignment được giữ, và counterfactual listener đã pass được giữ khi reset process case đứng sau nó. Nút “Học lại từ đầu” xóa toàn bộ và chọn lại assignment. Transcript terminal không được persist.</p>
     </div>
   );
 }
