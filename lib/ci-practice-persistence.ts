@@ -5,6 +5,8 @@ import {
   explanationMatches,
   initialCiLabState,
   transferMatches,
+  validCiExplanationShape,
+  validCiTransferShape,
   type CiLabState
 } from "./ci-simulator.ts";
 
@@ -62,10 +64,10 @@ export function isValidCiLabState(value: unknown): value is CiLabState {
   if (state.runStatus === "failed" && (!state.repair || state.repair === "map-current-artifact-output")) return false;
   if (state.verified !== (state.runStatus === "passed" && state.evidenceBackedRepair)) return false;
 
-  if (state.explanation !== null && !isRecord(state.explanation)) return false;
+  if (state.explanation !== null && !validCiExplanationShape(state.explanation)) return false;
   if (state.explained !== (state.explanation !== null && explanationMatches(state.explanation))) return false;
   if (state.explained && !state.verified) return false;
-  if (state.transfer !== null && !isRecord(state.transfer)) return false;
+  if (state.transfer !== null && !validCiTransferShape(state.transfer)) return false;
   if (state.transfer !== null && !state.explained) return false;
   if (state.transferPassed !== (state.transfer !== null && transferMatches(state.transfer))) return false;
   return true;
