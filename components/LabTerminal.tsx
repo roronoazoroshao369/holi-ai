@@ -3,9 +3,12 @@ import { FormEvent, useEffect, useState } from "react";
 import {
   causalTransferSatisfied,
   checkCausalTransfer,
+  checkPermissionTransfer,
   differentialScenario,
   editCausalTransfer,
+  editPermissionTransfer,
   emptyCausalTransfer,
+  emptyPermissionTransfer,
   evidenceReady,
   evidenceSlots,
   editReasoning,
@@ -14,9 +17,11 @@ import {
   explain,
   initialLabState,
   isDifferentialScenario,
+  permissionTransferSatisfied,
   recordHypothesis,
   scenarios,
   type CausalTransferAnswer,
+  type PermissionTransferAnswer,
   type ReasoningAnswer,
   type DifferentialOrder,
   type DifferentialStep,
@@ -50,6 +55,7 @@ export function LabTerminal() {
   const [hypothesisDraft, setHypothesisDraft] = useState("");
   const [hypothesisFeedback, setHypothesisFeedback] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [permissionTransferFeedback, setPermissionTransferFeedback] = useState("");
   const [transferFeedback, setTransferFeedback] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const [storageUsable, setStorageUsable] = useState(false);
@@ -105,6 +111,7 @@ export function LabTerminal() {
       setHypothesisDraft("");
       setHypothesisFeedback("");
       setFeedback("");
+      setPermissionTransferFeedback("");
       setTransferFeedback("");
     }
     setCommand("");
@@ -126,12 +133,24 @@ export function LabTerminal() {
     const carriedTransfer = causalTransferSatisfied(state) && state.causalTransfer
       ? structuredClone(state.causalTransfer)
       : null;
-    setState(initialLabState(nextScenario, state.differentialOrder, differentialStep, carriedTransfer, Boolean(carriedTransfer)));
+    const carriedPermissionTransfer = permissionTransferSatisfied(state) && state.permissionTransfer
+      ? structuredClone(state.permissionTransfer)
+      : null;
+    setState(initialLabState(
+      nextScenario,
+      state.differentialOrder,
+      differentialStep,
+      carriedTransfer,
+      Boolean(carriedTransfer),
+      carriedPermissionTransfer,
+      Boolean(carriedPermissionTransfer)
+    ));
     setLines(welcome);
     setCommand("");
     setHypothesisDraft("");
     setHypothesisFeedback("");
     setFeedback("");
+    setPermissionTransferFeedback("");
     setTransferFeedback("");
   }
 
@@ -145,6 +164,7 @@ export function LabTerminal() {
     setHypothesisDraft("");
     setHypothesisFeedback("");
     setFeedback("");
+    setPermissionTransferFeedback("");
     setTransferFeedback("");
     if (cleared) {
       setStorageUsable(true);
@@ -177,6 +197,8 @@ export function LabTerminal() {
   const hypothesisLocked = Boolean(state.hypothesis);
   const inDifferential = isDifferentialScenario(state.scenario);
   const answer = state.reasoning ?? emptyReasoning();
+  const permissionTransferAnswer = state.permissionTransfer ?? emptyPermissionTransfer();
+  const permissionSatisfied = permissionTransferSatisfied(state);
   const transferAnswer = state.causalTransfer ?? emptyCausalTransfer();
   const transferSatisfied = causalTransferSatisfied(state);
   const evidenceLabels = { symptom: "E1 · symptom", identity: "E2 · " + fixture.identityLabel, resource: "E3 · " + fixture.resourceLabel };
@@ -184,7 +206,13 @@ export function LabTerminal() {
   function updateAnswer(next: ReasoningAnswer) {
     setState(editReasoning(state, next));
     setFeedback("");
+    if (state.scenario === "transfer") setPermissionTransferFeedback("");
     if (state.scenario === "differential-listener") setTransferFeedback("");
+  }
+
+  function updatePermissionTransfer(next: PermissionTransferAnswer) {
+    setState(editPermissionTransfer(state, next));
+    setPermissionTransferFeedback("");
   }
 
   function updateCausalTransfer(next: CausalTransferAnswer) {
@@ -314,6 +342,68 @@ export function LabTerminal() {
       </section>}
       <p role="status">{feedback}</p>
 
+      {state.scenario === "transfer" && state.explained && <section className="reasoningPanel" aria-label="Dự đoán permission counterfactual">
+        <h4>Permission counterfactual · đổi identity, giữ resource relation</h4>
+        <p>Snapshot gốc cho thấy <code>report-worker</code> thuộc group <code>web</code> và file thuộc <code>root:web</code>. Sau repair tối thiểu <code>640</code>, giả sử chỉ identity thay đổi: worker không còn thuộc <code>web</code>. Ghi đúng source/fact gốc rồi dự đoán HTTP, việc access repair còn cần hay không và causal relation.</p>
+        <form onSubmit={event => {
+          event.preventDefault();
+          const result = checkPermissionTransfer(state, permissionTransferAnswer);
+          setState(result);
+          setPermissionTransferFeedback(result.permissionTransferPassed
+            ? "Đúng: group-read chỉ có hiệu lực khi worker còn là member của file group."
+            : "Chưa đúng. Giữ file root:web ở mode 640 và chỉ thay membership của report-worker rồi suy ra quyền đọc.");
+        }}>
+          <fieldset>
+            <legend>Evidence gốc</legend>
+            <label>Nguồn identity gốc
+              <select aria-label="Nguồn identity gốc" value={permissionTransferAnswer.identityEvidenceId}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, identityEvidenceId: event.target.value })}>
+                {evidenceOptions()}
+              </select>
+            </label>
+            <label>Fact identity gốc
+              <input aria-label="Fact identity gốc" maxLength={100} value={permissionTransferAnswer.identityFact}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, identityFact: event.target.value })} />
+            </label>
+            <label>Nguồn file gốc
+              <select aria-label="Nguồn file gốc" value={permissionTransferAnswer.resourceEvidenceId}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, resourceEvidenceId: event.target.value })}>
+                {evidenceOptions()}
+              </select>
+            </label>
+            <label>Fact file gốc
+              <input aria-label="Fact file gốc" maxLength={100} value={permissionTransferAnswer.resourceFact}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, resourceFact: event.target.value })} />
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Giữ mode 640, bỏ membership web</legend>
+            <label>Mode giữ cố định
+              <input aria-label="Mode giữ cố định" maxLength={100} value={permissionTransferAnswer.fixedMode}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, fixedMode: event.target.value })} />
+            </label>
+            <label>Identity giả định
+              <input aria-label="Identity giả định" maxLength={100} value={permissionTransferAnswer.hypotheticalIdentity}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, hypotheticalIdentity: event.target.value })} />
+            </label>
+            <label>Dự đoán HTTP permission
+              <input aria-label="Dự đoán HTTP permission" maxLength={100} value={permissionTransferAnswer.predictedSymptom}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, predictedSymptom: event.target.value })} />
+            </label>
+            <label>Access repair còn cần
+              <input aria-label="Access repair còn cần" maxLength={100} value={permissionTransferAnswer.repairNeed}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, repairNeed: event.target.value })} />
+            </label>
+            <label>Quan hệ permission
+              <input aria-label="Quan hệ permission" maxLength={100} value={permissionTransferAnswer.causalClaim}
+                onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, causalClaim: event.target.value })} />
+            </label>
+          </fieldset>
+          <button type="submit">Kiểm tra permission transfer</button>
+        </form>
+        <p role="status">{permissionTransferFeedback}</p>
+      </section>}
+
       {state.scenario === "differential-listener" && state.explained && <section className="reasoningPanel" aria-label="Dự đoán counterfactual">
         <h4>Counterfactual transfer · đổi evidence, dự đoán hệ quả</h4>
         <p>Giữ nguyên observation rằng process api-server đang chạy. Trước bất kỳ repair nào, giả sử socket observation đổi từ listener đã quan sát sang <code>127.0.0.1:8080</code>. Dùng đúng hai snapshot gốc để ghi fact ban đầu, rồi dự đoán symptom của curl 8080, repair listener còn cần hay không và quan hệ nhân quả.</p>
@@ -369,15 +459,15 @@ export function LabTerminal() {
       </section>}
 
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
-      {state.explained && state.scenario === "transfer" &&
+      {state.explained && state.scenario === "transfer" && permissionSatisfied &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 0), 0)}>Thử differential diagnosis</button>}
-      {state.explained && inDifferential && state.differentialStep === 0 &&
+      {state.explained && inDifferential && state.differentialStep === 0 && permissionSatisfied &&
         (state.scenario !== "differential-listener" || transferSatisfied) &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 1), 1)}>Thử case cùng symptom</button>}
-      {state.explained && inDifferential && state.differentialStep === 1 && transferSatisfied &&
-        <p role="status">Hoàn tất bốn tình huống luyện tập và causal transfer gate: hai health incident có cùng symptom dẫn tới causal class khác nhau, và listener case còn yêu cầu dự đoán hệ quả khi socket evidence đổi. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
+      {state.explained && inDifferential && state.differentialStep === 1 && permissionSatisfied && transferSatisfied &&
+        <p role="status">Hoàn tất bốn tình huống luyện tập và hai causal transfer gates: permission case kiểm tra hệ quả khi group membership đổi, còn listener case kiểm tra hệ quả khi socket evidence đổi. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
 
-      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại; nếu đang ở listener case thì draft counterfactual của case đó cũng bị xóa. Hidden health-case assignment được giữ, và counterfactual listener đã pass được giữ khi reset process case đứng sau nó. Nút “Học lại từ đầu” xóa toàn bộ và chọn lại assignment. Transcript terminal không được persist.</p>
+      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại. Permission transfer đã pass được giữ khi vào/reset health differential; listener counterfactual đã pass được giữ khi reset process case đứng sau nó. Reset ngay trên transfer/listener case sẽ xóa draft của gate thuộc case đó. Hidden health-case assignment được giữ. Nút “Học lại từ đầu” xóa toàn bộ và chọn lại assignment. Transcript terminal không được persist.</p>
     </div>
   );
 }

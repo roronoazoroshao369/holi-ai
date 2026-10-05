@@ -1,6 +1,7 @@
 import {
   DEFAULT_DIFFERENTIAL_ORDER,
   causalTransferAnswerMatches,
+  causalTransferSatisfied,
   differentialScenario,
   evidenceReady,
   evidenceSlots,
@@ -10,15 +11,18 @@ import {
   validReasoningShape,
   initialLabState,
   isDifferentialScenario,
+  permissionTransferAnswerMatches,
+  permissionTransferSatisfied,
   scenarios,
   targetReached,
   validCausalTransferShape,
+  validPermissionTransferShape,
   type DifferentialOrder,
   type LabState
 } from "./linux-simulator.ts";
 
 export const PRACTICE_STORAGE_KEY = "holi.devops.linux-practice";
-export const PRACTICE_SCHEMA_VERSION = 6 as const;
+export const PRACTICE_SCHEMA_VERSION = 7 as const;
 export const LINUX_FIXTURE_VERSION = 5 as const;
 
 type Completion = { guided: boolean; transfer: boolean; differential: boolean };
@@ -38,10 +42,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function expectedCompletion(state: LabState): Completion {
   const inDifferential = isDifferentialScenario(state.scenario);
+  const permissionDone = permissionTransferSatisfied(state);
   return {
     guided: state.scenario !== "guided" || state.explained,
-    transfer: inDifferential || (state.scenario === "transfer" && state.explained),
-    differential: inDifferential && state.differentialStep === 1 && state.explained && state.causalTransferPassed
+    transfer: inDifferential ? permissionDone : state.scenario === "transfer" && state.explained && permissionDone,
+    differential: inDifferential && state.differentialStep === 1 && state.explained &&
+      permissionDone && causalTransferSatisfied(state)
   };
 }
 
@@ -93,6 +99,8 @@ export function isValidLabState(value: unknown): value is LabState {
     if (typeof value[key] !== "boolean") return false;
   }
   if (typeof value.hypothesis !== "string" || !["", "permission", "network", "process"].includes(value.hypothesis)) return false;
+  if (value.permissionTransfer !== null && !validPermissionTransferShape(value.permissionTransfer)) return false;
+  if (typeof value.permissionTransferPassed !== "boolean") return false;
   if (value.causalTransfer !== null && !validCausalTransferShape(value.causalTransfer)) return false;
   if (typeof value.causalTransferPassed !== "boolean") return false;
 
@@ -114,6 +122,16 @@ export function isValidLabState(value: unknown): value is LabState {
   if (state.verified && (!state.repairedWithEvidence || !targetReached(state))) return false;
   if (state.reasoning !== null && !state.verified) return false;
   if (state.explained && (!state.verified || !reasoningMatches(state, state.reasoning))) return false;
+
+  if (state.permissionTransferPassed && !permissionTransferAnswerMatches(state.permissionTransfer)) return false;
+  if (state.permissionTransfer !== null && !state.permissionTransferPassed &&
+      (state.scenario !== "transfer" || !state.explained)) return false;
+  if (state.permissionTransferPassed) {
+    const currentPermission = state.scenario === "transfer" && state.explained;
+    const carriedPermission = isDifferentialScenario(state.scenario);
+    if (!currentPermission && !carriedPermission) return false;
+  }
+  if (isDifferentialScenario(state.scenario) && !permissionTransferSatisfied(state)) return false;
 
   if (state.causalTransferPassed && !causalTransferAnswerMatches(state.causalTransfer)) return false;
   if (state.causalTransfer !== null && !state.causalTransferPassed &&
@@ -140,6 +158,7 @@ export function checkpointFor(state: LabState): PracticeCheckpoint {
       observations: { ...state.observations },
       preRepairEvidence: structuredClone(state.preRepairEvidence),
       reasoning: state.reasoning ? structuredClone(state.reasoning) : null,
+      permissionTransfer: state.permissionTransfer ? structuredClone(state.permissionTransfer) : null,
       causalTransfer: state.causalTransfer ? structuredClone(state.causalTransfer) : null
     },
     completed: expectedCompletion(state)
@@ -181,6 +200,7 @@ export function loadPractice(
         observations: { ...checkpoint.state.observations },
         preRepairEvidence: structuredClone(checkpoint.state.preRepairEvidence),
         reasoning: checkpoint.state.reasoning ? structuredClone(checkpoint.state.reasoning) : null,
+        permissionTransfer: checkpoint.state.permissionTransfer ? structuredClone(checkpoint.state.permissionTransfer) : null,
         causalTransfer: checkpoint.state.causalTransfer ? structuredClone(checkpoint.state.causalTransfer) : null
       }
     };

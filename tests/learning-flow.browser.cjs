@@ -22,6 +22,35 @@ async function submitHypothesis(page, value) {
   await expect(input).toBeDisabled();
 }
 
+async function fillPermissionTransfer(page, overrides = {}) {
+  const values = {
+    identityEvidenceId: "transfer:before:identity",
+    identityFact: "1001:report-worker,web",
+    resourceEvidenceId: "transfer:before:resource",
+    resourceFact: "600:root:web",
+    fixedMode: "640",
+    hypotheticalIdentity: "1001:report-worker",
+    predictedSymptom: "403",
+    repairNeed: "required",
+    causalClaim: "group-membership-required",
+    ...overrides
+  };
+  await page.getByRole("combobox", { name: "Nguồn identity gốc", exact: true }).selectOption(values.identityEvidenceId);
+  await page.getByRole("textbox", { name: "Fact identity gốc", exact: true }).fill(values.identityFact);
+  await page.getByRole("combobox", { name: "Nguồn file gốc", exact: true }).selectOption(values.resourceEvidenceId);
+  await page.getByRole("textbox", { name: "Fact file gốc", exact: true }).fill(values.resourceFact);
+  await page.getByRole("textbox", { name: "Mode giữ cố định", exact: true }).fill(values.fixedMode);
+  await page.getByRole("textbox", { name: "Identity giả định", exact: true }).fill(values.hypotheticalIdentity);
+  await page.getByRole("textbox", { name: "Dự đoán HTTP permission", exact: true }).fill(values.predictedSymptom);
+  await page.getByRole("textbox", { name: "Access repair còn cần", exact: true }).fill(values.repairNeed);
+  await page.getByRole("textbox", { name: "Quan hệ permission", exact: true }).fill(values.causalClaim);
+}
+
+async function submitPermissionTransfer(page, overrides = {}) {
+  await fillPermissionTransfer(page, overrides);
+  await page.getByRole("button", { name: "Kiểm tra permission transfer" }).click();
+}
+
 async function fillCausalTransfer(page, overrides = {}) {
   const values = {
     processEvidenceId: "differential-listener:before:identity",
@@ -77,7 +106,7 @@ test("production flow differentiates same connection symptom using process and s
   await page.goto("/");
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 6,
+    schemaVersion: 7,
     fixtureVersion: 5,
     state: {
       scenario: "guided",
@@ -87,6 +116,8 @@ test("production flow differentiates same connection symptom using process and s
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      permissionTransfer: null,
+      permissionTransferPassed: false,
       causalTransfer: null,
       causalTransferPassed: false,
       hypothesis: "",
@@ -156,6 +187,17 @@ test("production flow differentiates same connection symptom using process and s
   await runCommand(page, "chmod 640 /srv/reports/status.html");
   await runCommand(page, "curl localhost");
   await explainWith(page, "group-read");
+  await expect(page.getByRole("region", { name: "Dự đoán permission counterfactual" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
+  await submitPermissionTransfer(page, { identityEvidenceId: "transfer:before:resource" });
+  await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
+  await submitPermissionTransfer(page, { predictedSymptom: "200" });
+  await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
+  await submitPermissionTransfer(page);
+  await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toBeVisible();
+  await page.getByRole("textbox", { name: "Dự đoán HTTP permission", exact: true }).fill("200");
+  await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
+  await submitPermissionTransfer(page);
   await page.getByRole("button", { name: "Thử differential diagnosis" }).click();
 
   const differentialHeading = page.getByRole("heading", { name: "Health endpoint differential diagnosis" });
@@ -253,12 +295,12 @@ test("production flow differentiates same connection symptom using process and s
   await runCommand(page, "start api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
   await explainWith(page, "listener-port-match");
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toHaveCount(0);
   await explainWith(page, "process-started");
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toBeVisible();
   await expect(page.getByText(/Đã phục hồi checkpoint hợp lệ/)).toBeVisible();
   await page.evaluate(key => {
     const checkpoint = JSON.parse(localStorage.getItem(key));
@@ -279,7 +321,7 @@ test("production browser exercises the reversed process-first differential order
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 6,
+    schemaVersion: 7,
     fixtureVersion: 5,
     state: {
       scenario: "differential-process",
@@ -289,6 +331,18 @@ test("production browser exercises the reversed process-first differential order
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      permissionTransfer: {
+        identityEvidenceId: "transfer:before:identity",
+        identityFact: "1001:report-worker,web",
+        resourceEvidenceId: "transfer:before:resource",
+        resourceFact: "600:root:web",
+        fixedMode: "640",
+        hypotheticalIdentity: "1001:report-worker",
+        predictedSymptom: "403",
+        repairNeed: "required",
+        causalClaim: "group-membership-required"
+      },
+      permissionTransferPassed: true,
       causalTransfer: null,
       causalTransferPassed: false,
       hypothesis: "",
@@ -331,25 +385,25 @@ test("production browser exercises the reversed process-first differential order
   await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
   await explainWith(page, "listener-port-match");
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toHaveCount(0);
   await submitCausalTransfer(page, { causalClaim: "process-started" });
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toHaveCount(0);
   await submitCausalTransfer(page);
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
 
-test("browser persistence and resilience fail closed with practice schema v6", async ({ page, browser }) => {
+test("browser persistence and resilience fail closed with practice schema v7", async ({ page, browser }) => {
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 6,
+    schemaVersion: 7,
     fixtureVersion: 5,
     state: {
       scenario: "differential-listener",
@@ -359,6 +413,18 @@ test("browser persistence and resilience fail closed with practice schema v6", a
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      permissionTransfer: {
+        identityEvidenceId: "transfer:before:identity",
+        identityFact: "1001:report-worker,web",
+        resourceEvidenceId: "transfer:before:resource",
+        resourceFact: "600:root:web",
+        fixedMode: "640",
+        hypotheticalIdentity: "1001:report-worker",
+        predictedSymptom: "403",
+        repairNeed: "required",
+        causalClaim: "group-membership-required"
+      },
+      permissionTransferPassed: true,
       causalTransfer: null,
       causalTransferPassed: false,
       hypothesis: "",
@@ -388,7 +454,7 @@ test("browser persistence and resilience fail closed with practice schema v6", a
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state.differentialStep, storageKey)).toBe(0);
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 6,
+    schemaVersion: 7,
     fixtureVersion: 5,
     state: {
       scenario: "differential-listener",
@@ -398,6 +464,18 @@ test("browser persistence and resilience fail closed with practice schema v6", a
       observations: { symptom: false, resource: false, identity: false },
       preRepairEvidence: {},
       reasoning: null,
+      permissionTransfer: {
+        identityEvidenceId: "transfer:before:identity",
+        identityFact: "1001:report-worker,web",
+        resourceEvidenceId: "transfer:before:resource",
+        resourceFact: "600:root:web",
+        fixedMode: "640",
+        hypotheticalIdentity: "1001:report-worker",
+        predictedSymptom: "403",
+        repairNeed: "required",
+        causalClaim: "group-membership-required"
+      },
+      permissionTransferPassed: true,
       causalTransfer: null,
       causalTransferPassed: false,
       hypothesis: "",
@@ -421,7 +499,7 @@ test("browser persistence and resilience fail closed with practice schema v6", a
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 5,
+    schemaVersion: 6,
     fixtureVersion: 5,
     state: {},
     completed: {}
@@ -454,7 +532,7 @@ test("browser persistence and resilience fail closed with practice schema v6", a
   await blockedPage.goto("/");
   await expect(blockedPage.getByRole("button", { name: "Thử lưu lại" })).toBeVisible();
   await expect(blockedPage.getByText(/Không xác nhận được lưu bền vững/)).toBeVisible();
-  await expect(blockedPage.getByText(/Hoàn tất bốn tình huống luyện tập và causal transfer gate/)).toHaveCount(0);
+  await expect(blockedPage.getByText(/Hoàn tất bốn tình huống luyện tập và hai causal transfer gates/)).toHaveCount(0);
   expect(blockedErrors).toEqual([]);
   await blockedContext.close();
 

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkCausalTransfer, execute, explain, initialLabState, recordHypothesis, scenarios } from "../lib/linux-simulator.ts";
+import { checkCausalTransfer, checkPermissionTransfer, execute, explain, initialLabState, recordHypothesis, scenarios } from "../lib/linux-simulator.ts";
 import {
   LINUX_FIXTURE_VERSION,
   PRACTICE_SCHEMA_VERSION,
@@ -38,6 +38,21 @@ function counterfactualFor(overrides = {}) {
   };
 }
 
+function permissionCounterfactualFor(overrides = {}) {
+  return {
+    identityEvidenceId: "transfer:before:identity",
+    identityFact: "1001:report-worker,web",
+    resourceEvidenceId: "transfer:before:resource",
+    resourceFact: "600:root:web",
+    fixedMode: "640",
+    hypotheticalIdentity: "1001:report-worker",
+    predictedSymptom: "403",
+    repairNeed: "required",
+    causalClaim: "group-membership-required",
+    ...overrides
+  };
+}
+
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
   return {
@@ -48,8 +63,28 @@ function memoryStorage(initial = {}) {
   };
 }
 
-function evidence(scenario = "guided", order, step, causalTransfer = null, causalTransferPassed = false) {
-  let state = initialLabState(scenario, order, step, causalTransfer, causalTransferPassed);
+function evidence(
+  scenario = "guided",
+  order,
+  step,
+  causalTransfer = null,
+  causalTransferPassed = false,
+  permissionTransfer = null,
+  permissionTransferPassed = false
+) {
+  if (scenario.startsWith("differential") && permissionTransfer === null) {
+    permissionTransfer = permissionCounterfactualFor();
+    permissionTransferPassed = true;
+  }
+  let state = initialLabState(
+    scenario,
+    order,
+    step,
+    causalTransfer,
+    causalTransferPassed,
+    permissionTransfer,
+    permissionTransferPassed
+  );
   const fixture = scenarios[scenario];
   for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) {
     state = execute(state, command).state;
@@ -57,12 +92,30 @@ function evidence(scenario = "guided", order, step, causalTransfer = null, causa
   return recordHypothesis(state, fixture.correctHypothesis);
 }
 
-function completed(scenario = "guided", order, step, causalTransfer = null, causalTransferPassed = false) {
+function completed(
+  scenario = "guided",
+  order,
+  step,
+  causalTransfer = null,
+  causalTransferPassed = false,
+  permissionTransfer = null,
+  permissionTransferPassed = false
+) {
   const fixture = scenarios[scenario];
-  let state = evidence(scenario, order, step, causalTransfer, causalTransferPassed);
+  let state = evidence(
+    scenario,
+    order,
+    step,
+    causalTransfer,
+    causalTransferPassed,
+    permissionTransfer,
+    permissionTransferPassed
+  );
   state = execute(state, fixture.commands.repair).state;
   state = execute(state, fixture.commands.symptom).state;
-  return explain(state, reasoningFor(state));
+  state = explain(state, reasoningFor(state));
+  if (scenario === "transfer") state = checkPermissionTransfer(state, permissionCounterfactualFor());
+  return state;
 }
 
 test("valid partial and completed checkpoints round-trip across all incident cases", () => {
@@ -90,9 +143,16 @@ test("valid partial and completed checkpoints round-trip across all incident cas
   }
 });
 
-test("completion requires final differential explanation plus the listener counterfactual gate", () => {
+test("completion requires permission transfer before differential and both transfer gates at the end", () => {
   assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, differential: false });
   assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, differential: false });
+
+  let transferWithoutCounterfactual = evidence("transfer");
+  transferWithoutCounterfactual = execute(transferWithoutCounterfactual, scenarios.transfer.commands.repair).state;
+  transferWithoutCounterfactual = execute(transferWithoutCounterfactual, scenarios.transfer.commands.symptom).state;
+  transferWithoutCounterfactual = explain(transferWithoutCounterfactual, reasoningFor(transferWithoutCounterfactual));
+  assert.deepEqual(checkpointFor(transferWithoutCounterfactual).completed, { guided: true, transfer: false, differential: false });
+
   assert.deepEqual(checkpointFor(completed("differential-listener", "listener-first", 0)).completed, { guided: true, transfer: true, differential: false });
 
   const listenerPassed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
@@ -115,11 +175,12 @@ test("corrupt JSON is discarded and starts clean", () => {
   assert.equal(storage.peek(PRACTICE_STORAGE_KEY), undefined);
 });
 
-test("schema and fixture version mismatches including stale v5 fail closed", () => {
+test("schema and fixture version mismatches including stale v6 fail closed", () => {
   const checkpoint = checkpointFor(evidence());
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
     { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
+    { ...checkpoint, schemaVersion: 6, fixtureVersion: 5 },
     { ...checkpoint, schemaVersion: 5, fixtureVersion: 5 },
     { ...checkpoint, schemaVersion: 4, fixtureVersion: 4 },
     { ...checkpoint, schemaVersion: 3, fixtureVersion: 3 }
@@ -206,6 +267,41 @@ test("snapshot provenance and explained reasoning contradictions are rejected on
   }
 });
 
+
+test("permission transfer persistence rejects forged identity/resource facts and impossible carry", () => {
+  const passed = completed("transfer");
+  const valid = checkpointFor(passed);
+  assert.ok(parseCheckpoint(JSON.stringify(valid)));
+
+  for (const mutate of [
+    checkpoint => { checkpoint.state.permissionTransfer.identityEvidenceId = "transfer:before:resource"; },
+    checkpoint => { checkpoint.state.permissionTransfer.resourceFact = "640:root:web"; },
+    checkpoint => { checkpoint.state.permissionTransfer.fixedMode = "644"; },
+    checkpoint => { checkpoint.state.permissionTransfer.hypotheticalIdentity = "1001:report-worker,web"; },
+    checkpoint => { checkpoint.state.permissionTransfer.predictedSymptom = "200"; },
+    checkpoint => { checkpoint.state.permissionTransferPassed = false; checkpoint.completed.transfer = false; },
+    checkpoint => { checkpoint.state.permissionTransfer.extra = "forged"; }
+  ]) {
+    const forged = structuredClone(valid);
+    mutate(forged);
+    if (forged.state.permissionTransferPassed === false) {
+      assert.ok(parseCheckpoint(JSON.stringify(forged)));
+    } else {
+      assert.equal(parseCheckpoint(JSON.stringify(forged)), null);
+    }
+  }
+
+  const guided = checkpointFor(completed("guided"));
+  guided.state.permissionTransfer = permissionCounterfactualFor();
+  guided.state.permissionTransferPassed = true;
+  assert.equal(parseCheckpoint(JSON.stringify(guided)), null);
+
+  const differential = checkpointFor(evidence("differential-process", "process-first", 0));
+  differential.state.permissionTransfer = null;
+  differential.state.permissionTransferPassed = false;
+  differential.completed.transfer = false;
+  assert.equal(parseCheckpoint(JSON.stringify(differential)), null);
+});
 
 test("counterfactual persistence rejects forged answers and impossible sequence carry", () => {
   const passed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());

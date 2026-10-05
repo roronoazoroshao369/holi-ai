@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkCausalTransfer, differentialScenario, editCausalTransfer, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
+import { checkCausalTransfer, checkPermissionTransfer, differentialScenario, editCausalTransfer, editPermissionTransfer, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
 
 
 function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) {
@@ -24,6 +24,21 @@ function counterfactualFor(overrides = {}) {
     predictedSymptom: "200",
     repairNeed: "none",
     causalClaim: "listener-target-match",
+    ...overrides
+  };
+}
+
+function permissionCounterfactualFor(overrides = {}) {
+  return {
+    identityEvidenceId: "transfer:before:identity",
+    identityFact: "1001:report-worker,web",
+    resourceEvidenceId: "transfer:before:resource",
+    resourceFact: "600:root:web",
+    fixedMode: "640",
+    hypotheticalIdentity: "1001:report-worker",
+    predictedSymptom: "403",
+    repairNeed: "required",
+    causalClaim: "group-membership-required",
     ...overrides
   };
 }
@@ -82,6 +97,58 @@ test("permission scenarios require the evidence-backed access-class explanation"
     assert.equal(explain(state, reasoningFor(state, "owner-read")).explained, false);
     assert.equal(explain(state, reasoningFor(state)).explained, true);
   }
+});
+
+test("permission counterfactual changes only group membership after the minimal 640 repair", () => {
+  let state = run(repaired("transfer"), scenarios.transfer.commands.symptom);
+  state = explain(state, reasoningFor(state));
+  assert.equal(state.explained, true);
+
+  for (const wrong of [
+    { identityEvidenceId: "transfer:before:resource" },
+    { identityFact: "1001:report-worker" },
+    { resourceEvidenceId: "transfer:before:identity" },
+    { resourceFact: "640:root:web" },
+    { fixedMode: "644" },
+    { hypotheticalIdentity: "1001:report-worker,web" },
+    { predictedSymptom: "200" },
+    { repairNeed: "none" },
+    { causalClaim: "other-read" }
+  ]) {
+    assert.equal(checkPermissionTransfer(state, permissionCounterfactualFor(wrong)).permissionTransferPassed, false);
+  }
+
+  state = checkPermissionTransfer(state, permissionCounterfactualFor());
+  assert.equal(state.permissionTransferPassed, true);
+  assert.deepEqual(state.permissionTransfer, permissionCounterfactualFor());
+});
+
+test("editing or resetting permission transfer revokes it, while differential reset preserves a passed gate", () => {
+  let transfer = run(repaired("transfer"), scenarios.transfer.commands.symptom);
+  transfer = explain(transfer, reasoningFor(transfer));
+  transfer = checkPermissionTransfer(transfer, permissionCounterfactualFor());
+  assert.equal(transfer.permissionTransferPassed, true);
+
+  const edited = editPermissionTransfer(transfer, permissionCounterfactualFor({ predictedSymptom: "200" }));
+  assert.equal(edited.permissionTransferPassed, false);
+  assert.equal(edited.permissionTransfer.predictedSymptom, "200");
+
+  const carried = initialLabState(
+    "differential-listener",
+    "listener-first",
+    0,
+    null,
+    false,
+    transfer.permissionTransfer,
+    true
+  );
+  const resetDifferential = run(carried, "reset");
+  assert.equal(resetDifferential.permissionTransferPassed, true);
+  assert.deepEqual(resetDifferential.permissionTransfer, permissionCounterfactualFor());
+
+  const resetTransfer = run(transfer, "reset");
+  assert.equal(resetTransfer.permissionTransferPassed, false);
+  assert.equal(resetTransfer.permissionTransfer, null);
 });
 
 test("same-symptom differential cases have neutral learner-facing identity and initial symptom", () => {
