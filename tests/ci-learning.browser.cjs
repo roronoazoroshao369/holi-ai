@@ -140,7 +140,7 @@ test("Git CI practice degrades safely when localStorage is unavailable", async (
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
   const lab = page.getByRole("region", { name: "Git CI simulated incident" });
-  await expect(lab).toContainText("Không xác nhận được lưu bền vững");
+  await expect(lab).toContainText("Không thể persist checkpoint Git/CI");
   await expect(page.getByRole("combobox", { name: "Git CI hypothesis" })).toBeDisabled();
   expect(runtimeErrors).toEqual([]);
   await context.close();
