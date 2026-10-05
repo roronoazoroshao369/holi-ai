@@ -1,33 +1,38 @@
 # Project state
 
-Updated: 2026-10-05. Phase: production browser regression is now a mandatory CI quality gate; next frontier is broader unfamiliar Linux/OS/network diagnosis.
+Updated: 2026-10-05. Phase: unfamiliar diagnosis now spans two causal families; next frontier is same-symptom differential diagnosis.
 Package version: 0.1.0 (no release tag).
-Verified product main: 9e122bd1bbaccab7243703e3e6a6ab758a16fc87.
-Product PR #11 merged as 9e122bd1bbaccab7243703e3e6a6ab758a16fc87. Final PR head: 6ea9138a0c1264426f67b7c3877b52e2d322871a; CI 37253872837 succeeded. Resulting main, CI workflow, Playwright config and browser test were re-read and confirmed.
+Verified product main: 1b72ff2c332e4110fdaeb544626237ac569a7bb0.
+
+Product PR #13 added the new diagnosis family. Final head: 0d41a539ea982677ec3ba67690cec2a5c7a4ceb1; CI 37256198242 succeeded; squash merge: 7fbf4de0e8eb7b6e9d9800c81cfb5f45cafce45f.
+Follow-up product PR #14 removed learner-facing answer leakage and fixed a browser-test hydration race. Final head: 1d24a271c6552f72d559d223c60fc98fe06b2349; final CI 37256690555 succeeded; squash merge: 1b72ff2c332e4110fdaeb544626237ac569a7bb0. Resulting main was re-read and confirmed.
 
 ## Goal contract
-GOAL: make the production-browser learning regression reproducible and mandatory in CI before broadening curriculum.
-WHY NOW: v0.3 persistence added real refresh/hydration behavior, but CI only proved install/typecheck/pure tests/audit/build and could not catch browser-only regressions.
-USER VALUE: every PR/main change now has an automated production Chromium check for the current guided/transfer learning flow and persistence failure paths.
-SCOPE: Playwright Test harness; deterministic production `next start` lifecycle; dedicated port; one Chromium worker; exact-pinned CI Playwright runtime; guided/transfer path; refresh restore; current-fixture reset; full restart; corrupt and stale checkpoint rejection; unavailable Storage API; responsive overflow; keyboard focus; console/page runtime errors.
-NON-GOALS: cross-browser matrix, accounts, cross-device sync, trusted mastery/certification, real Linux execution, sandbox gateway, curriculum expansion.
-ACCEPTANCE: normal CI gates pass first; CI then starts the built production app deterministically, waits for readiness, runs the browser suite, fails on browser/runtime regressions and cleans up the server; final PR head must pass before merge.
-SECURITY: labs remain SIMULATED. Browser tests do not add command execution, credentials, privileged containers, host mounts, Docker socket or trusted client grading. localStorage remains attacker-controlled.
-LEARNING: the browser gate verifies product behavior, not learner competence. Two fixed permission fixtures and multiple-choice explanation remain narrow signals.
-ROLLBACK: revert PR #11. No migrations, account data or server-side learner state were added.
+GOAL: improve transfer beyond two permission fixtures with one unfamiliar SIMULATED incident whose causal mechanism differs meaningfully, while reducing hypothesis prompting.
+WHY NOW: two known permission fixtures allowed memorized chmod sequences and fixture identity to substitute for diagnosis.
+USER VALUE: the learner must now separate observations from conclusions and distinguish file access from process/socket/network evidence before repair.
+SCOPE: add a deterministic TCP-listener/port-mismatch incident; split observation state from incident state; use incident-family dispatch; replace the hypothesis select with a typed causal class; version persistence for the changed state/fixture semantics; expand Node and production-browser coverage; remove answer-leaking learner copy.
+NON-GOALS: broad curriculum expansion, real Linux/network execution, free-form semantic grading, accounts, cross-device sync, trusted certification or a cross-browser matrix.
+ACCEPTANCE: wrong or blind hypotheses cannot complete the unfamiliar incident; incident families cannot mutate each other; stale v1 checkpoints fail closed; learner-facing prompts do not reveal hidden listener evidence; full CI including production Chromium passes on final PR heads.
+SECURITY: all commands remain exact-matched SIMULATED transitions. No eval, shell, subprocess, Docker, credentials, host mounts, Docker socket, privileged runtime or external/internal network execution was added.
+LEARNING: this broadens transfer evidence but does not prove general mastery. Three deterministic fixtures remain learnable by repetition.
+ROLLBACK: revert PR #14 then PR #13. Existing v1 checkpoints were intentionally invalidated when schema/fixture versions moved to 2; no server-side learner data exists.
 
 ## Product truth
-Works: executable product shell; guided and transfer SIMULATED Linux permission practice; evidence/hypothesis/minimal-repair/verification/explanation gates; versioned local checkpoint with safe refresh/reset/restart/corrupt/stale/unavailable-storage behavior; mandatory production Chromium regression in CI.
-Partial: only one skill and two fixed fixtures; local checkpoint is same-browser/device only; terminal transcript is intentionally not persisted; no authoritative mastery model; browser CI currently covers Chromium only.
-Broken: no known in-scope failure after final-head CI and product-main re-read.
-Known risks: client progress is forgeable; fixed fixtures can be memorized; parent-directory traversal, ACL/SELinux and other server configuration remain assumed healthy; curriculum breadth is still mostly planned; the CI-only Playwright runtime is exact-pinned but installed outside the app lockfile and after the normal app dependency audit.
-Current highest-value frontier: broaden Linux/OS/network diagnosis with unfamiliar fixtures and less prompted reasoning while preserving the browser gate.
-Next candidate goals: introduce broader diagnosis/transfer cases; then revisit trusted mastery/accounts only when server identity or cross-device state is justified; real Linux labs remain blocked on an isolated execution design and escape/resource verification.
+Works: executable product shell; two SIMULATED file-access incidents plus one SIMULATED listener/port incident; observation → typed hypothesis → minimal repair → endpoint verification → mechanism explanation gates; incident-family isolation; versioned local checkpoint; safe refresh/reset/restart/corrupt/stale/unavailable-storage behavior; mandatory production Chromium regression in CI.
+Persistence truth: PRACTICE_SCHEMA_VERSION = 2 and LINUX_FIXTURE_VERSION = 2. Old v1 checkpoints are discarded rather than silently interpreted under changed semantics.
+Partial: only three fixed fixtures across two causal families; explanation remains multiple-choice; typed hypotheses are still three known keywords; local checkpoint is same-browser/device only; terminal transcript is intentionally not persisted; browser CI covers Chromium only.
+Broken: no known in-scope product failure after final-head CI and product-main re-read.
+Known risks: client progress is forgeable; scenario order/identity and exact command sequences can still be memorized; the listener incident is a state-machine model rather than a real network stack; parent-directory traversal, ACL/SELinux and other server configuration remain assumed healthy in permission fixtures; curriculum breadth is mostly planned; the CI-only Playwright runtime is exact-pinned but outside package-lock.json and the normal app dependency audit.
+Current highest-value frontier: same-symptom differential diagnosis. Add a second incident that initially looks like the current connection-refused case but has a competing root cause, such as process absent versus process alive on the wrong listener port, with neutral learner-facing identity and evidence that discriminates the causes.
+Next candidate after that: reduce mechanism-explanation prompting and broaden unfamiliar cases; revisit trusted mastery/accounts only when server identity or cross-device state is justified; real Linux labs remain blocked on an isolated execution design and escape/resource verification.
 External blockers: none established.
 
 ## Verification evidence
-Local checks actually executed for PR #11: `node --check playwright.config.cjs` and `node --check tests/learning-flow.browser.cjs` passed on the drafted contents. No local full install/build or local production-browser pass is claimed for this run.
-GitHub CI 37253872837 succeeded on final PR head 6ea9138a0c1264426f67b7c3877b52e2d322871a: npm ci, full typecheck, 14 Node behavioral tests, npm audit --audit-level=high, production build, exact-pinned @playwright/test 1.63.0 install, Chromium/runtime dependency install and production browser regression all passed.
-Browser-job log confirmed `next start --hostname 127.0.0.1 --port 3100`, one discovered test and `1 passed (7.3s)`. The test exercised guided/transfer behavior, persistence restore/reset/restart, corrupt/stale storage, blocked Storage API, 390px overflow, keyboard focus and console/page errors.
-GitHub confirmed PR #11 squash merge as 9e122bd1bbaccab7243703e3e6a6ab758a16fc87. Main was re-read and the expected workflow/config/browser-test files were confirmed.
-Inspect live GitHub before trusting these SHAs.
+PR #13 final head 0d41a539ea982677ec3ba67690cec2a5c7a4ceb1 passed GitHub CI 37256198242: npm ci, full typecheck, 17/17 Node behavioral tests, npm audit --audit-level=high, production build, exact-pinned @playwright/test 1.63.0 install, Chromium/runtime install and production browser regression. Browser log confirmed `next start --hostname 127.0.0.1 --port 3100`, two discovered tests using one worker, and `2 passed (10.3s)`. PR #13 squash-merged as 7fbf4de0e8eb7b6e9d9800c81cfb5f45cafce45f.
+
+Post-merge red-team found learner-facing answer leakage in the unfamiliar incident title. PR #14 removed that cue and added a regression test. Its first head 76ddc6b4714d69fb9e12300bae4775b4a1d41d42 ran CI 37256411604: npm ci/typecheck/18 Node tests/audit/build/browser-runtime install all succeeded, but the production browser step failed with 1 passed / 1 failed because the test injected localStorage before the app's initial hydration/autosave had settled. Artifact evidence showed a valid guided checkpoint overwrote the injected listener checkpoint. This was a test race, not accepted as a product pass.
+
+PR #14 final head 1d24a271c6552f72d559d223c60fc98fe06b2349 waited for the initial persistence save before injecting the browser checkpoint. GitHub CI 37256690555 succeeded: 18/18 Node tests, audit/build/runtime install, then production `next start` on 127.0.0.1:3100 and two Chromium tests using one worker, `2 passed (15.6s)`. PR #14 squash-merged as 1b72ff2c332e4110fdaeb544626237ac569a7bb0. Main was re-read and confirmed to contain neutral learner copy, schema/fixture version 2 and the deterministic browser setup.
+
+No separate successful post-merge main-push CI is claimed unless live GitHub evidence establishes one. Inspect live GitHub before trusting these SHAs.
