@@ -156,10 +156,10 @@ export function LabTerminal() {
 
       <details>
         <summary>Mental model: tách observation khỏi conclusion</summary>
-        <p>HTTP/curl chỉ cho biết symptom. Process tồn tại chưa chứng minh socket đang LISTEN đúng port; file tồn tại chưa chứng minh process có access class phù hợp.
-          Hãy thu thập dữ liệu về resource và identity/process trước khi ghi hypothesis.</p>
-        <p>Fixture permission giả định directory traversal, ACL/SELinux và cấu hình khác đang khỏe. Incident listener là simulator TCP, không phải network stack thật.
-          Trong production phải kiểm tra thêm namespace, firewall, bind address, service manager và logs.</p>
+        <p>HTTP/curl chỉ cho biết symptom. Cùng một connection failure có thể xuất phát từ các causal layer khác nhau.
+          Hãy kiểm tra process state và socket state trước khi khóa hypothesis; đừng suy ra nguyên nhân từ tên hoặc thứ tự fixture.</p>
+        <p>Fixture permission giả định directory traversal, ACL/SELinux và cấu hình khác đang khỏe. Các health incident là simulator deterministic, không phải network stack thật.
+          Trong production cần kiểm tra thêm namespace, firewall, bind address, service manager và logs.</p>
       </details>
 
       <h3>{fixture.title}</h3>
@@ -209,8 +209,9 @@ export function LabTerminal() {
       <p role="status">{feedback}</p>
 
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
-      {state.explained && state.scenario === "transfer" && <button onClick={() => advanceScenario("listener")}>Thử incident khác cơ chế</button>}
-      {state.explained && state.scenario === "listener" && <p role="status">Hoàn tất ba tình huống luyện tập, gồm một incident listener/port khác cơ chế permission. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
+      {state.explained && state.scenario === "transfer" && <button onClick={() => advanceScenario("differential-listener")}>Thử differential diagnosis</button>}
+      {state.explained && state.scenario === "differential-listener" && <button onClick={() => advanceScenario("differential-process")}>Thử case cùng symptom</button>}
+      {state.explained && state.scenario === "differential-process" && <p role="status">Hoàn tất bốn tình huống luyện tập, gồm hai health incident có cùng symptom nhưng evidence dẫn tới causal class khác nhau. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
 
       <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại và checkpoint mới sẽ ghi trạng thái reset. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn. Transcript terminal không được persist.</p>
     </div>
