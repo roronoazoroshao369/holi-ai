@@ -38,7 +38,14 @@ async function fillTransfer(page, selectedRevision = sha.tagCommit) {
 async function saved(page, predicate) {
   await expect.poll(() => page.evaluate(([key, expression]) => {
     const v = JSON.parse(localStorage.getItem(key));
-    return v && expression === 'complete' ? v.state.revisionPractice.transferPassed : Boolean(v);
+    if (!v) return false;
+    const s = v.state.revisionPractice;
+    if (expression === 'complete') return s.transferPassed;
+    if (expression === 'fresh') return Object.keys(s.evidence).length === 0 && s.hypothesis === '' && !s.transferPassed;
+    if (expression === 'transfer-draft') return !s.transferPassed && s.transfer?.selectedRevision === 'c8'.repeat(20);
+    if (expression === 'explanation-draft') return !s.explained && s.transfer === null && s.explanation?.sources.intent.fact === 'a4'.repeat(20);
+    if (expression === 'wrong-diagnosis') return s.hypothesis === 'cache-content' && s.verification !== null && !s.verified;
+    return true;
   }, [key, predicate])).toBe(true);
 }
 
@@ -64,6 +71,7 @@ test('Git revision production flow distinguishes green, consumed commit and caus
   await page.getByRole('button', { name: 'Verify consumed revision', exact: true }).click();
   await expect(lab).toContainText('Assessment chưa verified');
   await expect(explanation).toHaveCount(0);
+  await saved(page, 'wrong-diagnosis');
   await page.reload();
   await expect(lab).toContainText('Assessment chưa verified');
   await expect(page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true })).toHaveValue('cache-content');
@@ -110,12 +118,13 @@ test('Git revision production flow distinguishes green, consumed commit and caus
   await field.focus();
   expect(await field.evaluate(e => getComputedStyle(e).outlineStyle !== 'none' && getComputedStyle(e).outlineWidth !== '0px')).toBe(true);
   await field.fill(sha.tagObject); await expect(transfer).not.toContainText('Hoàn tất Git revision slice');
+  await saved(page, 'transfer-draft');
   await page.reload(); await expect(field).toHaveValue(sha.tagObject); await expect(transfer).not.toContainText('Hoàn tất Git revision slice');
   await field.fill(sha.tagCommit); await page.getByRole('button', { name: 'Check Git revision transfer', exact: true }).click();
   await expect(transfer).toContainText('Hoàn tất Git revision slice');
   await page.getByRole('textbox', { name: 'Git revision intent fact', exact: true }).fill(sha.built);
-  await expect(transfer).toHaveCount(0); await page.reload(); await expect(transfer).toHaveCount(0);
-  await page.getByRole('button', { name: 'Reset Git revision incident', exact: true }).click(); await page.reload();
+  await expect(transfer).toHaveCount(0); await saved(page, 'explanation-draft'); await page.reload(); await expect(transfer).toHaveCount(0);
+  await page.getByRole('button', { name: 'Reset Git revision incident', exact: true }).click(); await saved(page, 'fresh'); await page.reload();
   await expect(lab).toContainText('0/5 nguồn đã thu');
   await expect(page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true })).toHaveValue('');
   expect(runtime).toEqual([]);
@@ -133,9 +142,10 @@ test('Git revision restores fail closed and Storage getter denial remains epheme
   await collect(page);
   await expect(page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true })).toHaveValue('');
   await page.getByRole('button', { name: 'Reset Git revision incident', exact: true }).click();
-  await saved(page, 'initial');
+  await saved(page, 'fresh');
   const fresh = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
   for (const mode of ['forged', 'stale-schema', 'stale-fixture', 'corrupt']) {
+    await saved(page, 'fresh');
     const value = structuredClone(fresh);
     if (mode === 'forged') value.state.revisionPractice.transferPassed = true;
     if (mode === 'stale-schema') value.schemaVersion = 1;
