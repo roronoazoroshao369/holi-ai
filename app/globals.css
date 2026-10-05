@@ -128,3 +128,15 @@ footer strong { color:var(--text); }
   .persistenceActions { width: 100%; }
   .persistenceActions button { flex: 1 1 auto; }
 }
+
+
+.reasoningPanel { margin-top: 24px; padding: 20px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.reasoningPanel h4 { margin-top: 0; }
+.reasoningPanel fieldset { margin: 16px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.reasoningPanel label { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.reasoningPanel input, .reasoningPanel select { width: 100%; min-width: 0; box-sizing: border-box; }
+.evidenceBank { display: grid; gap: 12px; }
+.evidenceBank article { min-width: 0; padding: 12px; background: var(--bg); border-radius: 8px; }
+.evidenceBank code { display: block; margin-top: 8px; overflow-wrap: anywhere; }
+.evidenceBank pre { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: 0; }
+@media (max-width: 600px) { .reasoningPanel { padding: 12px; } .reasoningPanel fieldset { grid-template-columns: 1fr; padding: 12px; } }

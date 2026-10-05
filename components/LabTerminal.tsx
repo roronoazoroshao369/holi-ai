@@ -3,12 +3,16 @@ import { FormEvent, useEffect, useState } from "react";
 import {
   differentialScenario,
   evidenceReady,
+  evidenceSlots,
+  editReasoning,
+  emptyReasoning,
   execute,
   explain,
   initialLabState,
   isDifferentialScenario,
   recordHypothesis,
   scenarios,
+  type ReasoningAnswer,
   type DifferentialOrder,
   type DifferentialStep,
   type Line as ReplyLine,
@@ -40,7 +44,6 @@ export function LabTerminal() {
   const [command, setCommand] = useState("");
   const [hypothesisDraft, setHypothesisDraft] = useState("");
   const [hypothesisFeedback, setHypothesisFeedback] = useState("");
-  const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const [storageUsable, setStorageUsable] = useState(false);
@@ -95,7 +98,6 @@ export function LabTerminal() {
     if (cmd === "reset") {
       setHypothesisDraft("");
       setHypothesisFeedback("");
-      setAnswer("");
       setFeedback("");
     }
     setCommand("");
@@ -119,7 +121,6 @@ export function LabTerminal() {
     setCommand("");
     setHypothesisDraft("");
     setHypothesisFeedback("");
-    setAnswer("");
     setFeedback("");
   }
 
@@ -132,7 +133,6 @@ export function LabTerminal() {
     setCommand("");
     setHypothesisDraft("");
     setHypothesisFeedback("");
-    setAnswer("");
     setFeedback("");
     if (cleared) {
       setStorageUsable(true);
@@ -164,6 +164,21 @@ export function LabTerminal() {
   const ready = evidenceReady(state);
   const hypothesisLocked = Boolean(state.hypothesis);
   const inDifferential = isDifferentialScenario(state.scenario);
+  const answer = state.reasoning ?? emptyReasoning();
+  const evidenceLabels = { symptom: "E1 · symptom", identity: "E2 · " + fixture.identityLabel, resource: "E3 · " + fixture.resourceLabel };
+
+  function updateAnswer(next: ReasoningAnswer) {
+    setState(editReasoning(state, next));
+    setFeedback("");
+  }
+
+  function evidenceOptions() {
+    return <>
+      <option value="">Chọn nguồn observation</option>
+      {evidenceSlots.map(slot => state.preRepairEvidence[slot] &&
+        <option key={slot} value={state.preRepairEvidence[slot]!.id}>{evidenceLabels[slot]}</option>)}
+    </>;
+  }
 
   return (
     <div className="learningLab">
@@ -206,7 +221,7 @@ export function LabTerminal() {
         </div>
       </div>
 
-      <p>Bằng chứng: symptom {state.observations.symptom ? "✓" : "—"} · {fixture.resourceLabel} {state.observations.resource ? "✓" : "—"} · {fixture.identityLabel} {state.observations.identity ? "✓" : "—"}.</p>
+      <p>Observation đã xem: symptom {state.observations.symptom ? "✓" : "—"} · {fixture.resourceLabel} {state.observations.resource ? "✓" : "—"} · {fixture.identityLabel} {state.observations.identity ? "✓" : "—"}.</p>
 
       <form onSubmit={submitHypothesis}>
         <label>Giả thuyết trước khi sửa
@@ -219,20 +234,64 @@ export function LabTerminal() {
       </form>
       <p role="status">{hypothesisFeedback}</p>
 
-      {state.verified && <form onSubmit={event => {
-        event.preventDefault();
-        const result = explain(state, answer);
-        setState(result);
-        setFeedback(result.explained ? "Đúng: explanation khớp với evidence và cơ chế của incident." : "Chưa đúng. Đối chiếu observation với cơ chế trước khi kết luận.");
-      }}>
-        <label>{fixture.explanationPrompt}
-          <select aria-label="Giải thích cơ chế" value={answer} onChange={event => { setAnswer(event.target.value); setFeedback(""); }}>
-            <option value="">Chọn cơ chế được bằng chứng hỗ trợ</option>
-            {fixture.explanationOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </select>
-        </label>
-        <button disabled={!answer} type="submit">Kiểm tra giải thích</button>
-      </form>}
+      {state.verified && <section className="reasoningPanel" aria-label="Lập luận từ bằng chứng">
+        <h4>Nối bằng chứng với cơ chế</h4>
+        <p>Đọc snapshot thu trước sửa. Chọn nguồn cho từng nhận định, rồi nối hai nguồn với cơ chế và đích sửa tối thiểu.
+          Output sau sửa không thay thế các snapshot này. Bài này kiểm tra một bộ từ khóa hữu hạn, chưa đánh giá văn bản tự do.</p>
+        <div className="evidenceBank">
+          {evidenceSlots.map(slot => {
+            const evidence = state.preRepairEvidence[slot];
+            return evidence && <article key={slot}>
+              <strong>{evidenceLabels[slot]} · trước sửa</strong>
+              <code>{evidence.command}</code>
+              <pre>{evidence.output}</pre>
+            </article>;
+          })}
+        </div>
+        <p>{fixture.family === "file-access"
+          ? "Nhận định: symptom dùng mã HTTP; identity dùng UID:GROUPS với tên các group theo thứ tự trong output (ví dụ 42:app,ops); resource dùng mode trước sửa. Cơ chế: owner-read / group-read / other-read. Đích sửa: mode tối thiểu."
+          : "Nhận định: symptom dùng refused / ok; identity dùng present / absent; resource dùng port quan sát được hoặc none. Cơ chế: listener-port-match / process-started / file-mode. Đích sửa: port client cần."}</p>
+        <form onSubmit={event => {
+          event.preventDefault();
+          const result = explain(state, answer);
+          setState(result);
+          setFeedback(result.explained ? "Đúng: các nguồn observation, nhận định và liên kết cơ chế đều khớp." : "Chưa đúng. Kiểm tra nguồn, nhận định, hai bằng chứng hỗ trợ cơ chế và đích sửa tối thiểu.");
+        }}>
+          {evidenceSlots.map(slot => <fieldset key={slot}>
+            <legend>{slot === "symptom" ? "Symptom trước sửa" : slot === "identity" ? "Danh tính / process trước sửa" : "File / socket trước sửa"}</legend>
+            <label>Nguồn bằng chứng
+              <select aria-label={"Nguồn " + slot} value={answer[slot].evidenceId}
+                onChange={event => updateAnswer({ ...answer, [slot]: { ...answer[slot], evidenceId: event.target.value } })}>
+                {evidenceOptions()}
+              </select>
+            </label>
+            <label>Nhận định từ observation
+              <input aria-label={"Nhận định " + slot} maxLength={100} value={answer[slot].claim}
+                onChange={event => updateAnswer({ ...answer, [slot]: { ...answer[slot], claim: event.target.value } })} />
+            </label>
+          </fieldset>)}
+          <fieldset>
+            <legend>Liên kết cơ chế</legend>
+            {[0, 1].map(index => <label key={index}>Bằng chứng hỗ trợ {index + 1}
+              <select aria-label={"Bằng chứng cơ chế " + (index + 1)} value={answer.mechanism.evidenceIds[index]}
+                onChange={event => {
+                  const ids: [string, string] = [...answer.mechanism.evidenceIds];
+                  ids[index] = event.target.value;
+                  updateAnswer({ ...answer, mechanism: { ...answer.mechanism, evidenceIds: ids } });
+                }}>{evidenceOptions()}</select>
+            </label>)}
+            <label>Cơ chế được hai observation hỗ trợ
+              <input aria-label="Giải thích cơ chế" maxLength={100} value={answer.mechanism.claim}
+                onChange={event => updateAnswer({ ...answer, mechanism: { ...answer.mechanism, claim: event.target.value } })} />
+            </label>
+            <label>Đích sửa tối thiểu (mode hoặc port)
+              <input aria-label="Đích sửa tối thiểu" maxLength={100} value={answer.target}
+                onChange={event => updateAnswer({ ...answer, target: event.target.value })} />
+            </label>
+          </fieldset>
+          <button type="submit">Kiểm tra giải thích</button>
+        </form>
+      </section>}
       <p role="status">{feedback}</p>
 
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
@@ -247,3 +306,4 @@ export function LabTerminal() {
     </div>
   );
 }
+
