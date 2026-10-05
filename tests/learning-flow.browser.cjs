@@ -28,7 +28,7 @@ async function explainWith(page, value) {
   await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
 }
 
-test("production learning flow transfers from file access to unfamiliar listener diagnosis", async ({ page }) => {
+test("production flow differentiates same connection symptom using process and socket evidence", async ({ page }) => {
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
 
@@ -37,12 +37,10 @@ test("production learning flow transfers from file access to unfamiliar listener
   await expect(page.getByRole("textbox", { name: "Lab terminal command" })).toBeVisible();
   await expect(hypothesis).toBeDisabled();
 
-  // Blind permission repair cannot manufacture verified progress.
   await runCommand(page, "chmod 644 /srv/site/index.html");
   await runCommand(page, "curl localhost");
   await expect(page.getByRole("combobox", { name: "Giải thích cơ chế" })).toHaveCount(0);
 
-  // Guided permission flow: observations -> typed hypothesis -> minimal repair -> verify -> explain.
   await runCommand(page, "reset");
   for (const command of ["curl localhost", "ls -l /srv/site/index.html", "id www-data"]) {
     await runCommand(page, command);
@@ -50,12 +48,9 @@ test("production learning flow transfers from file access to unfamiliar listener
   await submitHypothesis(page, "permission");
   await runCommand(page, "chmod 644 /srv/site/index.html");
   await runCommand(page, "curl localhost");
-  await explainWith(page, "group-read");
-  await expect(page.getByRole("button", { name: "Thử tình huống permission mới" })).toHaveCount(0);
   await explainWith(page, "other-read");
   await page.getByRole("button", { name: "Thử tình huống permission mới" }).click();
 
-  // Transfer fixture rejects memorized 644 and requires group-scoped 640.
   for (const command of ["curl localhost", "ls -l /srv/reports/status.html", "id report-worker"]) {
     await runCommand(page, command);
   }
@@ -66,11 +61,15 @@ test("production learning flow transfers from file access to unfamiliar listener
   await runCommand(page, "chmod 640 /srv/reports/status.html");
   await runCommand(page, "curl localhost");
   await explainWith(page, "group-read");
-  await page.getByRole("button", { name: "Thử incident khác cơ chế" }).click();
+  await page.getByRole("button", { name: "Thử differential diagnosis" }).click();
 
-  // The unfamiliar family changes causal mechanism: process is alive, but the socket listens on 9090 instead of 8080.
-  await expect(page.getByRole("heading", { name: /Incident lạ/ })).toBeVisible();
-  await expect(hypothesis).toBeDisabled();
+  const differentialHeading = page.getByRole("heading", { name: "Health endpoint differential diagnosis" });
+  await expect(differentialHeading).toBeVisible();
+
+  await runCommand(page, "help");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).not.toContainText("Repair syntax");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).not.toContainText("configure api-server");
+
   for (const command of [
     "curl 127.0.0.1:8080/health",
     "ps -o pid,user,comm -C api-server",
@@ -78,9 +77,9 @@ test("production learning flow transfers from file access to unfamiliar listener
   ]) {
     await runCommand(page, command);
   }
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("842 app api-server");
   await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("127.0.0.1:9090");
 
-  // Wrong causal class cannot pass even with the superficially correct repair.
   await submitHypothesis(page, "process");
   await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
@@ -95,49 +94,84 @@ test("production learning flow transfers from file access to unfamiliar listener
     await runCommand(page, command);
   }
   await submitHypothesis(page, "network");
+  await runCommand(page, "help");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("configure SERVICE --listen ADDRESS:PORT");
   await runCommand(page, "configure api-server --listen 127.0.0.1:8080");
   await runCommand(page, "curl 127.0.0.1:8080/health");
-  await explainWith(page, "process-exists");
-  await expect(page.getByText(/Hoàn tất ba tình huống luyện tập/)).toHaveCount(0);
+  await explainWith(page, "process-started");
+  await expect(page.getByRole("button", { name: "Thử case cùng symptom" })).toHaveCount(0);
   await explainWith(page, "listener-port-match");
-  await expect(page.getByText(/Hoàn tất ba tình huống luyện tập/)).toBeVisible();
+  await page.getByRole("button", { name: "Thử case cùng symptom" }).click();
 
-  // Completion resumes after refresh but is still explicitly untrusted local practice.
+  await expect(differentialHeading).toBeVisible();
+  await runCommand(page, "help");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).not.toContainText("Repair syntax");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).not.toContainText("start api-server");
+
+  for (const command of [
+    "curl 127.0.0.1:8080/health",
+    "ps -o pid,user,comm -C api-server",
+    "ss -ltnp"
+  ]) {
+    await runCommand(page, command);
+  }
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("no matching api-server process");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("No LISTEN socket owned by api-server");
+
+  await submitHypothesis(page, "network");
+  await runCommand(page, "start api-server --listen 127.0.0.1:8080");
+  await runCommand(page, "curl 127.0.0.1:8080/health");
+  await expect(page.getByRole("combobox", { name: "Giải thích cơ chế" })).toHaveCount(0);
+
+  await runCommand(page, "reset");
+  for (const command of [
+    "curl 127.0.0.1:8080/health",
+    "ps -o pid,user,comm -C api-server",
+    "ss -ltnp"
+  ]) {
+    await runCommand(page, command);
+  }
+  await submitHypothesis(page, "process");
+  await runCommand(page, "help");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("start SERVICE --listen ADDRESS:PORT");
+  await runCommand(page, "start api-server --listen 127.0.0.1:8080");
+  await runCommand(page, "curl 127.0.0.1:8080/health");
+  await explainWith(page, "listener-port-match");
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toHaveCount(0);
+  await explainWith(page, "process-started");
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
+
   await page.reload();
-  await expect(page.getByText(/Hoàn tất ba tình huống luyện tập/)).toBeVisible();
+  await expect(page.getByText(/Hoàn tất bốn tình huống luyện tập/)).toBeVisible();
   await expect(page.getByText(/Đã phục hồi checkpoint hợp lệ/)).toBeVisible();
   await expect(page.getByText(/KHÔNG PHẢI MASTERY/)).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
 
-test("browser persistence and resilience fail closed with the expanded fixture schema", async ({ page, browser }) => {
+test("browser persistence and resilience fail closed with differential schema v3", async ({ page, browser }) => {
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
-  // Let initial hydration/autosave settle before injecting a checkpoint so the test does not race
-  // the app's first guided-state save and accidentally overwrite the injected listener state.
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
-  // A structurally valid local checkpoint may resume practice, but it remains client-controlled convenience state.
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 2,
-    fixtureVersion: 2,
+    schemaVersion: 3,
+    fixtureVersion: 3,
     state: {
-      scenario: "listener",
-      incident: { kind: "tcp-listener", listenerPort: 9090 },
+      scenario: "differential-listener",
+      incident: { kind: "tcp-service", processRunning: true, listenerPort: 9090 },
       observations: { symptom: false, resource: false, identity: false },
       hypothesis: "",
       repairedWithEvidence: false,
       verified: false,
       explained: false
     },
-    completed: { guided: true, transfer: true, listener: false }
+    completed: { guided: true, transfer: true, differential: false }
   })), storageKey);
   await page.reload();
-  await expect(page.getByRole("heading", { name: /Incident lạ/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Health endpoint differential diagnosis" })).toBeVisible();
   await expect(page.getByText(/KHÔNG PHẢI MASTERY/)).toBeVisible();
 
-  // Reset clears current-fixture evidence and persists that reset.
   for (const command of [
     "curl 127.0.0.1:8080/health",
     "ps -o pid,user,comm -C api-server",
@@ -148,25 +182,21 @@ test("browser persistence and resilience fail closed with the expanded fixture s
   await expect(page.getByRole("textbox", { name: "Giả thuyết" })).toBeEnabled();
   await runCommand(page, "reset");
   await page.reload();
-  await expect(page.getByRole("heading", { name: /Incident lạ/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Health endpoint differential diagnosis" })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Giả thuyết" })).toBeDisabled();
 
-  // Full restart returns to guided practice and survives refresh.
   await page.getByRole("button", { name: "Học lại từ đầu" }).click();
   await expect(page.getByRole("heading", { name: "1. Chẩn đoán có hướng dẫn" })).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading", { name: "1. Chẩn đoán có hướng dẫn" })).toBeVisible();
 
-  // Corrupt persisted data is discarded rather than manufacturing completion.
   await page.evaluate(key => localStorage.setItem(key, "{bad json"), storageKey);
   await page.reload();
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: "1. Chẩn đoán có hướng dẫn" })).toBeVisible();
 
-  // Old v1 schema/fixture checkpoints are semantically stale and fail closed.
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 1,
-    fixtureVersion: 1,
+    schemaVersion: 2,
+    fixtureVersion: 2,
     state: {},
     completed: {}
   })), storageKey);
@@ -174,7 +204,6 @@ test("browser persistence and resilience fail closed with the expanded fixture s
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Giả thuyết" })).toBeDisabled();
 
-  // Responsive layout must not overflow horizontally and keyboard focus stays visible.
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const commandInput = page.getByRole("textbox", { name: "Lab terminal command" });
@@ -184,7 +213,6 @@ test("browser persistence and resilience fail closed with the expanded fixture s
     return style.outlineStyle !== "none" && style.outlineWidth !== "0px";
   })).toBe(true);
 
-  // Storage failures are injected before navigation in a fresh context for deterministic behavior.
   const blockedContext = await browser.newContext();
   await blockedContext.addInitScript(() => {
     for (const method of ["getItem", "setItem", "removeItem"]) {
@@ -200,7 +228,7 @@ test("browser persistence and resilience fail closed with the expanded fixture s
   await blockedPage.goto("/");
   await expect(blockedPage.getByRole("button", { name: "Thử lưu lại" })).toBeVisible();
   await expect(blockedPage.getByText(/Không xác nhận được lưu bền vững/)).toBeVisible();
-  await expect(blockedPage.getByText(/Hoàn tất ba tình huống luyện tập/)).toHaveCount(0);
+  await expect(blockedPage.getByText(/Hoàn tất bốn tình huống luyện tập/)).toHaveCount(0);
   expect(blockedErrors).toEqual([]);
   await blockedContext.close();
 
