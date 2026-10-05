@@ -116,7 +116,7 @@ export function CiLab() {
             {loadStatus === "restored" ? "Đã khôi phục checkpoint Git/CI hợp lệ."
               : loadStatus === "discarded" ? "Checkpoint Git/CI cũ/hỏng đã bị loại bỏ an toàn."
               : storageWritable ? "Tiến trình Git/CI được lưu trên trình duyệt này."
-              : "Không xác nhận được lưu bền vững; practice vẫn chạy ephemeral."}
+              : "Không thể persist checkpoint Git/CI; practice vẫn chạy ephemeral."}
           </p>
         </div>
         <button className="secondaryButton" type="button" onClick={resetAll}>Reset Git/CI incident</button>
