@@ -1,11 +1,11 @@
 # Project state
 
-Updated: 2026-10-05. Phase: second cross-relation causal-transfer gate delivered and verified on main.
+Updated: 2026-10-05. Phase: v0.3 simulated mastery flow with reproducible audited browser-test runtime; dependency-hygiene goal delivered and verified on main.
 Package version: 0.1.0. No release or tag was created in this run.
-Verified main: 7ae7950af5f24efdc94306a7b4b6b9091f513d53 (PR #24), re-read after squash merge.
-Product PR final head: f1c7d444e1d1309c95be77fa795ebfa1a9f11977.
-Successful exact final-head PR CI: 37289499028 (job 111696299172).
-No separate successful main-push workflow is claimed; none was visible when main was re-read.
+Verified main: f6cbcc61c1285bbec6bb4ca779d2ea30b5f4ecd0 (PR #26), re-read after squash merge.
+Product PR final head: 9c1dd7159b1d449a75a4316290dce10b81fd7184.
+Successful exact final-head PR CI: 37315643839 (job 111781574376); duplicate exact-head run 37315695718 also completed successfully.
+PR #26 preserved simulator semantics and changed dependency/CI ownership plus durable docs only.
 
 ## Goal contract
 GOAL: test whether the changed-evidence prediction pattern transfers to a materially different permission/identity relation instead of adding another listener-token variant.
@@ -33,11 +33,10 @@ PR #24 squash-merged as 7ae7950af5f24efdc94306a7b4b6b9091f513d53. Main was re-re
 ## Known risks
 Two deterministic counterfactuals across different causal relations reduce single-token memorization but remain visible, finite and retryable. They do not prove general causal transfer or mastery.
 localStorage completion/evidence remains forgeable. Permission/TCP models are simplified. The fixture corpus is tiny. Browser coverage is Chromium-only. Web Crypto assignment can repeat an order.
-Mandatory Playwright 1.63.0 is still installed in CI outside package-lock.json and after the normal app audit, leaving a reproducibility/supply-chain gap.
+@playwright/test, playwright and playwright-core are exact-locked at 1.63.0 and included in npm ci/audit. Chromium/FFmpeg are still Playwright-managed CDN downloads selected by the locked version; those binary artifacts are not npm-audited.
 
 ## Highest-value frontier
-Move exact-pinned Playwright into the repository's reproducible lockfile and normal dependency-audit workflow without weakening production browser coverage. This risk now has higher leverage than adding a third fixed counterfactual.
-After dependency hygiene, prefer a genuinely unfamiliar learning-transfer/curriculum slice over another token variant unless a specific learning defect justifies one.
+Select one genuinely unfamiliar learning-transfer or broader curriculum slice with observable competence evidence. Do not add a third fixed counterfactual merely to increase gate count; the current two are visible, finite and memorizable. Prefer a vertical slice that forces diagnosis/repair/verification/explanation on a new mechanism while retaining explicit SIMULATED labeling until a separate isolated execution gateway exists.
 
 ## Completed goal — Playwright dependency hygiene
 GOAL: move the mandatory @playwright/test 1.63.0 runtime into package.json/package-lock.json and the normal npm ci/audit dependency graph while preserving production Chromium coverage.
@@ -46,7 +45,7 @@ USER VALUE: the mandatory browser gate becomes reproducible from the repository 
 SCOPE: exact-pin @playwright/test 1.63.0; lock its Playwright dependency chain; remove temporary CI runtime/NODE_PATH setup; install Chromium from the locked local CLI; keep the existing production browser suite mandatory.
 NON-GOALS: change Playwright version, broaden browser engines, add curriculum, alter simulator semantics, introduce accounts or real execution.
 ACCEPTANCE CRITERIA: SATISFIED on executable/config head caace34735d202c144934af7dd621206b34ab099. npm ci resolved the locked runtime; typecheck passed; 36/36 Node tests passed; high-severity npm audit found 0 vulnerabilities; production build passed; Chromium installation from the local locked Playwright CLI passed; 3/3 production Chromium tests passed; CI no longer runs npm install --no-save for Playwright or relies on RUNNER_TEMP/NODE_PATH.
-TEST PLAN: executable/config head caace34735d202c144934af7dd621206b34ab099 passed CI run 37314919851 (job 111779118647): npm ci; typecheck; 36/36 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; local Playwright Chromium install; 3/3 production browser tests in 39.6s. Exact final PR head must repeat the same workflow before merge.
+TEST PLAN: executable/config head caace34735d202c144934af7dd621206b34ab099 passed CI 37314919851. Exact final PR head 9c1dd7159b1d449a75a4316290dce10b81fd7184 then repeated the full workflow successfully in CI 37315643839 (job 111781574376); duplicate exact-head run 37315695718 also succeeded. PR #26 squash-merged as f6cbcc61c1285bbec6bb4ca779d2ea30b5f4ecd0.
 SECURITY IMPACT: reduces un-audited mandatory CI dependency surface; no learner execution boundary changes.
 LEARNING IMPACT: none to learner semantics; preserves the browser regression that protects the current mastery-flow UI.
 ROLLBACK STRATEGY: revert this branch/PR; the prior temporary Playwright installer can be restored without data migration.
