@@ -1,6 +1,7 @@
 # Learning model
 
 Current exercise: nginx worker www-data receives 403 for a root-owned file mode 600. Learner collects permission evidence before repair and verifies HTTP afterwards. Healthy system alone does not satisfy diagnostic practice. Help gives tool vocabulary; it does not give the exact repair mode.
-Next gate needs an explanation about owner/group/other read permissions, minimal privilege, and a changed scenario. A 644 answer is fixture-specific, not universal advice (sensitive content must not become world-readable).
+The learner now observes HTTP, file permissions and worker identity, records a hypothesis, repairs, verifies HTTP and selects the access-class explanation. Guided fixture uses other read (644); transfer changes the worker to a supplementary member of the file group (640). Copying 644 makes transfer HTTP healthy but fails least-access assessment. A 644 answer is fixture-specific, not universal advice (sensitive content must not become world-readable).
+Mechanism notes distinguish UID/GID access classes and state healthy parent-directory/configuration assumptions. Multiple-choice explanations and two known fixtures can be guessed or memorized; they are local practice signals, not general mastery certification. Future assessment needs broader unfamiliar cases and reasoned evidence.
 Reset clears evidence and repair state; refresh starts again. Keep practice completion distinct from durable mastery.
 

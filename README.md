@@ -4,7 +4,11 @@
 
 This repository is being repurposed from the earlier Holi-AI film-planning experiment into a **DevOps learning platform**.
 
-## Current slice — v0.1 bootstrap
+## Current slice — Linux learning and transfer
+
+The Linux exercise now includes HTTP/file/identity evidence, a pre-repair hypothesis, minimal repair, HTTP verification and access-class explanation. A second group-scoped fixture rejects copying the public-page repair. This is ephemeral, untrusted browser practice; reload resets it.
+
+Production browser regression: start the built app with npm start, then run node tests/learning-flow.browser.cjs with Playwright installed externally. Optional environment variables: PLAYWRIGHT_MODULE, CHROMIUM_PATH, BASE_URL and SCREENSHOT_PATH. This suite is currently manual; CI runs the pure behavioral tests, typecheck, dependency audit and production build.
 
 The current implementation contains:
 

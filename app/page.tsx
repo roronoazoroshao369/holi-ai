@@ -84,7 +84,7 @@ export default function Home() {
           <div><b>Explain</b><p>Giải thích bản chất, không bắt học thuộc command.</p></div>
           <div><b>Observe</b><p>Đọc metrics, logs, process và network trước khi thay đổi hệ thống.</p></div>
           <div><b>Repair</b><p>Mục tiêu: mỗi module có failure scenario và verification gate.</p></div>
-          <div><b>Transfer</b><p>Dự kiến: bài cuối đổi context để đánh giá khả năng chuyển giao.</p></div>
+          <div><b>Transfer</b><p>Lab Linux đổi danh tính worker và group file để kiểm tra cách suy luận trong tình huống mới.</p></div>
         </div>
       </section>
 
