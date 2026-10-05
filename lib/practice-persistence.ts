@@ -38,6 +38,12 @@ function validIncident(state: LabState): boolean {
     (state.incident.listenerPort === 8080 || state.incident.listenerPort === 9090);
 }
 
+function incidentIsInitial(state: LabState): boolean {
+  const fixture = scenarios[state.scenario];
+  if (fixture.family === "file-access") return state.incident.kind === "file-access" && state.incident.mode === "600";
+  return state.incident.kind === "tcp-listener" && state.incident.listenerPort === fixture.initialPort;
+}
+
 export function isValidLabState(value: unknown): value is LabState {
   if (!isRecord(value)) return false;
   if (value.scenario !== "guided" && value.scenario !== "transfer" && value.scenario !== "listener") return false;
@@ -55,7 +61,7 @@ export function isValidLabState(value: unknown): value is LabState {
 
   const evidenceReady = state.observations.symptom && state.observations.resource && state.observations.identity;
   if (state.hypothesis && !evidenceReady) return false;
-  if (state.repairedWithEvidence && (!evidenceReady || state.hypothesis !== scenarios[state.scenario].correctHypothesis)) return false;
+  if (state.repairedWithEvidence && (!evidenceReady || incidentIsInitial(state) || state.hypothesis !== scenarios[state.scenario].correctHypothesis)) return false;
   if (state.verified && (!state.repairedWithEvidence || !targetReached(state))) return false;
   if (state.explained && !state.verified) return false;
   return true;
