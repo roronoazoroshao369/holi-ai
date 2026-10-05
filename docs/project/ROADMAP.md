@@ -9,7 +9,7 @@
 - Transfer-hardening gate A: delivered explicit persisted differential order/step so either health cause may appear first; reset preserves assignment, full restart reassigns, and CI deterministically exercises both orderings.
 - Transfer-hardening gate B: delivered evidence-linked structured explanation with immutable pre-repair source snapshots, explicit facts, two-source mechanism and minimal target.
 - Transfer-hardening gate C: delivered listener changed-evidence prediction: process fixed, listener hypothetically changed to 8080, then predict endpoint/repair consequence.
-- Transfer-hardening gate D: implemented and code-head verified in PR #24: permission/group-identity prediction holds root:web at mode 640, removes web membership and requires the learner to predict loss of access. Practice schema moves to 7; Linux fixture remains 5. Consult PROJECT_STATE for final merge status.
+- Transfer-hardening gate D: delivered in PR #24: permission/group-identity prediction holds root:web at mode 640, removes web membership and requires the learner to predict loss of access. Exact final-head CI and production Chromium passed; practice schema is 7 and Linux fixture remains 5.
 - Dependency-hygiene gate: next, move exact-pinned Playwright into a reproducible lock/audit workflow before E2E scope grows further.
 - Learning breadth gate C: after dependency hygiene, prefer a genuinely unfamiliar transfer or curriculum slice over accumulating additional fixed counterfactual tokens.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
