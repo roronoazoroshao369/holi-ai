@@ -65,7 +65,7 @@ export default function Home() {
           <h2>Không học thuộc một lỗi.<br />Chẩn đoán nhiều cơ chế.</h2>
           <p>
             Lab hiện tại vẫn là simulator deterministic trong browser. Chuỗi thực hành bắt đầu bằng file permission,
-            sau đó chuyển sang incident process/listener khác cơ chế để buộc người học đối chiếu evidence thay vì replay một lệnh chmod.
+            sau đó chuyển sang một incident OS/network khác cơ chế để buộc người học đối chiếu evidence thay vì replay một lệnh chmod.
           </p>
           <ol>
             <li>Đọc symptom, chưa vội sửa.</li>
@@ -84,7 +84,7 @@ export default function Home() {
           <div><b>Explain</b><p>Giải thích bản chất, không bắt học thuộc command.</p></div>
           <div><b>Observe</b><p>Đọc symptom, resource, process và network trước khi thay đổi hệ thống.</p></div>
           <div><b>Repair</b><p>Mục tiêu: mỗi incident có evidence gate, repair tối thiểu và verification.</p></div>
-          <div><b>Transfer</b><p>Chuỗi Linux hiện có permission transfer và một listener/port incident khác cơ chế để giảm memorization.</p></div>
+          <div><b>Transfer</b><p>Chuỗi Linux hiện có permission transfer và một incident OS/network khác cơ chế để giảm memorization.</p></div>
         </div>
       </section>
 
