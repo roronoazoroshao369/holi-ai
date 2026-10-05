@@ -1,5 +1,11 @@
 # Decisions
 
+2026-10-05 PR #30: compose one Git revision machine with the existing artifact machine under Git/CI checkpoint. Bump Git/CI schema 1 -> 2 for persisted revision/run/verification/drafts and fixture 1 -> 2 for expanded revision/tag assessment corpus; discard v1. Preserve independent Linux 7/5. No generic interpreter, shared Linux engine or learner execution.
+
+2026-10-05: green pipeline is deliberately insufficient. Pinning intended immutable commit may fix the consumed SHA after wrong diagnosis, but verified requires correct locked class plus canonical pre-repair evidence and explicit checkout/metadata SHA verification. Source-linked rationale follows verification; label-only pre-repair guessing remains a named next frontier.
+
+2026-10-05: changed transfer uses annotated tag OBJECT -> target COMMIT while main advances; require immutable COMMIT SHA under the stated reproduction request. Do not imply a tag name is invalid Git checkout syntax. Display selected repair ID only after lock; reset all clears component drafts. Browser tests poll semantic persistence before reload/injection rather than adding retry/timeouts.
+
 2026-10-05: make the mandatory production-browser runtime a normal exact-pinned devDependency instead of installing it into RUNNER_TEMP after audit. Lock @playwright/test, playwright and playwright-core at 1.63.0; run the local Playwright binary from node_modules for Chromium installation and regression. This closes the npm lock/audit gap without changing browser assertions. Chromium/FFmpeg remain Playwright-managed CDN downloads and are not described as npm-audited artifacts.
 
 2026-10-05: add a second narrow changed-evidence gate using a permission/group-identity relation rather than another listener token. After the private report case is correctly repaired to mode 640 and explained as group-read, retain the original identity/file sources, hold root:web and mode 640 fixed, hypothetically remove report-worker from supplementary group web, and require prediction of HTTP 403, an access change still being required, and causal relation `group-membership-required`. This tests a distinct relation while changing one causal variable.
@@ -61,3 +67,4 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 2026-10-05: make the changed Git/CI transfer materially different from the original literal artifact-name mismatch. The transfer keeps the artifact name aligned and tests extraction-path semantics with a nested report path. Treat this as bounded assisted transfer, not mastery.
 
 2026-10-05: when the new Git/CI unavailable-storage copy made an existing Linux Playwright selector ambiguous, fix the product copy instead of weakening the established Linux regression. Cross-module additions must preserve existing browser tests without broad selectors becoming false positives.
+
