@@ -1,8 +1,10 @@
 # Project state
 
-Updated: 2026-10-05. Phase: evidence-linked structured explanation implemented; final-head production CI and merge pending.
+Updated: 2026-10-05. Phase: evidence-linked structured explanation delivered; next frontier is narrow causal transfer beyond finite-form transcription.
 Package version: 0.1.0 (no release tag).
-Inspected live main: 946e5eeb0bbc9361bbc965766914728a58405dd4 (PR #19).
+Verified product main: 426076a7edb000f344f93f5fba2b4e5de9cc02e5 (PR #20), re-read after merge.
+Product final head: 259e64fc0479bb7da107bd0081a733b01a7742ee; successful PR CI: 37270303740.
+Inspected baseline: 946e5eeb0bbc9361bbc965766914728a58405dd4 (PR #19).
 Previous product: PR #18, head fbb738ef05182a8290bffa3fd009bd09c27ae407, CI 37265647222, squash merge 87295ad59f696b232febe62bf1ae6d76546c84f7.
 
 ## Goal contract
@@ -25,4 +27,6 @@ Secondary frontier: Playwright dependency hygiene; deliberate counterbalancing o
 
 ## Verification evidence
 Local verification executed: npm ci; full TypeScript typecheck; 29/29 Node behavioral tests; npm audit --audit-level=high (0 vulnerabilities); production Next.js build. Production browser regression passed locally: three tests, one worker, `3 passed (32.0s)`, Playwright-managed `next start` on port 3100. Local CDN browser download failed with invalid/truncated archives; QA used packaged @sparticuz/chromium 153.0.0 through a scratch-only launch configuration without its single-process flag. The repo/CI browser configuration was not changed. Desktop/mobile reasoning-panel screenshots were inspected; mobile overflow, keyboard focus, both differential orders, wrong source/fact/mechanism/support, draft refresh/reset and corrupt explanation recovery were exercised.
-Remote final-head CI/merge evidence will be recorded after execution. No new PR, CI run, merge or release is inferred from prior handoff evidence.
+PR #20 final head 259e64fc0479bb7da107bd0081a733b01a7742ee passed CI 37270303740. Job 111635682249 executed npm ci, full TypeScript check, 29/29 Node tests, npm audit --audit-level=high (0 vulnerabilities), production build, exact-pinned Playwright 1.63.0 and Chromium/runtime installation, and production browser regression. Log explicitly confirmed `next start --hostname 127.0.0.1 --port 3100`, three tests using one worker and `3 passed (38.0s)`. Standard PR CI checked the merge ref 879b295d062924581ce91720bba1202ee134968b associated with that final head and unchanged base.
+PR #20 squash-merged as 426076a7edb000f344f93f5fba2b4e5de9cc02e5. Main was re-read; its tree cb21ac49c8b17124e9bffe7e9aedb60ad69190d0 exactly matches the implementation tree. Simulator, persistence and package manifest were also fetched at that merge and matched the delivered contents.
+A separate main-push CI 37270486284 was observed running at the documentation checkpoint; no successful result is claimed here without later live evidence. No release/tag was created; package remains 0.1.0.
