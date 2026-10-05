@@ -114,6 +114,9 @@ test("browser persistence and resilience fail closed with the expanded fixture s
   const runtimeErrors = [];
   collectRuntimeErrors(page, runtimeErrors);
   await page.goto("/");
+  // Let initial hydration/autosave settle before injecting a checkpoint so the test does not race
+  // the app's first guided-state save and accidentally overwrite the injected listener state.
+  await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
 
   // A structurally valid local checkpoint may resume practice, but it remains client-controlled convenience state.
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({

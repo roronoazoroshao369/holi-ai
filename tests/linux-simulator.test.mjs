@@ -156,3 +156,10 @@ test("help exposes evidence vocabulary and repair syntax without running command
   assert.match(result.lines[0].text, /ss -ltnp/);
   assert.match(result.lines[0].text, /configure SERVICE --listen ADDRESS:PORT/);
 });
+
+
+test("unfamiliar incident prompt does not leak hidden listener evidence", () => {
+  const fixture = scenarios.listener;
+  const learnerPrompt = [fixture.title, fixture.summary, fixture.readme].join(" ");
+  assert.doesNotMatch(learnerPrompt, /9090|842 app api-server|process sống|process is alive/i);
+});
