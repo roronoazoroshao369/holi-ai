@@ -12,3 +12,12 @@ Do not promote to CONTROLLED_EXECUTION / REAL_SANDBOX without documented identit
 
 The mandatory production Chromium suite verifies browser behavior, both explicit differential orderings, both transfer progression/revocation paths and storage failure paths, but it does not convert client state into trusted evidence. Playwright itself is CI tooling only and does not change the learner execution boundary.
 
+
+
+## Git & CI simulator boundary
+
+The Git/CI incident does not execute YAML, git commands, shell commands, GitHub Actions jobs or network calls from learner input. Buttons and form fields select exact client-side state transitions only. The displayed workflow/job logs are fixture data, not observations from GitHub, the learner's machine or the CI runner executing repository tests.
+
+Git/CI persistence uses a separate localStorage key with schema 1 / fixture 1. Its validator rejects malformed reasoning shapes, stale versions, inconsistent evidence, impossible run status and forged derived completion flags. This protects local state invariants only. A learner with developer tools can still manufacture an internally consistent checkpoint, so Git/CI completion remains non-authoritative and must never grant execution, secrets, privileges or certification.
+
+The Playwright production tests do execute the repository's built web application inside GitHub CI, but that is maintainer verification tooling. It is not learner-controlled execution and does not change the product boundary from SIMULATED to CONTROLLED_EXECUTION.
