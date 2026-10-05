@@ -1,5 +1,19 @@
 export type Line = { kind: "output" | "success" | "error"; text: string };
 export type ScenarioId = "guided" | "transfer" | "differential-listener" | "differential-process";
+export type DifferentialScenarioId = "differential-listener" | "differential-process";
+export type DifferentialOrder = "listener-first" | "process-first";
+export type DifferentialStep = 0 | 1;
+export const DEFAULT_DIFFERENTIAL_ORDER: DifferentialOrder = "listener-first";
+
+export function isDifferentialScenario(scenario: ScenarioId): scenario is DifferentialScenarioId {
+  return scenario === "differential-listener" || scenario === "differential-process";
+}
+
+export function differentialScenario(order: DifferentialOrder, step: DifferentialStep): DifferentialScenarioId {
+  if (order === "listener-first") return step === 0 ? "differential-listener" : "differential-process";
+  return step === 0 ? "differential-process" : "differential-listener";
+}
+
 export type Hypothesis = "" | "permission" | "network" | "process";
 export type FileMode = "600" | "644" | "640";
 export type IncidentState =
@@ -169,6 +183,8 @@ export const scenarios = {
 
 export type LabState = {
   scenario: ScenarioId;
+  differentialOrder: DifferentialOrder;
+  differentialStep: DifferentialStep;
   incident: IncidentState;
   observations: ObservationState;
   hypothesis: Hypothesis;
@@ -188,9 +204,25 @@ function initialIncident(scenario: ScenarioId): IncidentState {
       };
 }
 
-export function initialLabState(scenario: ScenarioId = "guided"): LabState {
+export function initialLabState(
+  scenario: ScenarioId = "guided",
+  differentialOrder: DifferentialOrder = DEFAULT_DIFFERENTIAL_ORDER,
+  differentialStep?: DifferentialStep
+): LabState {
+  const resolvedStep: DifferentialStep = differentialStep ??
+    (isDifferentialScenario(scenario) && differentialScenario(differentialOrder, 0) !== scenario ? 1 : 0);
+
+  if (isDifferentialScenario(scenario) && differentialScenario(differentialOrder, resolvedStep) !== scenario) {
+    throw new Error("Differential scenario does not match its explicit order/step assignment.");
+  }
+  if (!isDifferentialScenario(scenario) && resolvedStep !== 0) {
+    throw new Error("Non-differential scenarios cannot use differential step 1.");
+  }
+
   return {
     scenario,
+    differentialOrder,
+    differentialStep: resolvedStep,
     incident: initialIncident(scenario),
     observations: { symptom: false, resource: false, identity: false },
     hypothesis: "",
@@ -361,7 +393,10 @@ export function execute(state: LabState, command: string): { state: LabState; li
   const cmd = command.trim();
 
   if (cmd === "reset") {
-    return { state: initialLabState(state.scenario), lines: [{ kind: "output", text: "Fixture reset. All observations, hypothesis and explanation cleared." }] };
+    return {
+      state: initialLabState(state.scenario, state.differentialOrder, state.differentialStep),
+      lines: [{ kind: "output", text: "Fixture reset. Hidden differential assignment is preserved; observations, hypothesis and explanation are cleared." }]
+    };
   }
   if (cmd === "pwd") return { state, lines: [{ kind: "output", text: "/opt/holi-lab" }] };
   if (cmd === "ls") return { state, lines: [{ kind: "output", text: "README.txt" }] };

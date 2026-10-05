@@ -1,6 +1,19 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
-import { evidenceReady, execute, explain, initialLabState, recordHypothesis, scenarios, type Line as ReplyLine, type ScenarioId } from "../lib/linux-simulator";
+import {
+  differentialScenario,
+  evidenceReady,
+  execute,
+  explain,
+  initialLabState,
+  isDifferentialScenario,
+  recordHypothesis,
+  scenarios,
+  type DifferentialOrder,
+  type DifferentialStep,
+  type Line as ReplyLine,
+  type ScenarioId
+} from "../lib/linux-simulator";
 import { clearPractice, loadPractice, savePractice, type PracticeStorage } from "../lib/practice-persistence";
 
 type Line = ReplyLine | { kind: "input"; text: string };
@@ -9,6 +22,16 @@ const welcome: Line[] = [{ kind: "output", text: "SIMULATED — Type cat README.
 
 function browserStorage(): PracticeStorage | null {
   try { return window.localStorage; } catch { return null; }
+}
+
+function chooseDifferentialOrder(): DifferentialOrder {
+  try {
+    const value = new Uint8Array(1);
+    window.crypto.getRandomValues(value);
+    return value[0] % 2 === 0 ? "listener-first" : "process-first";
+  } catch {
+    return "listener-first";
+  }
 }
 
 export function LabTerminal() {
@@ -25,15 +48,17 @@ export function LabTerminal() {
   const [persistenceNotice, setPersistenceNotice] = useState("");
 
   useEffect(() => {
+    const freshOrder = chooseDifferentialOrder();
     const storage = browserStorage();
     if (!storage) {
+      setState(initialLabState("guided", freshOrder));
       setStorageUsable(false);
       setPersistence("unavailable");
-      setPersistenceNotice("Trình duyệt không cho truy cập localStorage; lab vẫn chạy nhưng tiến trình chỉ tồn tại trong tab hiện tại.");
+      setPersistenceNotice("Trình duyệt không cho truy cập localStorage; lab vẫn chạy nhưng tiến trình và thứ tự health case ẩn chỉ tồn tại trong tab hiện tại.");
       setHydrated(true);
       return;
     }
-    const loaded = loadPractice(storage);
+    const loaded = loadPractice(storage, freshOrder);
     setState(loaded.state);
     if (loaded.status === "restored") {
       setLines([...welcome, { kind: "output", text: "Đã phục hồi checkpoint cục bộ. Transcript lệnh không được lưu; dùng các chỉ báo evidence bên dưới để tiếp tục." }]);
@@ -88,8 +113,8 @@ export function LabTerminal() {
     }
   }
 
-  function advanceScenario(nextScenario: ScenarioId) {
-    setState(initialLabState(nextScenario));
+  function advanceScenario(nextScenario: ScenarioId, differentialStep: DifferentialStep = 0) {
+    setState(initialLabState(nextScenario, state.differentialOrder, differentialStep));
     setLines(welcome);
     setCommand("");
     setHypothesisDraft("");
@@ -101,7 +126,8 @@ export function LabTerminal() {
   function restartPractice() {
     const storage = browserStorage();
     const cleared = storage ? clearPractice(storage) : false;
-    setState(initialLabState());
+    const freshOrder = chooseDifferentialOrder();
+    setState(initialLabState("guided", freshOrder));
     setLines(welcome);
     setCommand("");
     setHypothesisDraft("");
@@ -110,7 +136,7 @@ export function LabTerminal() {
     setFeedback("");
     if (cleared) {
       setStorageUsable(true);
-      setPersistenceNotice("Đã xóa checkpoint cũ và bắt đầu lại từ tình huống có hướng dẫn.");
+      setPersistenceNotice("Đã xóa checkpoint cũ, chọn lại thứ tự health case ẩn và bắt đầu từ tình huống có hướng dẫn.");
     } else {
       setStorageUsable(false);
       setPersistence("unavailable");
@@ -137,6 +163,7 @@ export function LabTerminal() {
   const fixture = scenarios[state.scenario];
   const ready = evidenceReady(state);
   const hypothesisLocked = Boolean(state.hypothesis);
+  const inDifferential = isDifferentialScenario(state.scenario);
 
   return (
     <div className="learningLab">
@@ -209,11 +236,14 @@ export function LabTerminal() {
       <p role="status">{feedback}</p>
 
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
-      {state.explained && state.scenario === "transfer" && <button onClick={() => advanceScenario("differential-listener")}>Thử differential diagnosis</button>}
-      {state.explained && state.scenario === "differential-listener" && <button onClick={() => advanceScenario("differential-process")}>Thử case cùng symptom</button>}
-      {state.explained && state.scenario === "differential-process" && <p role="status">Hoàn tất bốn tình huống luyện tập, gồm hai health incident có cùng symptom nhưng evidence dẫn tới causal class khác nhau. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
+      {state.explained && state.scenario === "transfer" &&
+        <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 0), 0)}>Thử differential diagnosis</button>}
+      {state.explained && inDifferential && state.differentialStep === 0 &&
+        <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 1), 1)}>Thử case cùng symptom</button>}
+      {state.explained && inDifferential && state.differentialStep === 1 &&
+        <p role="status">Hoàn tất bốn tình huống luyện tập, gồm hai health incident có cùng symptom nhưng evidence dẫn tới causal class khác nhau. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
 
-      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại và checkpoint mới sẽ ghi trạng thái reset. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn. Transcript terminal không được persist.</p>
+      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại nhưng giữ nguyên health-case assignment ẩn. Nút “Học lại từ đầu” quay về tình huống có hướng dẫn và chọn lại assignment cho lần luyện mới. Transcript terminal không được persist.</p>
     </div>
   );
 }
