@@ -18,7 +18,7 @@ The current implementation contains:
 ## Run locally
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -29,6 +29,12 @@ For a production compile:
 ```bash
 npm run build
 ```
+
+## Verification
+
+Run `npm run typecheck`, `npm test`, `npm audit --audit-level=high` and `npm run build`. CI runs the same checks.
+
+Read [project state](docs/project/PROJECT_STATE.md) and [roadmap](docs/project/ROADMAP.md) before continuing implementation. Simulator practice is ephemeral and is not a mastery assessment; refresh resets it.
 
 ## Product direction
 
@@ -68,3 +74,4 @@ See [docs/DEVOPS_PLATFORM_ARCHITECTURE.md](docs/DEVOPS_PLATFORM_ARCHITECTURE.md)
 ## Legacy documents
 
 The existing `docs/plan/` files belong to the previous AI-film concept. They are retained temporarily on this feature branch for history and safe rollback; they are **not** the specification for the new product and should be archived or removed once the repurpose PR is accepted.
+
