@@ -1,5 +1,11 @@
 # Decisions
 
+2026-10-05: remove deterministic sequence-position leakage from the same-symptom differential pair before expanding curriculum. Persist an explicit `differentialOrder` plus `differentialStep`, derive the active concrete case from those values, and keep simulator transitions pure once assignment is supplied. Choose a fresh assignment only at the browser/UI boundary with Web Crypto. Current-case reset preserves assignment; full restart chooses a fresh assignment. This is randomized assignment, not guaranteed alternation or statistical counterbalancing.
+
+2026-10-05: bump PRACTICE_SCHEMA_VERSION from 3 to 4 because LabState now persists differential order/step. Bump LINUX_FIXTURE_VERSION from 3 to 4 because assessment-order semantics changed. Discard v3 checkpoints and reject order/step/scenario contradictions rather than silently reinterpreting them.
+
+2026-10-05: do not treat hidden order as a security secret or grading signal. Normal learner-facing copy/buttons remain cause-neutral, but localStorage is inspectable and forgeable through developer tools. Order, step and local completion remain untrusted practice mechanics and cannot authorize real execution or certification.
+
 2026-10-05: add same-symptom differential diagnosis before broad curriculum expansion. Model TCP service state as both process presence and listening port, then present two learner-neutral connection-refused cases with identical title/summary/README/symptom/evidence commands. One case requires a `network` hypothesis because the process listens on the wrong port; the competing case requires a `process` hypothesis because the service is absent. Evidence, not learner-facing fixture identity, must discriminate them. Keep all behavior SIMULATED and exact-matched.
 
 2026-10-05: hide repair syntax until the learner has collected the required observations and locked a causal hypothesis. Pre-hypothesis `help` may expose diagnostic commands but must not reveal whether the correct repair is `configure` or `start`. A wrong hypothesis may still lead to a healthy endpoint after a repair command, but it cannot produce verified completion without reset and correct pre-repair reasoning.
