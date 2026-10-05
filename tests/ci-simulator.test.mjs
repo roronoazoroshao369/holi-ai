@@ -27,7 +27,7 @@ function evidence(state = initialCiLabState()) {
 function correctExplanation(overrides = {}) {
   return {
     workflowEvidenceId: "git-ci:before:workflow",
-    workflowFact: "stale job output mapping",
+    workflowFact: "artifact name crosses build job output",
     producerEvidenceId: "git-ci:before:producer",
     producerFact: "web-dist",
     consumerEvidenceId: "git-ci:before:consumer",
