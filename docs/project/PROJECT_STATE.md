@@ -38,3 +38,15 @@ Mandatory Playwright 1.63.0 is still installed in CI outside package-lock.json a
 ## Highest-value frontier
 Move exact-pinned Playwright into the repository's reproducible lockfile and normal dependency-audit workflow without weakening production browser coverage. This risk now has higher leverage than adding a third fixed counterfactual.
 After dependency hygiene, prefer a genuinely unfamiliar learning-transfer/curriculum slice over another token variant unless a specific learning defect justifies one.
+
+## Active goal — Playwright dependency hygiene
+GOAL: move the mandatory @playwright/test 1.63.0 runtime into package.json/package-lock.json and the normal npm ci/audit dependency graph while preserving production Chromium coverage.
+WHY NOW: browser regression is a merge gate, but its runtime is currently installed after npm audit with --no-save and no lockfile, creating a concrete reproducibility and supply-chain blind spot.
+USER VALUE: the mandatory browser gate becomes reproducible from the repository and audited with the rest of the application dependency graph.
+SCOPE: exact-pin @playwright/test 1.63.0; lock its Playwright dependency chain; remove temporary CI runtime/NODE_PATH setup; install Chromium from the locked local CLI; keep the existing production browser suite mandatory.
+NON-GOALS: change Playwright version, broaden browser engines, add curriculum, alter simulator semantics, introduce accounts or real execution.
+ACCEPTANCE CRITERIA: npm ci resolves the locked Playwright runtime; npm audit --audit-level=high covers it and passes; typecheck/tests/build pass; production Chromium tests pass from the repository dependency; CI no longer runs npm install --no-save for Playwright or relies on RUNNER_TEMP/NODE_PATH.
+TEST PLAN: exact final-head CI must run npm ci, typecheck, Node tests, high-severity audit, production build, local Playwright Chromium install and production browser regression.
+SECURITY IMPACT: reduces un-audited mandatory CI dependency surface; no learner execution boundary changes.
+LEARNING IMPACT: none to learner semantics; preserves the browser regression that protects the current mastery-flow UI.
+ROLLBACK STRATEGY: revert this branch/PR; the prior temporary Playwright installer can be restored without data migration.
