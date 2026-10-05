@@ -22,8 +22,8 @@ function memoryStorage(initial = {}) {
   };
 }
 
-function evidence(scenario = "guided") {
-  let state = initialLabState(scenario);
+function evidence(scenario = "guided", order, step) {
+  let state = initialLabState(scenario, order, step);
   const fixture = scenarios[scenario];
   for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) {
     state = execute(state, command).state;
@@ -31,9 +31,9 @@ function evidence(scenario = "guided") {
   return recordHypothesis(state, fixture.correctHypothesis);
 }
 
-function completed(scenario = "guided") {
+function completed(scenario = "guided", order, step) {
   const fixture = scenarios[scenario];
-  let state = evidence(scenario);
+  let state = evidence(scenario, order, step);
   state = execute(state, fixture.commands.repair).state;
   state = execute(state, fixture.commands.symptom).state;
   return explain(state, fixture.explanation);
@@ -48,7 +48,11 @@ test("valid partial and completed checkpoints round-trip across all incident cas
     evidence("differential-listener"),
     completed("differential-listener"),
     evidence("differential-process"),
-    completed("differential-process")
+    completed("differential-process"),
+    evidence("differential-process", "process-first", 0),
+    completed("differential-process", "process-first", 0),
+    evidence("differential-listener", "process-first", 1),
+    completed("differential-listener", "process-first", 1)
   ]) {
     const storage = memoryStorage();
     assert.equal(savePractice(storage, state), true);
@@ -64,6 +68,10 @@ test("completion is derived from sequence position and final differential explan
   assert.deepEqual(checkpointFor(completed("differential-listener")).completed, { guided: true, transfer: true, differential: false });
   const checkpoint = checkpointFor(completed("differential-process"));
   assert.deepEqual(checkpoint.completed, { guided: true, transfer: true, differential: true });
+
+  const reversed = checkpointFor(completed("differential-listener", "process-first", 1));
+  assert.deepEqual(reversed.completed, { guided: true, transfer: true, differential: true });
+
   checkpoint.completed.differential = false;
   assert.equal(parseCheckpoint(JSON.stringify(checkpoint)), null);
 });
@@ -76,11 +84,12 @@ test("corrupt JSON is discarded and starts clean", () => {
   assert.equal(storage.peek(PRACTICE_STORAGE_KEY), undefined);
 });
 
-test("schema and fixture version mismatches including v2 fail closed", () => {
+test("schema and fixture version mismatches including v3 fail closed", () => {
   const checkpoint = checkpointFor(evidence());
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
     { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
+    { ...checkpoint, schemaVersion: 3, fixtureVersion: 3 },
     { ...checkpoint, schemaVersion: 2, fixtureVersion: 2 }
   ]) {
     const storage = memoryStorage({ [PRACTICE_STORAGE_KEY]: JSON.stringify(changed) });
@@ -106,6 +115,14 @@ test("scenario-family and competing-case state mismatches are rejected", () => {
     incident: { kind: "tcp-service", processRunning: false, listenerPort: 9090 }
   };
   assert.equal(parseCheckpoint(JSON.stringify(impossibleSocket)), null);
+
+  const orderMismatch = checkpointFor(evidence("differential-listener"));
+  orderMismatch.state = { ...orderMismatch.state, differentialOrder: "process-first" };
+  assert.equal(parseCheckpoint(JSON.stringify(orderMismatch)), null);
+
+  const stepMismatch = checkpointFor(evidence("differential-process", "process-first", 0));
+  stepMismatch.state = { ...stepMismatch.state, differentialStep: 1 };
+  assert.equal(parseCheckpoint(JSON.stringify(stepMismatch)), null);
 });
 
 test("impossible verified, explained or untouched-repaired states are rejected", () => {
@@ -130,9 +147,9 @@ test("unavailable storage falls back to ephemeral clean practice", () => {
     setItem() { throw new Error("blocked"); },
     removeItem() { throw new Error("blocked"); }
   };
-  const loaded = loadPractice(blocked);
+  const loaded = loadPractice(blocked, "process-first");
   assert.equal(loaded.status, "unavailable");
-  assert.deepEqual(loaded.state, initialLabState());
+  assert.deepEqual(loaded.state, initialLabState("guided", "process-first"));
   assert.equal(savePractice(blocked, evidence()), false);
   assert.equal(clearPractice(blocked), false);
 });
