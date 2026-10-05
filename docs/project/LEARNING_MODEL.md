@@ -25,3 +25,16 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
 The next primary engineering frontier is browser-test dependency reproducibility. After that, learning work should prefer a genuinely unfamiliar transfer/curriculum slice over a third fixed counterfactual unless a concrete learning defect justifies it.
+
+
+## Git & CI vertical slice — producer/consumer contract
+
+The Git & CI practice begins with a neutral failed downstream pipeline symptom. The learner cannot lock a hypothesis until three pre-repair sources are captured: workflow structure, producer job output and consumer failure output. This preserves the same instructional invariant as the Linux labs: observation precedes causal commitment.
+
+The original incident is intentionally not graded by pipeline color alone. The minimally sufficient mapping repair can make the simulated pipeline green after either a correct or incorrect locked hypothesis. Only a correct artifact-contract diagnosis made from complete pre-repair evidence produces `verified=true`. This separates operational recovery from demonstrated diagnostic reasoning.
+
+After verification, the learner must submit a source-linked explanation using the canonical workflow, producer and consumer source IDs and facts. The required mechanism is the producer/consumer artifact-name contract, not a generic statement that CI was misconfigured.
+
+The changed transfer uses a different failure representation. The artifact name matches, but the producer archive retains a nested relative path while the consumer assumes a flatter extraction result. The learner must derive the post-extraction path and identify the path-preservation relation. Reusing the original name-mapping token fails.
+
+This remains assisted deterministic practice. It demonstrates completion of a bounded Git/CI reasoning exercise; it does not prove Git mastery, general CI transfer or production readiness.
