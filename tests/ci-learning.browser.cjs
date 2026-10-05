@@ -28,7 +28,7 @@ async function repairAndRerun(page, value) {
 
 async function fillExplanation(page, consumerFact = "site-dist") {
   await page.getByRole("combobox", { name: "Git CI workflow evidence" }).selectOption("git-ci:before:workflow");
-  await page.getByRole("textbox", { name: "Git CI workflow fact" }).fill("stale job output mapping");
+  await page.getByRole("textbox", { name: "Git CI workflow fact" }).fill("artifact name crosses build job output");
   await page.getByRole("combobox", { name: "Git CI producer evidence" }).selectOption("git-ci:before:producer");
   await page.getByRole("textbox", { name: "Git CI producer fact" }).fill("web-dist");
   await page.getByRole("combobox", { name: "Git CI consumer evidence" }).selectOption("git-ci:before:consumer");
