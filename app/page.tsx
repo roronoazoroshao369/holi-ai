@@ -36,7 +36,7 @@ export default function Home() {
       <section className="section" id="path">
         <div className="sectionHeading">
           <div>
-            <span className="kicker">CURRICULUM V0</span>
+            <span className="kicker">CURRICULUM V0 / ĐANG XÂY DỰNG</span>
             <h2>Một đường học. Không học lan man.</h2>
           </div>
           <p>Curriculum đầu tiên ưu tiên mental model và troubleshooting trước khi đẩy người học vào tool-chasing.</p>
@@ -53,7 +53,7 @@ export default function Home() {
               <div className="chips">
                 {module.skills.slice(0, 4).map(skill => <span key={skill}>{skill}</span>)}
               </div>
-              <div className="labLine"><b>LAB</b>{module.lab}</div>
+              <div className="labLine"><b>LAB DỰ KIẾN</b>{module.lab}</div>
             </article>
           ))}
         </div>
@@ -62,7 +62,7 @@ export default function Home() {
       <section className="labSection" id="lab">
         <div className="labCopy">
           <span className="kicker">PRACTICAL LAB / MVP</span>
-          <h2>Bạn nhận một hệ thống lỗi.<br />Không nhận đáp án.</h2>
+          <h2>Bài thực hành đầu tiên.<br />Chẩn đoán quyền file.</h2>
           <p>
             Bản đầu dùng simulator deterministic trong browser để dạy quy trình chẩn đoán. Production phase sẽ thay
             bằng sandbox container cô lập, có quota và reset để chạy Linux/Docker/Kubernetes thật.
@@ -83,8 +83,8 @@ export default function Home() {
         <div className="principleGrid">
           <div><b>Explain</b><p>Giải thích bản chất, không bắt học thuộc command.</p></div>
           <div><b>Observe</b><p>Đọc metrics, logs, process và network trước khi thay đổi hệ thống.</p></div>
-          <div><b>Repair</b><p>Mỗi module có failure scenario và verification gate.</p></div>
-          <div><b>Transfer</b><p>Bài cuối thay context để kiểm tra bạn thật sự hiểu hay chỉ nhớ bài mẫu.</p></div>
+          <div><b>Repair</b><p>Mục tiêu: mỗi module có failure scenario và verification gate.</p></div>
+          <div><b>Transfer</b><p>Dự kiến: bài cuối đổi context để đánh giá khả năng chuyển giao.</p></div>
         </div>
       </section>
 
