@@ -62,15 +62,15 @@ export default function Home() {
       <section className="labSection" id="lab">
         <div className="labCopy">
           <span className="kicker">PRACTICAL LAB / MVP</span>
-          <h2>Không học thuộc một lỗi.<br />Chẩn đoán nhiều cơ chế.</h2>
+          <h2>Cùng symptom.<br />Khác nguyên nhân.</h2>
           <p>
-            Lab hiện tại vẫn là simulator deterministic trong browser. Chuỗi thực hành bắt đầu bằng file permission,
-            sau đó chuyển sang một incident OS/network khác cơ chế để buộc người học đối chiếu evidence thay vì replay một lệnh chmod.
+            Lab hiện tại vẫn là simulator deterministic trong browser. Sau hai file-permission case,
+            người học gặp hai health incident có cùng connection-refused symptom nhưng process/socket evidence dẫn tới nguyên nhân khác nhau.
           </p>
           <ol>
             <li>Đọc symptom, chưa vội sửa.</li>
-            <li>Tách observation về resource và process/identity.</li>
-            <li>Ghi hypothesis trước khi thay đổi fixture.</li>
+            <li>Tách observation về resource, process và socket.</li>
+            <li>Khóa hypothesis trước khi thấy repair syntax.</li>
             <li>Sửa tối thiểu, verify đúng endpoint rồi giải thích cơ chế.</li>
           </ol>
         </div>
@@ -79,12 +79,12 @@ export default function Home() {
 
       <section className="principles" id="principles">
         <span className="kicker">LEARNING DESIGN</span>
-        <h2>Kiến thức chỉ được tính là “biết” khi bạn xử lý được tình huống mới.</h2>
+        <h2>Kiến thức chỉ được tính là “biết” khi bạn phân biệt được các nguyên nhân cạnh tranh.</h2>
         <div className="principleGrid">
           <div><b>Explain</b><p>Giải thích bản chất, không bắt học thuộc command.</p></div>
           <div><b>Observe</b><p>Đọc symptom, resource, process và network trước khi thay đổi hệ thống.</p></div>
-          <div><b>Repair</b><p>Mục tiêu: mỗi incident có evidence gate, repair tối thiểu và verification.</p></div>
-          <div><b>Transfer</b><p>Chuỗi Linux hiện có permission transfer và một incident OS/network khác cơ chế để giảm memorization.</p></div>
+          <div><b>Repair</b><p>Mỗi incident có evidence gate, causal hypothesis, repair tối thiểu và verification.</p></div>
+          <div><b>Transfer</b><p>Hai health case dùng cùng learner-facing prompt; chỉ evidence mới phân biệt process failure với socket mismatch.</p></div>
         </div>
       </section>
 
