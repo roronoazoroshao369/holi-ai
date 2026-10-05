@@ -54,10 +54,10 @@ const evidence: Record<CiEvidenceSlot, CiEvidenceRecord> = {
     phase: "before-repair",
     title: "Workflow definition",
     output: [
-      "build.outputs.artifact_name <- steps.legacy_meta.outputs.artifact_name",
-      "steps.meta writes artifact_name=web-dist",
-      "upload-artifact name <- steps.meta.outputs.artifact_name",
-      "verify downloads name <- needs.build.outputs.artifact_name"
+      "build job exposes output artifact_name",
+      "upload-artifact name <- package metadata output",
+      "verify downloads name <- needs.build.outputs.artifact_name",
+      "verify job depends on build"
     ].join("\n")
   },
   producer: {
@@ -191,7 +191,7 @@ export function explanationMatches(answer: unknown): answer is CiExplanation {
   const a = answer as unknown as Record<string, string>;
   const n = (value: unknown) => String(value).trim().toLowerCase();
   return a.workflowEvidenceId === "git-ci:before:workflow" &&
-    n(a.workflowFact) === "stale job output mapping" &&
+    n(a.workflowFact) === "artifact name crosses build job output" &&
     a.producerEvidenceId === "git-ci:before:producer" &&
     n(a.producerFact) === "web-dist" &&
     a.consumerEvidenceId === "git-ci:before:consumer" &&
