@@ -82,9 +82,9 @@ export default function Home() {
         <div className="sectionHeading">
           <div>
             <span className="kicker">FOUNDATION VERTICAL SLICE</span>
-            <h2>Git & CI: artifact handoff dưới áp lực.</h2>
+            <h2>Git & CI: điều tra từ evidence.</h2>
           </div>
-          <p>Điều tra pipeline từ workflow và job evidence, khóa causal hypothesis trước repair, rerun rồi chứng minh quan hệ producer/consumer bằng source thực tế.</p>
+          <p>Hai incident SIMULATED: artifact delivery và release acceptance. Khóa diagnosis, sửa tối thiểu, kiểm tra output thực sự rồi giải thích và áp dụng vào tình huống mới.</p>
         </div>
         <CiLab />
       </section>

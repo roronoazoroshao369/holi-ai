@@ -1,0 +1,21 @@
+# Git revision learning contract
+
+Goal: one complete SIMULATED commit/ref causality incident, not a Git command terminal or generic workflow engine.
+
+The release is mechanically green but acceptance is unmet. Initial title/summary/symptom disclose no branch, SHA, repair or hidden selection defect. Five canonical pre-repair sources establish pipeline/acceptance result, checkout configuration, a build-time branch/ref snapshot, actual checkout/build metadata SHA and approved release intent. The learner separates observations from inference, locks a causal class, chooses one minimally sufficient repair, rebuilds and explicitly verifies the actual consumed revision against the intended SHA.
+
+Operational green is deliberately independent of learning completion: every bounded repair can leave the pipeline green. Only pinning the intended commit changes the consumed SHA. Even a matching actual SHA cannot verify learning after a wrong pre-repair diagnosis. Verification also checks checkout SHA and release source metadata rather than pipeline color.
+
+Explanation binds all five captured source IDs and their facts independently of the causal relation. Changed transfer replaces direct branch-to-commit resolution with an annotated tag object pointing to a commit while main has advanced. The learner must identify tag object SHA, target commit SHA and branch SHA, then select the immutable target commit for reproducing the tagged source tree. The original incident SHA, tag object, moving branch tip and branch/tag name are all insufficient answers under this requested immutable-COMMIT contract. This does not imply Git cannot checkout a tag name; it tests selecting a stable commit identity.
+
+Architecture: preserve the artifact machine in lib/ci-simulator.ts and compose revisionPractice from lib/git-revision-simulator.ts. CiLab owns the combined checkpoint and GitRevisionLab renders independent revision practice. There is no prerequisite cross-credit between artifact and revision exercises. Revision reset clears only revision; whole Git/CI reset clears both and remounts revision drafts. Editing explanation revokes explanation confirmation and transfer; editing transfer revokes its confirmation; rebuild/reverification revoke downstream work.
+
+Persistence decision: Git/CI schema 1 -> 2 because the stored state gains revisionPractice, its evidence, run/verification tuples and editable reasoning drafts. Git/CI fixture 1 -> 2 because the module corpus and assessment contract expand to revision/tag semantics. Version-1 checkpoints are intentionally discarded, not silently credited or migrated. Linux remains schema 7 / fixture 5 with an independent key. Local completion is forgeable, untrusted practice data, never certification.
+
+Acceptance/verification: five sources before lock/repair; immutable hypothesis; minimal selection repair; explicit actual/intended SHA verification; wrong diagnosis blocks learning despite green; every explanation and transfer source/fact independently validated; materially changed tag transfer; edit/rebuild/reset/refresh revocation; impossible/stale/forged flags fail closed; unavailable Storage methods AND denied property getter degrade to ephemeral practice; existing Linux/artifact regressions remain unchanged; production Chromium exercises mobile wrapping, visible focus and absent console/page errors.
+
+No learner-provided git command, YAML, shell, subprocess, Docker socket, host mount, cloud credential or arbitrary code executes. All displayed logs/SHAs are fixture data. Scope excludes accounts, Kubernetes, Docker, real sandbox and unrelated infrastructure.
+
+Red-team before PR: review identified that the explanation requested a repair ID not visible in normal UI. Fixed by displaying the selected ID only after repair lock. Whole-module reset must also clear component-local revision drafts; an epoch remount enforces this. Storage getter denial must be caught before passing localStorage to persistence helpers. Production exact-final-head CI remains required before merge; local install/build alone is not a merge gate.
+
+Rollback: revert the product PR; old Git/CI schema-1 implementation rejects schema-2 checkpoints. Linux contract needs no rollback migration.

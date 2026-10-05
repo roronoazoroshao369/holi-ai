@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { GitRevisionLab } from "./GitRevisionLab";
 import {
   CI_EVIDENCE_SLOTS,
   CI_TRANSFER_EVIDENCE,
@@ -24,6 +25,7 @@ import {
   clearCiPractice,
   loadCiPractice,
   saveCiPractice,
+  type CiStorage,
   type CiLoadStatus
 } from "../lib/ci-practice-persistence";
 
@@ -47,18 +49,24 @@ const emptyTransfer = (): CiTransferAnswer => ({
   causalClaim: ""
 });
 
+function browserCiStorage(): CiStorage | null {
+  try { return window.localStorage; } catch { return null; }
+}
+
 export function CiLab() {
   const [state, setState] = useState<CiLabState>(() => initialCiLabState());
   const [loadStatus, setLoadStatus] = useState<CiLoadStatus>("empty");
   const [hydrated, setHydrated] = useState(false);
   const [storageWritable, setStorageWritable] = useState(true);
+  const [revisionEpoch, setRevisionEpoch] = useState(0);
   const [hypothesisDraft, setHypothesisDraft] = useState<CiHypothesis>("");
   const [repairDraft, setRepairDraft] = useState<CiRepair>("");
   const [explanation, setExplanation] = useState<CiExplanation>(() => emptyExplanation());
   const [transfer, setTransfer] = useState<CiTransferAnswer>(() => emptyTransfer());
 
   useEffect(() => {
-    const loaded = loadCiPractice(window.localStorage);
+    const storage = browserCiStorage();
+    const loaded = storage ? loadCiPractice(storage) : { status: "unavailable" as const, state: initialCiLabState() };
     setState(loaded.state);
     setLoadStatus(loaded.status);
     setStorageWritable(loaded.status !== "unavailable");
@@ -69,7 +77,8 @@ export function CiLab() {
 
   useEffect(() => {
     if (!hydrated) return;
-    setStorageWritable(saveCiPractice(window.localStorage, state));
+    const storage = browserCiStorage();
+    setStorageWritable(Boolean(storage && saveCiPractice(storage, state)));
   }, [hydrated, state]);
 
   const evidenceReady = ciEvidenceReady(state);
@@ -79,7 +88,9 @@ export function CiLab() {
   );
 
   const resetAll = () => {
-    clearCiPractice(window.localStorage);
+    setRevisionEpoch(current => current + 1);
+    const storage = browserCiStorage();
+    if (storage) clearCiPractice(storage);
     setState(initialCiLabState());
     setHypothesisDraft("");
     setRepairDraft("");
@@ -310,6 +321,8 @@ export function CiLab() {
         Security boundary: không có learner input nào được chạy trong host process; toàn bộ transitions là client-side exact-matched SIMULATED state.
         Storage key: <code>{CI_PRACTICE_STORAGE_KEY}</code>.
       </p>
+      <GitRevisionLab key={revisionEpoch} state={state.revisionPractice}
+        onChange={next => setState(current => ({ ...current, revisionPractice: next }))} />
     </section>
   );
 }
