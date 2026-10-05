@@ -1,9 +1,9 @@
 # Project state
 
-Updated: 2026-10-05. Phase: v0.2 Linux learning vertical slice implemented; remote CI and merge pending.
+Updated: 2026-10-05. Phase: v0.2 Linux learning vertical slice verified and merged; v0.3 practice persistence next.
 Package version: 0.1.0 (no release tag).
 Baseline main: 7f66238ffb3818adf2b63d8ab2cb5f2f6bdbdfa0; latest prior merged PR #6.
-Branch: feat/linux-learning-transfer. Current PR: #7. Implementation commit: 6be2f7bde3c76d3643a043a9122784340beb4b7c.
+Product PR #7 merged as 715fc3087572a28dc6257662743b3798d4414463. Last verified PR head: 70596cbd541e4371b1de49ea4675e28c62de5801 (CI 37251372370 success). Resulting main re-read and expected learning state confirmed. Current branch: docs/linux-learning-handoff (documentation checkpoint).
 Last verified main CI: 37250572331 success on baseline above.
 
 ## Goal contract
@@ -21,7 +21,7 @@ ROLLBACK: revert focused PR. No migrations or persisted data.
 ## Product truth
 Works: executable shell, curriculum skeleton, guided Linux incident and changed group-access incident with gated explanation.
 Partial: only one skill and two fixtures; no free-form explanation grading or broad assessment.
-Broken: no known in-scope failure after local verification; remote gates pending.
+Broken: no known in-scope failure after local verification; product PR CI passed and merge confirmed.
 Known risks: no durable progress; reload resets; client assessment untrusted; parent directories, ACL/SELinux and other server configuration are assumed healthy. Guided world-read applies only to this public page fixture.
 Current highest-value frontier: versioned local practice progress with safe refresh/reset/retry semantics and explicit trust boundary; retain no certification claims.
 Next candidate goals: browser regression CI; persistent practice attempts; broader Linux diagnosis with less prompted transfer.
@@ -30,4 +30,4 @@ External blockers: none established. Direct git mirror checkout lacks credential
 ## Verification evidence
 Local npm ci succeeded. Typecheck, 8 behavioral tests, npm audit (0 vulnerabilities), production build passed.
 Production Chromium/Playwright flow passed: blind repair denied, guided observation/hypothesis/repair/verify/explanation, wrong explanation denied, transfer 644 denied and 640 accepted, reset, refresh, 390px width, visible input focus, no page errors. Mobile screenshot inspected; button wrapping corrected and final build/browser rerun passed.
-Remote CI and merge: pending; do not interpret local success as merge confirmation.
+GitHub CI 37251372370 passed all install/typecheck/test/audit/build steps on final product head 70596cbd541e4371b1de49ea4675e28c62de5801. GitHub confirmed PR #7 squash merge 715fc3087572a28dc6257662743b3798d4414463; resulting main state re-read. Goal complete. This documentation checkpoint does not implement persistence. Inspect live GitHub before trusting these SHAs.
