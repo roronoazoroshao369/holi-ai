@@ -178,11 +178,17 @@ export function rerunCiPipeline(state: CiLabState): CiLabState {
   };
 }
 
-export function explanationMatches(answer: unknown): answer is CiExplanation {
+export function validCiExplanationShape(answer: unknown): answer is CiExplanation {
   if (!answer || typeof answer !== "object" || Array.isArray(answer)) return false;
   const a = answer as Record<string, unknown>;
   const keys = ["workflowEvidenceId", "workflowFact", "producerEvidenceId", "producerFact", "consumerEvidenceId", "consumerFact", "causalClaim", "minimalRepair"];
-  if (Object.keys(a).length !== keys.length || !keys.every(key => typeof a[key] === "string")) return false;
+  return Object.keys(a).length === keys.length &&
+    keys.every(key => typeof a[key] === "string" && (a[key] as string).length <= 120);
+}
+
+export function explanationMatches(answer: unknown): answer is CiExplanation {
+  if (!validCiExplanationShape(answer)) return false;
+  const a = answer as unknown as Record<string, string>;
   const n = (value: unknown) => String(value).trim().toLowerCase();
   return a.workflowEvidenceId === "git-ci:before:workflow" &&
     n(a.workflowFact) === "stale job output mapping" &&
@@ -206,11 +212,17 @@ export function submitCiExplanation(state: CiLabState, answer: CiExplanation): C
   };
 }
 
-export function transferMatches(answer: unknown): answer is CiTransferAnswer {
+export function validCiTransferShape(answer: unknown): answer is CiTransferAnswer {
   if (!answer || typeof answer !== "object" || Array.isArray(answer)) return false;
   const a = answer as Record<string, unknown>;
   const keys = ["producerEvidenceId", "producerFact", "consumerEvidenceId", "consumerFact", "predictedPath", "causalClaim"];
-  if (Object.keys(a).length !== keys.length || !keys.every(key => typeof a[key] === "string")) return false;
+  return Object.keys(a).length === keys.length &&
+    keys.every(key => typeof a[key] === "string" && (a[key] as string).length <= 160);
+}
+
+export function transferMatches(answer: unknown): answer is CiTransferAnswer {
+  if (!validCiTransferShape(answer)) return false;
+  const a = answer as unknown as Record<string, string>;
   const n = (value: unknown) => String(value).trim().toLowerCase();
   return a.producerEvidenceId === "git-ci:transfer:producer" &&
     n(a.producerFact) === "reports/coverage.json" &&
