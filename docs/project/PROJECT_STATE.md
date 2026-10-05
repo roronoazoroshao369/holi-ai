@@ -1,86 +1,48 @@
 # Project state
 
-Updated: 2026-10-05. Phase: v0.3 simulated mastery-flow foundation now includes the first complete Git & CI learning vertical slice alongside the existing Linux practice.
-Package version: 0.1.0. No release or tag was created in this run.
-Verified main: 0dd9c4c4956ee92531dd1e8c5af56dd2f4a2fe6b (PR #28), re-read after squash merge.
-Product PR final head: 03915755c2cdf4ec9744def78eff187f125935ea.
-Successful exact final-head PR CI: 37318719562 (job 111791991295).
-Verification on that exact head: npm ci; full TypeScript typecheck; 43/43 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; locked Playwright Chromium install; 5/5 production Chromium tests in 41.1s.
-Linux practice schema remains 7 / Linux fixture 5. Git & CI uses a separate client-local schema 1 / fixture 1, so the Linux persistence contract was not migrated for unrelated semantics.
+Updated: 2026-10-05. Phase: v0.3 SIMULATED mastery-flow foundation. Package remains 0.1.0; no release/tag created.
+Verified product main: 1b614eb51984b8737efa545eb92c951adafa2640, re-read after PR #30 squash merge. Documentation closeout follows in a separate PR and must pass full exact-final-head CI before merge; the next operator must always re-read LIVE main.
+Product PR #30 final head: dc03b3c0a8a0ea1e2a728106c72d5395000fe00e.
+Exact-final-head CI: 37325201149 / job 111814058034 — SUCCESS.
+Gate: npm ci; full TypeScript typecheck; 53/53 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; Chromium from repository-locked Playwright 1.63.0; 7/7 production Chromium tests (52.1s) against next start --hostname 127.0.0.1 --port 3100.
 
-## Current goal contract — Git & CI artifact handoff
+## Delivered current goal — Git commit/ref causality
 
-GOAL: require evidence-backed diagnosis of a failed CI producer/consumer artifact handoff, minimally sufficient repair, explicit green rerun verification, source-linked explanation and a materially changed path-transfer variant.
-USER VALUE: the learner must reason from workflow, producer and consumer evidence instead of replaying a config token; a correct config guess after the wrong diagnosis can make the simulated pipeline green but cannot earn verified completion.
-SCOPE: one deterministic SIMULATED CI incident, separate fail-closed localStorage checkpoint, source-linked artifact-name reasoning, changed artifact-extraction path transfer, production Chromium regression.
-NON-GOALS: real GitHub Actions execution, arbitrary YAML execution, server-trusted mastery, accounts, real sandbox, Docker/Kubernetes infrastructure or host command execution.
-ACCEPTANCE: initial copy is root-cause neutral; all three pre-repair sources precede hypothesis lock; only the minimal mapping repair can turn the simulated run green; verified completion additionally requires the correct pre-repair artifact-contract diagnosis; explanation binds canonical source IDs/facts; changed transfer requires applying path semantics; corrupt/stale/impossible checkpoints fail closed.
-SECURITY: all transitions remain browser-local exact-matched simulation. localStorage is untrusted practice state and cannot authorize certification or execution.
-ROLLBACK: revert PR #28. Linux schema/fixture versions are intentionally unchanged because the new Git/CI state machine and persistence key are isolated.
-
-## Historical delivered goal contract — permission transfer
-GOAL: test whether the changed-evidence prediction pattern transfers to a materially different permission/identity relation instead of adding another listener-token variant.
-WHY NOW: the first listener counterfactual tests socket-target reasoning, but its fixed 9090 -> 8080 tokens could be memorized without demonstrating the same reasoning structure across another causal mechanism.
-USER VALUE: after solving the private report case with minimal mode 640, the learner must hold file owner/group and mode fixed, hypothetically remove report-worker from group web, and predict the resulting access failure and required intervention.
-SCOPE: permission/group-identity counterfactual; explicit original identity/resource sources and facts; fixed post-repair mode 640; hypothetical identity without web membership; deterministic HTTP/repair/causal prediction; progression/completion gate; persistence invariants; production-browser regression.
-NON-GOALS: arbitrary prose/LLM grading, a fifth incident, broad curriculum expansion, real Linux execution, accounts, server-trusted mastery, certification, anti-cheat or hidden client secrets.
-ACCEPTANCE: wrong source/fact/fixed mode/hypothetical identity/prediction/repair need/causal relation fails; editing/reset/re-explain revokes the gate; differential diagnosis cannot start or continue without a valid carried permission gate; existing listener transfer remains independently required; stale schema-v6 and impossible carry states fail closed.
-SECURITY: execution boundary remains SIMULATED. All learner commands and hypothetical predictions are exact-matched client transitions; localStorage state remains forgeable and non-authoritative.
-ROLLBACK: revert PR #24. Schema-v6 checkpoints are intentionally incompatible with schema v7. Linux fixture version remains 5 because incident definitions and command outputs did not change.
+GOAL: complete one unfamiliar Git revision-selection vertical slice as explicit SIMULATED practice.
+USER VALUE: mechanically green release does not establish that approved source was built, nor that the learner diagnosed its causal defect.
+SCOPE: five immutable pre-repair sources; locked causal class; minimally sufficient checkout revision repair; rebuild; separate consumed-SHA verification; five source-linked explanation facts; materially changed annotated-tag-to-commit transfer; persistence and production browser coverage.
+NON-GOALS: actual Git/GitHub Actions execution, generic Git/YAML interpreter, accounts, Kubernetes/Docker/real sandbox, certification or trusted assessment.
+ACCEPTANCE: satisfied on the exact final product head above. Initial copy neutral; missing evidence blocks lock/repair; hypothesis immutable; correct repair after wrong diagnosis can match actual/intended SHA while verified remains false; green alone does not verify; wrong source/fact cannot be rescued by a correct relation; transfer distinguishes tag object, commit target and advanced main; edit/rebuild/reset/refresh revoke dependent confirmation; impossible/stale/corrupt state fails closed.
+SECURITY: pure browser fixture transitions; no learner shell/subprocess/git/YAML/network execution or credentials. localStorage is forgeable and never authoritative.
+ROLLBACK: revert PR #30; schema-1 implementation rejects schema-2 checkpoint. Linux needs no migration.
 
 ## Product truth
-Four SIMULATED incidents remain: two file-access scenarios and two same-symptom TCP-service scenarios. Structured before-repair evidence, locked hypotheses, minimal repair, verification and source-linked explanation still gate progress.
-Permission transfer gate: original identity source/fact is `transfer:before:identity` / `1001:report-worker,web`; original resource is `transfer:before:resource` / `600:root:web`; post-repair mode is held at `640`; hypothetical identity becomes `1001:report-worker`; expected HTTP is `403`; repair need is `required`; causal relation is `group-membership-required`.
-Listener transfer gate remains: process presence is held fixed while listener evidence changes from 9090 to target 8080; expected endpoint prediction is `200`, listener repair need `none`, relation `listener-target-match`.
-Progression requires permission transfer before entering and continuing through differential diagnosis. Final completion also requires listener transfer. Editing dependent reasoning/transfer revokes pass. Reset semantics preserve only already-valid prior gates in later cases.
-Persistence: PRACTICE_SCHEMA_VERSION = 7; LINUX_FIXTURE_VERSION = 5. Main was re-read after merge and these values were confirmed. Schema-v6 and older incompatible checkpoints fail closed.
-Red-team result: an initial implementation only gated differential entry; review found the step-0 -> step-1 transition also needed to re-check carried permission transfer. Commit 23c28de23891b07f4bd6f80249e11f95edc7f872 fixed this before final-head CI.
 
-## Verification evidence
-PR #24 exact final head f1c7d444e1d1309c95be77fa795ebfa1a9f11977 passed CI 37289499028. The job executed npm ci, full TypeScript typecheck, 36/36 Node tests, npm audit --audit-level=high with 0 vulnerabilities, production build, exact-pinned @playwright/test 1.63.0 plus Chromium/runtime installation, and production browser regression.
-Final-head browser logs show `next start --hostname 127.0.0.1 --port 3100`, three tests with one worker and `3 passed (41.8s)`. Browser coverage includes wrong/correct permission counterfactual attempts, edit revocation, both differential orderings, schema-v7 persistence/resilience, unavailable Storage API, mobile overflow, keyboard focus and runtime-error checks.
-PR #24 squash-merged as 7ae7950af5f24efdc94306a7b4b6b9091f513d53. Main was re-read and confirmed to contain schema v7, fixture v5 and the permission-transfer state/rubric.
+Six primary SIMULATED incidents: four Linux (two permission, two same-symptom TCP) and two Git/CI (artifact handoff, release acceptance). Permission/group and listener/socket counterfactuals plus artifact-path and annotated-tag transfers are assessment steps, not additional real environments.
 
-## Known risks
-Two deterministic counterfactuals across different causal relations reduce single-token memorization but remain visible, finite and retryable. They do not prove general causal transfer or mastery.
-localStorage completion/evidence remains forgeable. Permission/TCP models are simplified. The fixture corpus is tiny. Browser coverage is Chromium-only. Web Crypto assignment can repeat an order.
-@playwright/test, playwright and playwright-core are exact-locked at 1.63.0 and included in npm ci/audit. Chromium/FFmpeg are still Playwright-managed CDN downloads selected by the locked version; those binary artifacts are not npm-audited.
+Git artifact incident is preserved: web-dist producer versus site-dist consumer; correct artifact-output repair after wrong diagnosis may make pipeline green but cannot verify learning. Its changed transfer applies nested extraction semantics.
 
-## Highest-value frontier
-Select one genuinely unfamiliar learning-transfer or broader curriculum slice with observable competence evidence. Do not add a third fixed counterfactual merely to increase gate count; the current two are visible, finite and memorizable. Prefer a vertical slice that forces diagnosis/repair/verification/explanation on a new mechanism while retaining explicit SIMULATED labeling until a separate isolated execution gateway exists.
+Git revision incident: refs/heads/release resolves to synthetic a4… commit; approved build-start main snapshot is b7…; original checkout and release metadata both record a4…. Pinning checkout to approved immutable b7… is the minimal repair. Explicit verification checks checkout and metadata against intent; pipeline pass is insufficient. Original facts remain captured before repair for explanation.
 
-## Completed goal — Playwright dependency hygiene
-GOAL: move the mandatory @playwright/test 1.63.0 runtime into package.json/package-lock.json and the normal npm ci/audit dependency graph while preserving production Chromium coverage.
-WHY NOW: browser regression is a merge gate, but its runtime is currently installed after npm audit with --no-save and no lockfile, creating a concrete reproducibility and supply-chain blind spot.
-USER VALUE: the mandatory browser gate becomes reproducible from the repository and audited with the rest of the application dependency graph.
-SCOPE: exact-pin @playwright/test 1.63.0; lock its Playwright dependency chain; remove temporary CI runtime/NODE_PATH setup; install Chromium from the locked local CLI; keep the existing production browser suite mandatory.
-NON-GOALS: change Playwright version, broaden browser engines, add curriculum, alter simulator semantics, introduce accounts or real execution.
-ACCEPTANCE CRITERIA: SATISFIED on executable/config head caace34735d202c144934af7dd621206b34ab099. npm ci resolved the locked runtime; typecheck passed; 36/36 Node tests passed; high-severity npm audit found 0 vulnerabilities; production build passed; Chromium installation from the local locked Playwright CLI passed; 3/3 production Chromium tests passed; CI no longer runs npm install --no-save for Playwright or relies on RUNNER_TEMP/NODE_PATH.
-TEST PLAN: executable/config head caace34735d202c144934af7dd621206b34ab099 passed CI 37314919851. Exact final PR head 9c1dd7159b1d449a75a4316290dce10b81fd7184 then repeated the full workflow successfully in CI 37315643839 (job 111781574376); duplicate exact-head run 37315695718 also succeeded. PR #26 squash-merged as f6cbcc61c1285bbec6bb4ca779d2ea30b5f4ecd0.
-SECURITY IMPACT: reduces un-audited mandatory CI dependency surface; no learner execution boundary changes.
-LEARNING IMPACT: none to learner semantics; preserves the browser regression that protects the current mastery-flow UI.
-ROLLBACK STRATEGY: revert this branch/PR; the prior temporary Playwright installer can be restored without data migration.
+Tag transfer: refs/tags/v2.4 points to c8… tag OBJECT, which targets d9… COMMIT, while main now points to e2…. The request explicitly asks for an immutable COMMIT identity; d9… is required. This does not deny that Git can checkout tag names. No real Git history/general Actions competence is claimed.
 
-## Post-goal project truth
-The mandatory Node-side browser test runtime is now repository-owned: `@playwright/test` is exact-pinned at 1.63.0 and `package-lock.json` locks `@playwright/test -> playwright -> playwright-core` at the same version. CI uses only `./node_modules/.bin/playwright`; the previous temporary `npm install --no-save --package-lock=false`, RUNNER_TEMP runtime and NODE_PATH/GITHUB_PATH indirection are removed.
+## Persistence and reset truth
 
-Residual supply-chain boundary: npm audit now covers the Playwright npm packages, but the Chromium/FFmpeg binaries are still downloaded from Playwright's CDN during CI. Their revision is selected by the locked Playwright package, but they are not independently represented as npm lockfile entries or audited by npm audit. Do not claim that browser binaries themselves are npm-audited.
+Linux: PRACTICE_SCHEMA_VERSION=7 / LINUX_FIXTURE_VERSION=5, unchanged.
+Git/CI: CI_PRACTICE_SCHEMA_VERSION=2 / CI_FIXTURE_VERSION=2 under holi.devops.git-ci-practice. Schema bumps for nested revision state, verification tuples and editable reasoning drafts; fixture bumps for expanded revision/tag assessment corpus. Version-1 checkpoints intentionally discard. The Linux/Git checkpoint contracts remain separate.
 
-Highest-value frontier after this goal: prefer a genuinely unfamiliar learning-transfer/curriculum slice with observable competence evidence over a third fixed token counterfactual. Keep all current labs explicitly SIMULATED until a separately isolated execution gateway exists.
+CiLab composes artifact state with revisionPractice; no cross-credit or unrelated prerequisite gate. Revision reset clears revision only; whole Git/CI reset clears both and remounts revision drafts. Editing explanation clears its confirmation and tag transfer; editing transfer clears its confirmation; rebuild/reverification clear downstream work. Storage method errors AND denied localStorage getter degrade to ephemeral practice.
 
+## Red-team and verification evidence
 
-## Git & CI product truth after PR #28
+Review found an explanation asking for a repair ID hidden in option DOM values. Product now displays the selected ID only after repair lock. Whole-module reset also remounts component-local drafts. Getter denial is caught at the browser boundary. Browser checkpoint tests poll the required semantic state before reload/injection to avoid first-save/reset races; retries remain zero. Existing Linux/artifact tests were not weakened.
 
-The fifth primary SIMULATED incident introduces a third mechanism family: CI artifact producer/consumer contract failure. Initial learner-facing copy reports only a failed downstream delivery. The learner must inspect workflow structure, producer upload metadata and consumer failure output before a causal hypothesis can be locked.
+Initial product head b6d3b47c5866631f1d3086c298acefa2e0ae363f passed full CI 37324780829 / 111812605785 with 53 Node and 7 Chromium tests (1.0m). Final test-hardening commit dc03b3c0a8a0ea1e2a728106c72d5395000fe00e was independently verified by the exact-final-head run above. Local typecheck/53 tests/audit/build also passed; local Chromium CDN ZIP was invalid, so no local browser pass is claimed.
 
-The canonical incident produces artifact name `web-dist` while the consumer resolves `site-dist`. The minimally sufficient simulated repair maps the build job output to the current producer metadata. The pipeline may become green after that repair even when the learner locked the wrong causal class, but `verified` stays false unless pre-repair evidence was complete and the locked hypothesis was `artifact-contract`.
+## Remaining risks and ONE next frontier
 
-After a verified rerun, explanation requires the workflow, producer and consumer source IDs plus their canonical facts and the `producer-consumer-artifact-contract` relation. The changed transfer no longer reuses artifact-name tokens: it keeps artifact name aligned and asks the learner to reason about extraction preserving the nested `reports/coverage.json` relative path.
+All scenarios remain finite, visible and retryable fixtures. Fully consistent forged client checkpoints may display completion. Source grammar is exact, not free-form grading. Git revision pre-repair diagnosis is currently a multiple-choice CLASS; its detailed source-linked rationale is submitted only after repair, so guessing that class can still earn a local pass. This is the next learning weakness to address.
 
-Git/CI persistence is isolated under `holi.devops.git-ci-practice` with schema 1 / fixture 1. Restore rejects malformed answer shapes, stale versions, forged derived flags and impossible run/completion combinations. A deliberately forged but internally consistent client checkpoint is still not trusted mastery.
+Lock a source-linked Git revision causal rationale BEFORE repair, rather than only a multiple-choice causal label. Keep one existing incident and its tag transfer; do not add another scenario merely to increase gate count.
 
-Red-team history: pre-PR review removed a `legacy_meta` clue from workflow evidence because it leaked the likely root cause too early. CI run 37318368318 later exposed a cross-lab browser-test collision: the new storage-fallback sentence duplicated a Linux selector. The fix changed Git/CI copy rather than weakening the Linux regression. Exact final head 03915755c2cdf4ec9744def78eff187f125935ea then passed CI 37318719562.
-
-## Highest-value frontier after Git & CI slice
-
-Broaden the Git half of the module with an unfamiliar commit/ref causality incident rather than adding another artifact-name/path token quiz. A strong next slice would require inspecting branch/ref/commit evidence to explain why a pipeline or deployment consumed the wrong revision, then repair and verify the ref relation. Keep it SIMULATED until the separately designed execution gateway satisfies the real-sandbox security contract.
+Chromium-only coverage; tiny corpus; simplified Linux/Git models; randomized Linux order may repeat; browser/FFmpeg CDN binaries are selected by locked Playwright but not npm-audited; real sandbox remains design-only. See RISKS and GIT_REVISION_CONTRACT.

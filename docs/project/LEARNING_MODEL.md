@@ -1,6 +1,6 @@
 # Learning model
 
-The current practice sequence has four SIMULATED incidents across two causal families plus two bounded changed-evidence assessment steps.
+The Linux practice sequence has four SIMULATED incidents across two causal families plus two bounded changed-evidence assessment steps.
 
 1. Guided file access: nginx worker `www-data` receives HTTP 403 for a root-owned file mode 600. Learner collects HTTP symptom, file mode and worker identity, records a `permission` hypothesis, applies the minimal public-page read repair and verifies HTTP. The mechanism explanation is `other-read`.
 2. Permission transfer: `report-worker` is a supplementary member of group `web`. Copying the memorized 644 repair makes HTTP healthy but fails least-access assessment; 640 is required because the report is group-private. The mechanism explanation is `group-read`.
@@ -24,7 +24,7 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
-The next primary engineering frontier is browser-test dependency reproducibility. After that, learning work should prefer a genuinely unfamiliar transfer/curriculum slice over a third fixed counterfactual unless a concrete learning defect justifies it.
+Playwright dependency reproducibility and Git/CI breadth are delivered. The current next learning frontier is pre-repair source-linked Git causal rationale, rather than another fixed token scenario.
 
 
 ## Git & CI vertical slice — producer/consumer contract
@@ -38,3 +38,12 @@ After verification, the learner must submit a source-linked explanation using th
 The changed transfer uses a different failure representation. The artifact name matches, but the producer archive retains a nested relative path while the consumer assumes a flatter extraction result. The learner must derive the post-extraction path and identify the path-preservation relation. Reusing the original name-mapping token fails.
 
 This remains assisted deterministic practice. It demonstrates completion of a bounded Git/CI reasoning exercise; it does not prove Git mastery, general CI transfer or production readiness.
+
+
+## Git revision causality and annotated-tag transfer — PR #30
+
+A green release with unmet acceptance presents neutral copy. Five pre-repair sources distinguish cache/target hypotheses from checkout selection. Build-start ref snapshot plus actual checkout/metadata SHA and approved intent establish the consumed-revision relation. Repair choices open only after immutable class lock. Every repair may leave pipeline green, but only pinning the approved immutable commit changes consumed SHA. A separate verify action checks checkout and metadata against intent; even matching SHA after wrong diagnosis cannot verify learning.
+
+Five explanation source/fact pairs independently validate, then one changed transfer replaces branch -> commit with annotated tag object -> commit while main advances. The learner selects immutable target COMMIT, not original SHA, tag object or current branch. Exact grammar is visible, finite and retryable. Editing explanation or transfer revokes downstream pass; reset/rebuild/reverification revoke affected work and refresh validates semantic consistency.
+
+Current weakness: pre-repair lock records only a multiple-choice causal class; explanation occurs after repair. Next: require source-linked factual rationale when committing to diagnosis. This is assisted local learning, not trusted mastery or arbitrary prose evaluation.
