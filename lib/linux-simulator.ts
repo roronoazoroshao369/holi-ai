@@ -169,6 +169,8 @@ export type LabState = {
   observations: ObservationState;
   preRepairEvidence: Partial<Record<EvidenceSlot, EvidenceRecord>>;
   reasoning: ReasoningAnswer | null;
+  causalTransfer: CausalTransferAnswer | null;
+  causalTransferPassed: boolean;
   hypothesis: Hypothesis;
   repairedWithEvidence: boolean;
   verified: boolean;
@@ -189,7 +191,9 @@ function initialIncident(scenario: ScenarioId): IncidentState {
 export function initialLabState(
   scenario: ScenarioId = "guided",
   differentialOrder: DifferentialOrder = DEFAULT_DIFFERENTIAL_ORDER,
-  differentialStep?: DifferentialStep
+  differentialStep?: DifferentialStep,
+  causalTransfer: CausalTransferAnswer | null = null,
+  causalTransferPassed = false
 ): LabState {
   const resolvedStep: DifferentialStep = differentialStep ??
     (isDifferentialScenario(scenario) && differentialScenario(differentialOrder, 0) !== scenario ? 1 : 0);
@@ -209,6 +213,8 @@ export function initialLabState(
     observations: { symptom: false, resource: false, identity: false },
     preRepairEvidence: {},
     reasoning: null,
+    causalTransfer: causalTransfer ? structuredClone(causalTransfer) : null,
+    causalTransferPassed,
     hypothesis: "",
     repairedWithEvidence: false,
     verified: false,
@@ -276,6 +282,67 @@ export function emptyReasoning(): ReasoningAnswer {
   };
 }
 
+export type CausalTransferAnswer = {
+  processEvidenceId: string;
+  processFact: string;
+  socketEvidenceId: string;
+  socketFact: string;
+  predictedSymptom: string;
+  repairNeed: string;
+  causalClaim: string;
+};
+
+export function emptyCausalTransfer(): CausalTransferAnswer {
+  return {
+    processEvidenceId: "",
+    processFact: "",
+    socketEvidenceId: "",
+    socketFact: "",
+    predictedSymptom: "",
+    repairNeed: "",
+    causalClaim: ""
+  };
+}
+
+export function validCausalTransferShape(value: unknown): value is CausalTransferAnswer {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const answer = value as Record<string, unknown>;
+  const keys = ["processEvidenceId", "processFact", "socketEvidenceId", "socketFact", "predictedSymptom", "repairNeed", "causalClaim"];
+  if (Object.keys(answer).length !== keys.length || !keys.every(key => Object.hasOwn(answer, key))) return false;
+  return keys.every(key => typeof answer[key] === "string" && (answer[key] as string).length <= 100);
+}
+
+export function causalTransferAnswerMatches(answer: unknown): boolean {
+  if (!validCausalTransferShape(answer)) return false;
+  const normalized = (value: string) => value.trim().toLowerCase();
+  return answer.processEvidenceId === "differential-listener:before:identity" &&
+    normalized(answer.processFact) === "present" &&
+    answer.socketEvidenceId === "differential-listener:before:resource" &&
+    normalized(answer.socketFact) === "9090" &&
+    normalized(answer.predictedSymptom) === "200" &&
+    normalized(answer.repairNeed) === "none" &&
+    normalized(answer.causalClaim) === "listener-target-match";
+}
+
+export function causalTransferSatisfied(state: LabState): boolean {
+  return state.causalTransferPassed && causalTransferAnswerMatches(state.causalTransfer);
+}
+
+export function editCausalTransfer(state: LabState, answer: CausalTransferAnswer): LabState {
+  if (state.scenario !== "differential-listener" || !state.explained || !validCausalTransferShape(answer)) return state;
+  return { ...state, causalTransfer: structuredClone(answer), causalTransferPassed: false };
+}
+
+export function checkCausalTransfer(state: LabState, answer: CausalTransferAnswer): LabState {
+  if (state.scenario !== "differential-listener" || !state.explained || !reasoningMatches(state, state.reasoning) ||
+      !validCausalTransferShape(answer)) return state;
+  return {
+    ...state,
+    causalTransfer: structuredClone(answer),
+    causalTransferPassed: causalTransferAnswerMatches(answer)
+  };
+}
+
 // Canonical immutable fixture output, captured only by a diagnostic command before repair.
 // An ID identifies a source, not a trusted learner or an anti-cheat credential.
 export function initialEvidence(scenario: ScenarioId, slot: EvidenceSlot): EvidenceRecord {
@@ -334,12 +401,24 @@ export function reasoningMatches(state: LabState, answer: unknown): boolean {
 
 export function editReasoning(state: LabState, answer: ReasoningAnswer): LabState {
   if (!state.verified || !validReasoningShape(answer)) return state;
-  return { ...state, reasoning: structuredClone(answer), explained: false };
+  return {
+    ...state,
+    reasoning: structuredClone(answer),
+    explained: false,
+    ...(state.scenario === "differential-listener" ? { causalTransfer: null, causalTransferPassed: false } : {})
+  };
 }
 
 export function explain(state: LabState, answer: ReasoningAnswer): LabState {
   if (!state.verified || !state.repairedWithEvidence || !targetReached(state) || !validReasoningShape(answer)) return state;
-  return { ...state, reasoning: structuredClone(answer), explained: reasoningMatches(state, answer) };
+  const explained = reasoningMatches(state, answer);
+  const revokeTransfer = state.scenario === "differential-listener" && (!explained || !state.explained);
+  return {
+    ...state,
+    reasoning: structuredClone(answer),
+    explained,
+    ...(revokeTransfer ? { causalTransfer: null, causalTransferPassed: false } : {})
+  };
 }
 
 function withObservation(state: LabState, key: EvidenceSlot): LabState {
@@ -437,7 +516,8 @@ function executeTcpServiceScenario(state: LabState, command: string, fixture: Tc
         repairedWithEvidence,
         verified: false,
         explained: false,
-        reasoning: null
+        reasoning: null,
+        ...(state.scenario === "differential-listener" ? { causalTransfer: null, causalTransferPassed: false } : {})
       },
       lines: [{
         kind: "output",
@@ -474,9 +554,24 @@ export function execute(state: LabState, command: string): { state: LabState; li
   const cmd = command.trim();
 
   if (cmd === "reset") {
+    const preservePriorTransfer = state.scenario === "differential-process" &&
+      state.differentialOrder === "listener-first" &&
+      state.differentialStep === 1 &&
+      causalTransferSatisfied(state);
     return {
-      state: initialLabState(state.scenario, state.differentialOrder, state.differentialStep),
-      lines: [{ kind: "output", text: "Fixture reset. Hidden differential assignment is preserved; observations, hypothesis and explanation are cleared." }]
+      state: initialLabState(
+        state.scenario,
+        state.differentialOrder,
+        state.differentialStep,
+        preservePriorTransfer ? state.causalTransfer : null,
+        preservePriorTransfer
+      ),
+      lines: [{
+        kind: "output",
+        text: preservePriorTransfer
+          ? "Fixture reset. Hidden differential assignment and the already-passed listener counterfactual are preserved; current observations, hypothesis and explanation are cleared."
+          : "Fixture reset. Hidden differential assignment is preserved; current observations, hypothesis, explanation and listener counterfactual draft are cleared."
+      }]
     };
   }
   if (cmd === "pwd") return { state, lines: [{ kind: "output", text: "/opt/holi-lab" }] };
