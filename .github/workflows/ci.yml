@@ -5,8 +5,6 @@ on:
   push:
     branches: [main]
 
-env:
-  PLAYWRIGHT_VERSION: 1.63.0
 
 jobs:
   build:
@@ -23,18 +21,10 @@ jobs:
       - run: npm test
       - run: npm audit --audit-level=high
       - run: npm run build
-      - name: Install pinned browser test runtime
-        shell: bash
-        run: |
-          set -euo pipefail
-          runtime="$RUNNER_TEMP/holi-playwright"
-          mkdir -p "$runtime"
-          npm install --prefix "$runtime" --package-lock=false --no-save "@playwright/test@$PLAYWRIGHT_VERSION"
-          echo "NODE_PATH=$runtime/node_modules" >> "$GITHUB_ENV"
-          echo "$runtime/node_modules/.bin" >> "$GITHUB_PATH"
-          "$runtime/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Install Chromium for locked Playwright runtime
+        run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run production browser regression
-        run: playwright test --config=playwright.config.cjs
+        run: ./node_modules/.bin/playwright test --config=playwright.config.cjs
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
