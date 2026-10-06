@@ -371,7 +371,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .siteShell {
   position: relative;
   min-height: 100vh;
-  overflow: clip;
+  overflow-x: clip;
 }
 
 .siteShell::before {
@@ -808,6 +808,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .traceRail {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
