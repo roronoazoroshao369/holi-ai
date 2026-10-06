@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { GitGraphLab } from "./GitGraphLab";
 import { GitRevisionLab } from "./GitRevisionLab";
 import {
   CI_EVIDENCE_SLOTS,
@@ -321,8 +322,11 @@ export function CiLab() {
         Security boundary: không có learner input nào được chạy trong host process; toàn bộ transitions là client-side exact-matched SIMULATED state.
         Storage key: <code>{CI_PRACTICE_STORAGE_KEY}</code>.
       </p>
+      <GitGraphLab key={`graph-${revisionEpoch}`} state={state.graphPractice}
+        onChange={next => setState(current => ({ ...current, graphPractice: next }))} />
       <GitRevisionLab key={revisionEpoch} state={state.revisionPractice}
         onChange={next => setState(current => ({ ...current, revisionPractice: next }))} />
     </section>
   );
 }
+

@@ -24,7 +24,7 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
-Playwright dependency reproducibility and Git/CI breadth are delivered. The current next learning frontier is pre-repair source-linked Git causal rationale, rather than another fixed token scenario.
+Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The graph causality slice is delivered. The mechanism-first Git foundations lesson is now delivered with a separate teaching fixture and no assessment credit. The next learning gap is evidence synthesis: turning raw ref/checkout/build/graph observations into consumed-commit, direct-parent and ancestry predicates before the existing assessment.
 
 
 ## Git & CI vertical slice — producer/consumer contract
@@ -42,8 +42,25 @@ This remains assisted deterministic practice. It demonstrates completion of a bo
 
 ## Git revision causality and annotated-tag transfer — PR #30
 
-A green release with unmet acceptance presents neutral copy. Five pre-repair sources distinguish cache/target hypotheses from checkout selection. Build-start ref snapshot plus actual checkout/metadata SHA and approved intent establish the consumed-revision relation. Repair choices open only after immutable class lock. Every repair may leave pipeline green, but only pinning the approved immutable commit changes consumed SHA. A separate verify action checks checkout and metadata against intent; even matching SHA after wrong diagnosis cannot verify learning.
+A green release with unmet acceptance presents neutral copy. Five pre-repair sources distinguish cache/target hypotheses from checkout selection. Build-start ref snapshot plus actual checkout/metadata SHA and approved intent establish the consumed-revision relation. Repair choices open only after immutable class and factual-rationale lock. Every repair may leave pipeline green, but only pinning the approved immutable commit changes consumed SHA. A separate verify action checks checkout and metadata against intent; even matching SHA after wrong class, source ID, fact or relation cannot verify learning.
 
 Five explanation source/fact pairs independently validate, then one changed transfer replaces branch -> commit with annotated tag object -> commit while main advances. The learner selects immutable target COMMIT, not original SHA, tag object or current branch. Exact grammar is visible, finite and retryable. Editing explanation or transfer revokes downstream pass; reset/rebuild/reverification revoke affected work and refresh validates semantic consistency.
 
-Current weakness: pre-repair lock records only a multiple-choice causal class; explanation occurs after repair. Next: require source-linked factual rationale when committing to diagnosis. This is assisted local learning, not trusted mastery or arbitrary prose evaluation.
+PR #32 closes label-only pre-repair guessing: five captured source/fact pairs and a causal relation are committed with the class before repair. Complete wrong rationale can lock without grader feedback, but cannot verify learning even after correct repair. Post-repair explanation cannot rescue it. The draft persists before lock and is immutable after lock until reset. Grammar remains finite, visible and retryable, so copying a complete rationale or forging consistent local state remains possible. This is assisted local learning, not trusted mastery or arbitrary prose evaluation.
+
+
+
+## Graph causality and changed integration policy — PR #34
+
+Six independent observations precede immutable class/rationale commitment. The initial request requires ordered base/PR-head direct parents and consumed integration revision; a green PR-head build or two-parent commit containing a different head cannot satisfy it. Wrong factual reasoning remains unverified after correct recovery; later explanation cannot rewrite the lock.
+
+Transfer changes to a linear replayed series. Approved base is an ancestor through two edges while original PR-head identity is absent. The learner must distinguish parent count, ancestry and reviewed change series; an extra-change descendant fails despite preserving ancestry. These are deterministic synthetic exercises with visible finite grammar, not a general Git/rebase competence test. A foundations lesson should precede claims of a coherent near-zero learning path.
+
+
+## Git foundations lesson — PR #36 / corrective PR #37
+
+The learner now encounters a separate teaching-only sequence before graph assessment: Snapshot → Ref → Direct parent → Ancestry. Its fixture IDs are intentionally disjoint from the assessment graph corpus. The lesson uses React-local navigation and answer state only; it does not write the Git/CI checkpoint and cannot grant diagnosis, verified, explanation or transfer credit.
+
+A four-question self-check gives immediate teaching feedback and reveals the CTA to the existing graph diagnostic lab only after all four concept distinctions are correct. This is readiness scaffolding, not mastery evidence. Browser regression verifies that completing the lesson leaves persisted Git/CI assessment state unchanged and that active graph incident SHAs/relation tokens are absent from the lesson.
+
+The lesson closes vocabulary and mental-model debt, but not the full apprenticeship gap. A learner can know what a ref, direct parent and ancestor are while still struggling to infer those predicates from raw workflow/graph evidence. A future teaching-only evidence-reading bridge should address that gap using a third disjoint fixture, without weakening the assessment.

@@ -1,3 +1,4 @@
+import { isValidGraphState } from "./git-graph-simulator.ts";
 import {
   CI_EVIDENCE_SLOTS,
   ciEvidenceFor,
@@ -13,8 +14,8 @@ import {
 export const CI_PRACTICE_STORAGE_KEY = "holi.devops.git-ci-practice";
 import { isValidRevisionState } from "./git-revision-simulator.ts";
 
-export const CI_PRACTICE_SCHEMA_VERSION = 2 as const;
-export const CI_FIXTURE_VERSION = 2 as const;
+export const CI_PRACTICE_SCHEMA_VERSION = 4 as const;
+export const CI_FIXTURE_VERSION = 4 as const;
 
 export type CiStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 export type CiLoadStatus = "empty" | "restored" | "discarded" | "unavailable";
@@ -36,7 +37,7 @@ function sameJson(a: unknown, b: unknown): boolean {
 
 export function isValidCiLabState(value: unknown): value is CiLabState {
   if (!isRecord(value) || !isRecord(value.evidenceSeen) || !isRecord(value.preRepairEvidence)) return false;
-  if (!isValidRevisionState(value.revisionPractice)) return false;
+  if (!isValidRevisionState(value.revisionPractice) || !isValidGraphState(value.graphPractice)) return false;
   for (const slot of CI_EVIDENCE_SLOTS) {
     if (typeof value.evidenceSeen[slot] !== "boolean") return false;
     const record = value.preRepairEvidence[slot];
@@ -123,3 +124,5 @@ export function clearCiPractice(storage: CiStorage): boolean {
     return false;
   }
 }
+
+

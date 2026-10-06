@@ -10,7 +10,7 @@ Four SIMULATED incidents cover file-access and same-symptom TCP-service diagnosi
 
 Versioned localStorage (practice schema 7 / Linux fixture 5) restores valid snapshots, drafts, both counterfactual states and randomized differential assignments after refresh. Schema-v6 and older incompatible checkpoints or internally inconsistent states are discarded. Client state is inspectable and forgeable; current-case reset preserves assignment, full restart chooses a fresh assignment, and storage failure falls back to ephemeral practice.
 
-Production Chromium regression is mandatory in CI. `@playwright/test` is exact-pinned at 1.63.0 in the repository dependency graph and package lock, so `npm ci` and the normal high-severity npm audit cover the mandatory Node-side browser test runtime. CI installs the Chromium revision selected by that locked Playwright version and runs the local binary after `npm run build`; Playwright owns production startup/readiness/cleanup on loopback port 3100. The suite explicitly exercises both differential orderings.
+Production Chromium regression is mandatory in CI. `@playwright/test` is exact-pinned at 1.63.0 in the repository dependency graph and package lock, so `npm ci` and the normal high-severity npm audit cover the mandatory Node-side browser test runtime. CI installs the Chromium revision selected by that locked Playwright version and runs the local binary after `npm run build`; Playwright owns production startup/readiness/cleanup on loopback port 3100. CI explicitly checks out the exact PR head and asserts its identity before installing/testing. The suite explicitly exercises both differential orderings.
 
 The current implementation contains:
 
@@ -18,11 +18,11 @@ The current implementation contains:
 - DevOps curriculum skeleton from Linux → CI → Docker → Kubernetes → IaC/Cloud → Observability/SRE
 - Responsive learning-oriented landing page
 - Interactive deterministic Linux incident simulator
-- SIMULATED Git/CI artifact handoff and Git revision acceptance with changed path/tag transfers
+- SIMULATED Git/CI artifact handoff, Git revision acceptance and integration graph diagnosis with changed path/tag/linear-history transfers
 - Architecture plan for moving from simulation to isolated real execution labs
 - Explicit security constraints for learner-controlled workloads
 
-Git/CI adds artifact producer/consumer diagnosis and a mechanically green release with unmet acceptance. Revision practice requires checkout/ref/build/intent evidence, immutable diagnosis, minimal revision repair, explicit consumed-SHA verification, linked explanation and annotated-tag commit transfer. Git/CI checkpoint uses schema 2 / fixture 2 and discards v1; Linux remains 7/5. Seven production Chromium tests cover all existing Linux and artifact flows plus revision learning/persistence/storage failure. Everything remains SIMULATED and client-local, never certification.
+Git/CI adds artifact producer/consumer diagnosis and a mechanically green release with unmet acceptance. Revision practice requires checkout/ref/build/intent evidence, immutable source-linked diagnosis/rationale before repair, minimal revision repair, explicit consumed-SHA verification, linked explanation and annotated-tag commit transfer. Git/CI checkpoint uses schema 4 / fixture 4 and discards v3 and older; Linux remains 7/5. Eleven production Chromium tests cover Linux, artifact, revision and graph learning/persistence/storage failure. Integration graph practice requires ordered approved-base/PR-head parents; its changed linear-history transfer instead requires base ancestry and the reviewed fixture change series. Everything remains SIMULATED and client-local, never certification.
 
 ## Run locally
 
@@ -83,6 +83,8 @@ See [docs/DEVOPS_PLATFORM_ARCHITECTURE.md](docs/DEVOPS_PLATFORM_ARCHITECTURE.md)
 ## Legacy documents
 
 The existing `docs/plan/` files belong to the previous AI-film concept. They are retained as historical documents; they are **not** the specification for the current product.
+
+
 
 
 

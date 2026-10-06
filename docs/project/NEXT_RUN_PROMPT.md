@@ -1,38 +1,103 @@
 # NEXT_RUN_PROMPT
 
-Tiếp tục vận hành tự chủ repo THẬT roronoazoroshao369/holi-ai qua @GitHub, nhánh main. Báo cáo tiến độ, quyết định, bằng chứng, PR/CI/merge và bàn giao bằng TIẾNG VIỆT. Đọc LIVE repo trước; repo là nguồn sự thật và checkpoint này có thể đã cũ.
+Resume autonomous operation of the REAL repository:
+`roronoazoroshao369/holi-ai` through @GitHub. Default branch: `main`. Communicate in VIETNAMESE.
 
-Checkpoint sản phẩm: PR #30, head cuối dc03b3c0a8a0ea1e2a728106c72d5395000fe00e; CI 37325201149 / job 111814058034 SUCCESS. Thực chạy npm ci, full typecheck, 53/53 Node tests, audit 0 vulnerabilities, production build, Chromium từ Playwright 1.63.0 khóa trong repo, 7/7 production browser tests (52.1s), next start --hostname 127.0.0.1 --port 3100. Product squash merge 1b614eb51984b8737efa545eb92c951adafa2640 đã được đọc lại. Tài liệu closeout có PR riêng phải qua full exact-head CI; file này không tự khẳng định SHA merge cuối của chính PR tài liệu. Đọc lại main, PR mở và CI hiện tại.
+IMPORTANT: this handoff can become stale immediately. Inspect LIVE GitHub first. The repository is authoritative.
 
-Hiện có sáu primary incidents SIMULATED: bốn Linux (permission và TCP) cùng hai Git/CI (artifact handoff và release acceptance). Hai Linux counterfactuals và artifact-path/annotated-tag transfer là các assessment bước tiếp theo. Không gọi là Linux host, Git repo hay Actions runner thật; không chứng nhận, CONTROLLED_EXECUTION hay REAL_SANDBOX. localStorage forgeable, không authoritative. Không mở rộng sang accounts, Kubernetes, Docker hay sandbox thật trong lượt này.
+## Verified product checkpoint
 
-Persistence: Linux schema 7 / fixture 5 không đổi. Git/CI schema 2 / fixture 2, key holi.devops.git-ci-practice, nested revisionPractice. V1 được discard có chủ đích. Giữ hai hợp đồng độc lập; nếu đổi semantics phải quyết định schema và fixture riêng.
+Latest verified product main before documentation closeout:
+`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
 
-MỘT FRONTIER ĐỀ XUẤT: khóa lập luận Git revision có source/fact cụ thể TRƯỚC repair, thay vì chỉ khóa nhãn causal class từ dropdown. Giữ incident và annotated-tag transfer hiện tại; không thêm scenario/token quiz chỉ để tăng số gate.
+Primary product PR:
+#36 — Teach Git graph foundations before diagnostic practice
 
-Lý do: learner hiện có thể đoán đúng class rồi viết source-linked explanation sau khi thấy repair outcome. Discovery/learning review phải kiểm tra liệu frontier còn đúng từ LIVE code; chọn thay đổi nhỏ nhất giải quyết weakness này. Không tạo grading engine hay workflow interpreter tổng quát.
+Primary final head:
+`14a89672a1c945b864db9dc52553207c09d992c1`
 
-Acceptance:
-- Initial title/summary/button/source name trung tính, không leak đáp án.
-- Evidence được thu trước lock/repair; rationale trước sửa gắn với source ID và fact độc lập, cộng causal relation trong grammar hữu hạn.
-- Locked class/rationale bất biến đến reset; fact/source sai không được bù bởi relation đúng.
-- Repair đúng sau diagnosis/rationale sai có thể làm actual SHA khớp nhưng không verified learning.
-- Verify checkout SHA VÀ release metadata SHA đối chiếu intended commit, không chỉ màu pipeline.
-- Explanation sau repair không được sửa lại bad pre-repair rationale theo hồi tố.
-- Giữ transfer thay đổi representation: annotated tag OBJECT → target COMMIT, trong khi main đã tiến lên; không copy SHA incident đầu.
-- Edit/rebuild/reverify/reset/refresh thu hồi các completion phụ thuộc đúng phạm vi.
-- Restore fail closed với stale/corrupt/impossible/forged-derived flags; getter hoặc Storage methods bị chặn phải fallback ephemeral.
-- Giữ toàn bộ regression Linux/artifact/revision; không giảm assertion, thêm retry hay tăng timeout để che race. Poll semantic persisted state trước reload/injection.
-- Không tuyên bố chấm reasoning văn bản tự do nếu vẫn dùng typed finite grammar.
+Primary exact-head CI:
+run `37410436717` / job `112097436461` — SUCCESS.
 
-Đọc ít nhất docs/project/PROJECT_STATE.md, ROADMAP.md, BACKLOG.md, ARCHITECTURE.md, DECISIONS.md, RISKS.md, LEARNING_MODEL.md, LAB_SECURITY.md, RUN_LOG.md, GIT_REVISION_CONTRACT.md; lib/ci-simulator.ts, git-revision-simulator.ts, ci-practice-persistence.ts, linux-simulator.ts, practice-persistence.ts, curriculum.ts; components/CiLab.tsx, GitRevisionLab.tsx, LabTerminal.tsx; app/page.tsx, globals.css; mọi tests; playwright.config.cjs; .github/workflows/ci.yml; package.json/package-lock.json. Kiểm tra recent commits, PR mở và job logs.
+Same-goal corrective PR:
+#37 — Clean up Git foundations focus CSS
 
-Không learner input nào được execute git/YAML/shell/subprocess; không Docker socket, privileged container, host filesystem mount, cloud/control-plane credentials. Không dùng hidden client state làm security boundary. Giữ pure transitions nhỏ; không ép Git vào Linux simulator.
+Corrective final head:
+`c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
 
-Loop trong lượt: inspect LIVE → reconcile docs → discovery → council review → một primary goal → acceptance → implement → typecheck/unit/build → security/learning/UX red-team → production browser → fix → exact FINAL-head CI → merge → đọc lại main → documentation closeout → full exact docs-head CI → merge → đọc lại final main/docs/PR mở → xuất NEXT_RUN_PROMPT mới → DỪNG.
+Corrective exact-head CI:
+run `37410861260` / job `112098762706` — SUCCESS.
 
-Red-team bắt buộc: leakage, repair quá sớm, hypothesis/rationale mutable, right-label/wrong-facts bypass, green-only completion, checkpoint forge/refresh/reset, transfer chỉ đổi token, host execution, selector collision, mobile overflow, focus và console/page errors. Sửa finding trước gate cuối.
+Merged product main:
+`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
 
-Trước merge cần đúng FINAL HEAD qua npm ci, full typecheck, toàn bộ Node tests, npm audit --audit-level=high, production build, Chromium từ Playwright runtime khóa trong repo và mọi production browser tests. Đọc failing logs trực tiếp, không đoán nguyên nhân từ status. Merge có expected_head_sha; không merge head đã đổi sau CI.
+Post-merge main push CI:
+run `37411185039` / job `112099751819` — SUCCESS.
 
-Sau product merge: đọc lại main; cập nhật durable controls bằng sự thật đã verify, ghi exact head/run/job/counts/merge/version decisions/red-team/remaining risks và MỘT frontier kế tiếp. PR tài liệu riêng phải qua full exact-final-head CI. Sau docs merge đọc lại main, docs và PR mở. Không dừng ở plan/implementation/open PR/non-final CI; không tự bắt đầu primary goal kế tiếp trong cùng lượt.
+Final same-goal gate: explicit checked-out revision assertion, npm ci, full typecheck, 72/72 Node tests, npm audit --audit-level=high with 0 vulnerabilities, production build, locked Playwright 1.63.0 Chromium, 12/12 serial production browser tests. Main tree and tested corrective head tree both equal `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
+
+## Current phase
+
+v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
+
+Delivered:
+- Snapshot → Ref → Direct parent → Ancestry navigable Git foundations lesson.
+- Teaching fixture is disjoint from assessment fixture.
+- Self-check is local teaching state only: no Git/CI checkpoint writes, no assessment credit.
+- Lesson does not expose active graph incident SHAs or relation answer token.
+- Explicit handoff into existing graph diagnostic lab.
+- Responsive/mobile and visible-focus coverage.
+- PR #37 cleaned a literal CSS newline artifact without changing behavior.
+- Existing immutable pre-repair rationale, verification, revocation and transfer semantics remain unchanged.
+- Git/CI schema4/fixture4 and Linux schema7/fixture5 remain unchanged.
+- Learner environment remains SIMULATED; no learner host/Git/YAML/network execution.
+
+## ONE highest-value frontier
+
+A **teaching-only Git evidence-reading bridge** between the new foundations lesson and the existing graph diagnostic assessment.
+
+Candidate bounded goal:
+- introduce one third synthetic teaching fixture, disjoint from both the foundations and assessment fixtures;
+- present raw ref snapshot, checkout/build metadata and a small commit graph;
+- guide the learner to derive three predicates: consumed commit identity, ordered direct parents and ancestry reachability;
+- feedback may be instructional because this is teaching, not assessment;
+- no persistence, no diagnostic/verified/explained/transfer credit;
+- do not reveal active incident answers or relation token;
+- preserve immutable pre-repair reasoning and all downstream revocation in the real graph practice;
+- finish by handing off to the existing graph diagnostic lab.
+
+Rationale: concept definitions are now taught, but the product still jumps from definitions to evidence-heavy diagnosis. The highest-value missing capability is evidence synthesis, not another finite incident.
+
+Reassess this recommendation from LIVE evidence before implementation. Do not blindly follow stale wording.
+
+## Read first
+
+- docs/project/PROJECT_STATE.md
+- docs/project/NEXT_RUN_PROMPT.md
+- docs/project/ROADMAP.md
+- docs/project/BACKLOG.md
+- docs/project/ARCHITECTURE.md
+- docs/project/DECISIONS.md
+- docs/project/RISKS.md
+- docs/project/PRODUCT.md
+- docs/project/LEARNING_MODEL.md
+- docs/project/LAB_SECURITY.md
+- docs/project/RUN_LOG.md
+- docs/project/GIT_GRAPH_CONTRACT.md
+- docs/project/GIT_REVISION_CONTRACT.md
+- relevant app/components/lib
+- all tests, package manifests and .github/workflows/ci.yml
+
+## Operating loop
+
+Inspect LIVE → reconcile concurrent/stale state → discovery/review → choose exactly ONE bounded primary goal → implement → test/security/UX/learning/red-team → documentation → PR → full exact FINAL-head CI → merge with `expected_head_sha` → confirm LIVE main and push CI → separate documentation closeout with full exact-head CI → new handoff → STOP.
+
+Do not:
+- execute learner input on host;
+- force-push main;
+- merge failing or incomplete checks;
+- weaken assertions, retries or timeouts to hide failures;
+- let teaching/readiness state grant assessment credit;
+- mutate immutable pre-repair reasoning after lock;
+- bypass downstream revocation;
+- begin a second primary product goal in the same run.

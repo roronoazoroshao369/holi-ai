@@ -1,48 +1,74 @@
 # Project state
 
-Updated: 2026-10-05. Phase: v0.3 SIMULATED mastery-flow foundation. Package remains 0.1.0; no release/tag created.
-Verified product main: 1b614eb51984b8737efa545eb92c951adafa2640, re-read after PR #30 squash merge. Documentation closeout follows in a separate PR and must pass full exact-final-head CI before merge; the next operator must always re-read LIVE main.
-Product PR #30 final head: dc03b3c0a8a0ea1e2a728106c72d5395000fe00e.
-Exact-final-head CI: 37325201149 / job 111814058034 — SUCCESS.
-Gate: npm ci; full TypeScript typecheck; 53/53 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; Chromium from repository-locked Playwright 1.63.0; 7/7 production Chromium tests (52.1s) against next start --hostname 127.0.0.1 --port 3100.
+Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation. Package remains 0.1.0; no release/tag created.
 
-## Delivered current goal — Git commit/ref causality
+## Latest verified product state
 
-GOAL: complete one unfamiliar Git revision-selection vertical slice as explicit SIMULATED practice.
-USER VALUE: mechanically green release does not establish that approved source was built, nor that the learner diagnosed its causal defect.
-SCOPE: five immutable pre-repair sources; locked causal class; minimally sufficient checkout revision repair; rebuild; separate consumed-SHA verification; five source-linked explanation facts; materially changed annotated-tag-to-commit transfer; persistence and production browser coverage.
-NON-GOALS: actual Git/GitHub Actions execution, generic Git/YAML interpreter, accounts, Kubernetes/Docker/real sandbox, certification or trusted assessment.
-ACCEPTANCE: satisfied on the exact final product head above. Initial copy neutral; missing evidence blocks lock/repair; hypothesis immutable; correct repair after wrong diagnosis can match actual/intended SHA while verified remains false; green alone does not verify; wrong source/fact cannot be rescued by a correct relation; transfer distinguishes tag object, commit target and advanced main; edit/rebuild/reset/refresh revoke dependent confirmation; impossible/stale/corrupt state fails closed.
-SECURITY: pure browser fixture transitions; no learner shell/subprocess/git/YAML/network execution or credentials. localStorage is forgeable and never authoritative.
-ROLLBACK: revert PR #30; schema-1 implementation rejects schema-2 checkpoint. Linux needs no migration.
+LIVE product main before this documentation closeout: `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`.
 
-## Product truth
+Primary product PR #36 — **Teach Git graph foundations before diagnostic practice**:
+- base: `7f71b5d40d1f95261c2bfbc31ddf8fc2199c677e`
+- exact final head: `14a89672a1c945b864db9dc52553207c09d992c1`
+- merge commit: `1714bf111882decdcd21b5efb8a6ada53b2e7abe`
+- exact-head CI: run `37410436717`, job `112097436461` — SUCCESS.
 
-Six primary SIMULATED incidents: four Linux (two permission, two same-symptom TCP) and two Git/CI (artifact handoff, release acceptance). Permission/group and listener/socket counterfactuals plus artifact-path and annotated-tag transfers are assessment steps, not additional real environments.
+Same-goal corrective PR #37 — **Clean up Git foundations focus CSS**:
+- base: `1714bf111882decdcd21b5efb8a6ada53b2e7abe`
+- exact final head: `c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
+- merge/main commit: `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+- exact-head CI: run `37410861260`, job `112098762706` — SUCCESS.
+- post-merge main push CI: run `37411185039`, job `112099751819` — SUCCESS.
 
-Git artifact incident is preserved: web-dist producer versus site-dist consumer; correct artifact-output repair after wrong diagnosis may make pipeline green but cannot verify learning. Its changed transfer applies nested extraction semantics.
+Final same-goal gate on PR #37 ran explicit checkout/SHA verification, `npm ci`, full typecheck, **72/72 Node tests**, high-severity npm audit with **0 vulnerabilities**, production build, repository-locked Playwright 1.63.0 Chromium installation and **12/12 serial production Chromium tests**. The merged main tree matches the tested corrective head tree `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
 
-Git revision incident: refs/heads/release resolves to synthetic a4… commit; approved build-start main snapshot is b7…; original checkout and release metadata both record a4…. Pinning checkout to approved immutable b7… is the minimal repair. Explicit verification checks checkout and metadata against intent; pipeline pass is insufficient. Original facts remain captured before repair for explanation.
+## Delivered goal contract
 
-Tag transfer: refs/tags/v2.4 points to c8… tag OBJECT, which targets d9… COMMIT, while main now points to e2…. The request explicitly asks for an immutable COMMIT identity; d9… is required. This does not deny that Git can checkout tag names. No real Git history/general Actions competence is claimed.
+**GOAL:** one mechanism-first Git foundations lesson for a near-zero learner, followed by a deliberate handoff into the existing graph diagnostic practice.
 
-## Persistence and reset truth
+**WHY NOW / USER VALUE:** before this delivery the page jumped from a curriculum skeleton and terse mental-model copy into SHA-heavy independent assessment forms. That made clerical transcription and unfamiliar Git vocabulary compete with causal reasoning.
 
-Linux: PRACTICE_SCHEMA_VERSION=7 / LINUX_FIXTURE_VERSION=5, unchanged.
-Git/CI: CI_PRACTICE_SCHEMA_VERSION=2 / CI_FIXTURE_VERSION=2 under holi.devops.git-ci-practice. Schema bumps for nested revision state, verification tuples and editable reasoning drafts; fixture bumps for expanded revision/tag assessment corpus. Version-1 checkpoints intentionally discard. The Linux/Git checkpoint contracts remain separate.
+**DELIVERED:**
+- navigable Snapshot → Ref → Direct parent → Ancestry lesson;
+- a teaching graph fixture deliberately disjoint from the graph assessment fixture;
+- local four-question readiness self-check;
+- explicit **TEACHING ONLY / no assessment credit** boundary;
+- readiness/navigation state remains component-local and does not write the Git/CI checkpoint;
+- explicit anchor/CTA into the existing graph diagnostic lab;
+- responsive/mobile layout and visible keyboard focus;
+- browser regression proving lesson activity does not mutate Git/CI assessment state and does not expose active incident SHAs/relation tokens.
 
-CiLab composes artifact state with revisionPractice; no cross-credit or unrelated prerequisite gate. Revision reset clears revision only; whole Git/CI reset clears both and remounts revision drafts. Editing explanation clears its confirmation and tag transfer; editing transfer clears its confirmation; rebuild/reverification clear downstream work. Storage method errors AND denied localStorage getter degrade to ephemeral practice.
+**NON-GOALS PRESERVED:** no new incident, no schema/fixture bump, no real Git/YAML/shell/network execution, no weakening of immutable pre-repair reasoning, verification, downstream revocation or transfer semantics.
 
-## Red-team and verification evidence
+PR #37 only fixed a malformed literal `\\n` in the new focus CSS discovered during post-merge re-read. It changed no learning, persistence, security or test semantics and was held to the same full exact-head gate.
 
-Review found an explanation asking for a repair ID hidden in option DOM values. Product now displays the selected ID only after repair lock. Whole-module reset also remounts component-local drafts. Getter denial is caught at the browser boundary. Browser checkpoint tests poll the required semantic state before reload/injection to avoid first-save/reset races; retries remain zero. Existing Linux/artifact tests were not weakened.
+## Product truth / partial implementation
 
-Initial product head b6d3b47c5866631f1d3086c298acefa2e0ae363f passed full CI 37324780829 / 111812605785 with 53 Node and 7 Chromium tests (1.0m). Final test-hardening commit dc03b3c0a8a0ea1e2a728106c72d5395000fe00e was independently verified by the exact-final-head run above. Local typecheck/53 tests/audit/build also passed; local Chromium CDN ZIP was invalid, so no local browser pass is claimed.
+Seven primary SIMULATED incidents remain: four Linux permission/TCP incidents and three Git/CI artifact, revision and graph incidents. The new Git foundations lesson is **instructional scaffolding, not an eighth incident and not assessment evidence**. Permission/group, listener/socket, extraction-path, annotated-tag and linear-history transfers remain bounded assessment steps.
 
-## Remaining risks and ONE next frontier
+Git/CI persistence remains schema 4 / fixture 4 under `holi.devops.git-ci-practice`; Linux remains schema 7 / fixture 5. The foundations lesson adds no persisted field and no migration. localStorage remains forgeable and non-authoritative.
 
-All scenarios remain finite, visible and retryable fixtures. Fully consistent forged client checkpoints may display completion. Source grammar is exact, not free-form grading. Git revision pre-repair diagnosis is currently a multiple-choice CLASS; its detailed source-linked rationale is submitted only after repair, so guessing that class can still earn a local pass. This is the next learning weakness to address.
+The graph assessment still requires immutable pre-repair source-linked rationale before repair, separate consumed-commit and ordered-parent verification, and changed linear-history transfer. The foundations lesson neither grants prerequisite credit nor modifies those invariants.
 
-Lock a source-linked Git revision causal rationale BEFORE repair, rather than only a multiple-choice causal label. Keep one existing incident and its tag transfer; do not add another scenario merely to increase gate count.
+## Security / trust boundary
 
-Chromium-only coverage; tiny corpus; simplified Linux/Git models; randomized Linux order may repeat; browser/FFmpeg CDN binaries are selected by locked Playwright but not npm-audited; real sandbox remains design-only. See RISKS and GIT_REVISION_CONTRACT.
+Current learner environment remains pure finite in-browser SIMULATED transitions. Learner input never executes host shell, Git, YAML, subprocess, Docker, network calls or credentials. The foundations lesson uses static teaching data and React-local state only. Browser/CI execution is maintainer verification tooling, not learner execution.
+
+A consistent developer-tools forgery can still manufacture local completion in persisted labs. Nothing in the lesson or readiness check changes that trust boundary or authorizes certification, privileges or real execution.
+
+## Current risks
+
+- Passing current labs still demonstrates completion of a small deterministic corpus, not general Git/DevOps competence.
+- Full-length SHA and finite grammar transcription can measure clerical accuracy separately from conceptual understanding.
+- The foundations lesson teaches four graph concepts, but it does **not yet teach the diagnostic move from raw evidence to predicates** such as “what revision was consumed?”, “what are the ordered direct parents?” and “is base reachable by ancestry?”.
+- Chromium-only browser coverage and Playwright-managed browser binary provenance remain explicit limits.
+- Real sandbox isolation/identity/quotas/TTL/network/cost controls remain design-only.
+
+## ONE next frontier / candidate goal
+
+Highest-value frontier: **a non-credit Git evidence-reading bridge between the foundations lesson and the existing graph assessment**.
+
+Recommended bounded goal: use a third teaching-only fixture, disjoint from both current lesson and assessment fixtures, to guide a near-zero learner from raw synthetic evidence (ref snapshot, checkout/build metadata and a small commit graph) to three predicates: consumed commit identity, ordered direct parents and ancestry reachability. Give explanatory feedback in the teaching exercise, but do not persist readiness, grant assessment credit, expose active incident answers or alter graph assessment state. End with the existing diagnostic lab handoff.
+
+Why this is preferable to another incident: the conceptual definitions are now present; the remaining jump is **evidence synthesis**, while the current assessment still carries substantial finite-SHA/grammar burden. Reassess this recommendation against LIVE repository evidence before implementation.
+
+External blockers: none for the completed SIMULATED goal. Real execution remains gated on a separately verified isolation architecture.

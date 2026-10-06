@@ -1,5 +1,12 @@
 # Decisions
 
+2026-10-06 PR #32: require source-linked factual rationale before revision repair. Persist one rationale field, draft while hypothesis is empty and immutable cloned snapshot after class lock. Lock requires five evidence and nonempty bounded source/fact/relation; correctness is evaluated at verification, not disclosed early. Wrong class/source/fact/relation cannot be rescued by correct repair or later explanation. Preserve existing incident/tag transfer; no extra scenario.
+
+2026-10-06: Git/CI schema 2 -> 3 for rationale shape; fixture 2 -> 3 for changed pre-repair completion rubric, with incident output/tag corpus unchanged. Discard v2/older rather than retroactively credit rationale. Linux remains independent 7/5. Core/DOM lock, clone alias checks, wrong-rationale round-trip, forged-flag rejection and semantic autosave polling are required.
+
+2026-10-06: after verified delivery, ONE frontier is Git merge-graph / PR-head versus integration-commit causality with parent/ancestry evidence. Refine a bounded SIMULATED incident in LIVE discovery/review; no generic interpreter or simultaneous scenarios.
+
+
 2026-10-05 PR #30: compose one Git revision machine with the existing artifact machine under Git/CI checkpoint. Bump Git/CI schema 1 -> 2 for persisted revision/run/verification/drafts and fixture 1 -> 2 for expanded revision/tag assessment corpus; discard v1. Preserve independent Linux 7/5. No generic interpreter, shared Linux engine or learner execution.
 
 2026-10-05: green pipeline is deliberately insufficient. Pinning intended immutable commit may fix the consumed SHA after wrong diagnosis, but verified requires correct locked class plus canonical pre-repair evidence and explicit checkout/metadata SHA verification. Source-linked rationale follows verification; label-only pre-repair guessing remains a named next frontier.
@@ -68,3 +75,20 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 
 2026-10-05: when the new Git/CI unavailable-storage copy made an existing Linux Playwright selector ambiguous, fix the product copy instead of weakening the established Linux regression. Cross-module additions must preserve existing browser tests without broad selectors becoming false positives.
 
+
+
+
+2026-10-06 — PR #34: model one finite integration graph incident, not another ref-token variant. Ordered approved-base/PR-head parents are an explicit delivery request, not a universal Git rule. Preserve six raw source/fact observations separately from the causal relation, clone rationale before repair, allow green operational recovery after wrong reasoning but withhold verified learning. Verify consumed commit and ordered parents separately.
+
+2026-10-06 — change transfer mechanism to linear replay: traverse base ancestry and collect exactly reviewed fixture changes [p1,p2]; do not require original PR-head identity or two parents. Change IDs are stipulated fixture evidence, never a claim of real rebase semantic equivalence. Keep old annotated-tag transfer and independent sibling credit.
+
+2026-10-06 — schema4 adds graphPractice, fixture4 adds corpus; older shared Git/CI progress intentionally discards, Linux7/5 unchanged. Explicitly checkout/assert exact PR-head SHA in CI; final head must pass complete gates and merge uses expected_head_sha. Next product leverage is one mechanism-first Git foundations lesson using separate teaching fixtures, rather than accumulating another independent finite form.
+
+
+2026-10-06 — PR #36: add one mechanism-first Git foundations lesson before graph assessment instead of another finite incident. Teach snapshot identity, moving refs, one-edge direct parents and multi-edge ancestry with a fixture disjoint from assessment. Keep readiness/navigation component-local: no Git/CI persistence write and no assessment credit. The lesson may give instructional self-check feedback because it is explicitly teaching, not grading.
+
+2026-10-06 — PR #36: preserve the graph assessment boundary. The lesson must not expose active incident SHAs or the canonical relation token, must not mutate immutable pre-repair rationale/verification/transfer state, and must hand off via a stable anchor to the existing diagnostic lab. Add Node coverage for fixture isolation/semantics and production-browser coverage for no-credit persistence, navigation, mobile overflow, focus and runtime errors.
+
+2026-10-06 — PR #37: post-merge re-read found a literal `\\n` embedded between two focus CSS rules. Treat this as a same-goal corrective defect, not a second product goal. Replace it with a real newline and require the complete exact-head gate again before merge. No assertions, retries, timeouts, schema, fixture or learning semantics changed.
+
+2026-10-06 — after the foundations lesson, the next candidate is not another incident but a teaching-only evidence-reading bridge: raw synthetic ref/checkout/build/graph evidence → consumed commit / ordered direct parents / ancestry predicates. Use a third disjoint fixture and keep assessment credit at zero.

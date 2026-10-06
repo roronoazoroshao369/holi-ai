@@ -1,5 +1,6 @@
 import { LabTerminal } from "../components/LabTerminal";
 import { CiLab } from "../components/CiLab";
+import { GitFoundationsLesson } from "../components/GitFoundationsLesson";
 import { curriculum } from "../lib/curriculum";
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
         <nav>
           <a href="#path">Lộ trình</a>
           <a href="#lab">Lab</a>
+          <a href="#git-foundations">Git nền tảng</a>
           <a href="#principles">Cách học</a>
         </nav>
         <a className="navCta" href="#lab">Vào lab</a>
@@ -78,13 +80,15 @@ export default function Home() {
         <LabTerminal />
       </section>
 
+      <GitFoundationsLesson />
+
       <section className="section ciLearningSection" id="git-ci-lab">
         <div className="sectionHeading">
           <div>
             <span className="kicker">FOUNDATION VERTICAL SLICE</span>
             <h2>Git & CI: điều tra từ evidence.</h2>
           </div>
-          <p>Hai incident SIMULATED: artifact delivery và release acceptance. Khóa diagnosis, sửa tối thiểu, kiểm tra output thực sự rồi giải thích và áp dụng vào tình huống mới.</p>
+          <p>Ba incident SIMULATED: artifact delivery, release acceptance và delivery graph. Khóa diagnosis, sửa tối thiểu, kiểm tra output thực sự rồi giải thích và áp dụng vào tình huống mới.</p>
         </div>
         <CiLab />
       </section>
@@ -107,3 +111,4 @@ export default function Home() {
     </main>
   );
 }
+

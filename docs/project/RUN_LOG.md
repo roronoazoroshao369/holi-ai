@@ -1,5 +1,24 @@
 # Run log
 
+2026-10-06 — integration graph run: LIVE main e1ca8cefbc69327d87d21d10a9eff5f5e4b1c7ef, docs #33/main CI37404961378 successful, no open PR/issues. Inspected tree/controls/code/tests/recent commits and relevant prior job logs. Selected one graph mechanism slice because current Git evidence lacked parent/ancestry semantics.
+
+PR #34 delivers six neutral source snapshots; immutable factual rationale/class before repair; sole immutable checkout repair; green rebuild independent of learning; separate consumed-commit and ordered base/head-parent verification; explanation; changed linear-history ancestry/series transfer. Two-parent wrong-head candidate and extra-change descendant fail. No learner execution added. Git/CI schema4/fixture4 discards <=v3 shared progress; Linux7/5 unchanged. CI now explicitly checks out/asserts final PR head, instead of implicit merge ref.
+
+Local npm ci/typecheck/68 Node/audit0/build passed; local browser CDN ZIP invalid, no local browser pass claimed. Exact final head bbec3e01fa0f10c0667b39c1aa62160a9aef4027 passed CI37407112497 / job112087009068: exact SHA assertion, npm ci, typecheck, 68/68 Node, audit0, production build, locked Chromium install, production next start127.0.0.1:3100 and11/11 browser tests (2.2m). No failed remote product run. Existing Linux/artifact/revision tests were unchanged; zero retries/timeouts unchanged. Red-team validates wrong-source/fact/relation/class despite correct recovery, parent order/wrong head, unknown/cyclic traversal, linear transfer vs two-parent memorization, drafts/lock/completion refresh, revocation/reset scope, forged/stale/corrupt storage, denied getter/methods, mobile390px/focus/no runtime errors.
+
+Protected squash merge93bece59d54c937e8b38e5704bfca18e8d4a1c48 confirmed by LIVE main, tree d929374e03fa651ba0ae99417334cc518994a3e8 identical to tested tree; key source/component/persistence/workflow files fetched again and matched. Documentation closeout is separate and must pass full exact-head CI before merge; this entry makes no self-referential claim about its future docs merge. ONE next frontier: mechanism-first Git foundations lesson using separate teaching fixtures and leading to existing practice; no navigation/readiness credit for assessment. Finite grammar, forgeable progress, small corpus and design-only real sandbox remain risks.
+
+2026-10-06 — pre-repair Git rationale run: LIVE main 36ef647f34ed7e12ea014980a7502accc53042fe, no open PR, main CI 37326616707 / job 111818891967 SUCCESS. Read LIVE NEXT_RUN_PROMPT and required controls/code. Council confirmed class-only lock allowed guessing then post-outcome explanation. Selected only rationale hardening of the existing incident/tag transfer.
+
+Added five source ID/fact pairs and relation as persisted draft before lock. Class lock clones rationale and prevents edits until reset. Completeness is checked without correctness feedback; correct repair can match checkout/metadata SHA after a wrong rationale but verified remains false. Post-repair explanation stays separate. Git/CI schema/fixture 3/3 (shape/rubric), v2 discard; Linux 7/5 unchanged. No learner host execution introduced.
+
+Red-team found no blocker. Low advisory about ambiguous PIPELINE grammar fixed to PIPELINE_STATUS:acceptance-ACCEPTANCE_RESULT. Unit cases validate every source/fact/relation independently, clone aliasing, immutability, wrong rationale refresh, impossible derived flags and revocation. Browser adds missing/incomplete rationale, wrong source and wrong fact despite matching SHA, draft/locked refresh, forged verified rejection, reset, mobile/focus/runtime; distinct exact selectors and semantic autosave polling preserve old assertions/retries/timeouts.
+
+Local npm ci/typecheck/56 tests/audit 0/build passed; Chromium local CDN ZIP invalid, no local browser pass claimed. PR #32 exact final head 928fa71948ff99f5da85eb5be7678a56aacee79d passed CI 37404253657 / job 112078149690: npm ci, full typecheck, 56/56 Node, high audit 0 vulnerabilities, production build, locked Playwright Chromium install, next start --hostname 127.0.0.1 --port 3100, 8/8 serial production Chromium tests (1.3m). No failed remote product run. Protected squash merge 833b4906840d4c7e3e49b8bbcb0645d47823de3f; main re-read, exact tree b118ff11d38c58bd3b16e5008d71fc4947f95a96 matched product, code/versions/contract fetched again. Documentation closeout separately gated; no docs merge or final docs CI self-claim here.
+
+Reconciled stale PRODUCT description that mentioned only permission exercise. Remaining typed/visible/forgeable limitations retained. ONE frontier: unfamiliar Git merge-graph / PR-head versus integration-commit causality, selected/refined after next LIVE review. This execution stops after docs closeout and handoff.
+
+
 2026-10-05 — Git commit/ref run: live main d1e926e9d98df298e849c571cd973159e8a8defe matched checkpoint; no open PR. Re-read required controls and code, prior CI and recent commits. Selected one release-acceptance mechanism instead of another artifact token quiz. PR #30 composes five evidence sources, locked causal class, minimal SHA pin, rebuild, separate checkout/metadata revision verification, five source-linked facts and changed annotated-tag transfer. Pipeline may remain green after wrong diagnosis/repair; operational color cannot earn learning.
 
 Version decisions: Git/CI schema 2 for revisionPractice/run/verification/editable drafts; fixture 2 for corpus expansion; discard v1. Linux remains 7/5. No learner-controlled Git, YAML, shell, subprocess, host/network execution or credentials. Revision-only reset preserves artifact; whole Git/CI reset clears both and remounts drafts.
@@ -107,3 +126,27 @@ PR #28 exact final head 03915755c2cdf4ec9744def78eff187f125935ea passed CI 37318
 
 Next frontier: teach unfamiliar Git commit/ref causality before claiming broad Git & CI competence. Avoid another artifact-token variant; require branch/ref/commit evidence, minimal revision-selection repair and changed transfer.
 
+
+
+
+
+## 2026-10-06 — Git foundations lesson closeout
+
+LIVE reconciliation showed the incoming handoff at main `7f71b5d40d1f95261c2bfbc31ddf8fc2199c677e` was stale: PR #36 and same-goal corrective PR #37 had already merged, with no open PRs.
+
+Delivered product:
+- PR #36 `Teach Git graph foundations before diagnostic practice`
+  - final head `14a89672a1c945b864db9dc52553207c09d992c1`
+  - exact-head CI `37410436717` / job `112097436461`: SUCCESS
+  - merged as `1714bf111882decdcd21b5efb8a6ada53b2e7abe`
+- PR #37 `Clean up Git foundations focus CSS`
+  - final head `c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
+  - exact-head CI `37410861260` / job `112098762706`: SUCCESS
+  - merged as `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+- post-merge main push CI `37411185039` / job `112099751819`: SUCCESS
+
+Final effective gate: explicit checkout/SHA assertion, npm ci, typecheck, 72 Node tests, audit 0 high vulnerabilities, build, locked Playwright Chromium and 12 production Chromium tests. Tested corrective tree and merged main tree: `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
+
+Learning/security review: lesson state is teaching-only/local, fixture IDs are disjoint, active assessment answers are not exposed, Git/CI schema4/fixture4 and Linux7/5 are unchanged, and no learner execution surface was introduced.
+
+Documentation closeout updates the stale project state/handoff and advances the single next candidate to a non-credit evidence-reading bridge before graph assessment.
