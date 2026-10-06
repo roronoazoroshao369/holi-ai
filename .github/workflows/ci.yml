@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
 
+# TEMPORARY_UI_PREVIEW_BRIDGE: remove before merge.
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -33,6 +36,31 @@ jobs:
         run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run production browser regression
         run: ./node_modules/.bin/playwright test --config=playwright.config.cjs
+      - name: Build static UI preview
+        if: github.event_name == 'pull_request' && github.head_ref == 'design/ui-ux-overhaul-v1'
+        env:
+          CF_PAGES: "1"
+        run: npm run build
+      - name: Publish verified UI preview artifact branch
+        if: github.event_name == 'pull_request' && github.head_ref == 'design/ui-ux-overhaul-v1'
+        env:
+          ARTIFACT_BRANCH: deploy/cloudflare-ui-artifact
+          VERIFIED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          export ARTIFACT_DIR="$RUNNER_TEMP/holi-ui-artifact"
+          rm -rf "$ARTIFACT_DIR"
+          mkdir -p "$ARTIFACT_DIR"
+          cp -R out/. "$ARTIFACT_DIR/"
+          cd "$ARTIFACT_DIR"
+          git init
+          git checkout -b "$ARTIFACT_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          printf '%s\n' "$VERIFIED_HEAD" > .holi-source-sha
+          git add .
+          git commit -m "Publish verified UI preview for $VERIFIED_HEAD"
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git push --force origin "HEAD:refs/heads/$ARTIFACT_BRANCH"
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
