@@ -1,6 +1,30 @@
 # Project state
 
-Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell. Package remains 0.1.0; no release/tag created.
+Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell and redesigned production UI/UX system. Package remains 0.1.0; no release/tag created.
+
+## UI/UX production checkpoint
+
+Current verified LIVE product main: `ae043c1312f592392826aab7eb5b5514ef6da96a` from PR #43 — **Overhaul Holi UI/UX visual system**.
+
+Verification evidence:
+- final clean PR head `3f3b9c6c109c5520c6dc0e82fa7e3f9e7a08d3f0` passed exact-head CI run `37489630664` — SUCCESS;
+- visual-QA head `f1648744e25e44f697dc20c35a87429aa1a10a66` passed full CI plus automated 1440px desktop and 390px mobile full-page captures;
+- PR #43 squash-merged as `ae043c1312f592392826aab7eb5b5514ef6da96a`;
+- post-merge main push CI run `37490280081` — SUCCESS;
+- Cloudflare Worker `holi-devops-web` production deployment id `5c47a1e596bf441995c7dbb48a88445c`;
+- Cloudflare Browser Rendering successfully loaded `https://holi.shao.dpdns.org/` and confirmed the redesigned runtime console, `PUBLIC WEB SHELL` product-truth label, `SIMULATED` boundary and new hero.
+
+Delivered visual/UX system:
+- stronger product hierarchy and navigation framing;
+- split hero with evidence-driven runtime console and explicit product-truth signals;
+- redesigned curriculum cards, learning-loop rail and lab surfaces;
+- sticky instructional rail for the practical lab on desktop;
+- cohesive treatments across Linux lab, evidence/reasoning panels, Git foundations, Git/CI practice, principles and footer;
+- responsive behavior down to the 390px regression target, visible focus states and reduced-motion handling;
+- readability refinement for microcopy, terminal text and form controls;
+- no simulator, persistence, assessment or learner-execution semantics changed.
+
+The UI is intentionally technical/editorial rather than decorative illustration-heavy. Future product work should extend this design system instead of reintroducing the earlier flat mono-only presentation. CSS currently carries compatibility/cascade layers from the pre-overhaul styles; consolidation is maintainability debt, not a visual or functional blocker.
 
 ## Cloudflare deployment checkpoint
 
