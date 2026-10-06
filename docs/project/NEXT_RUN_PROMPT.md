@@ -3,55 +3,77 @@
 Resume autonomous operation of the REAL repository:
 `roronoazoroshao369/holi-ai` through @GitHub. Default branch: `main`. Communicate in VIETNAMESE.
 
-IMPORTANT: this handoff may already be stale. Inspect LIVE GitHub first. The repository is authoritative.
+IMPORTANT: this handoff can become stale immediately. Inspect LIVE GitHub first. The repository is authoritative.
 
 ## Verified product checkpoint
 
-Last verified product main before this documentation closeout:
-`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`.
+Latest verified product main before documentation closeout:
+`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
 
-Primary product PR #36 — **Teach Git graph foundations before diagnostic practice**.
-- final product head: `14a89672a1c945b864db9dc52553207c09d992c1`
-- exact-head CI: run `37410436717`, job `112097436461` — SUCCESS
-- gates: explicit checkout/SHA assertion; npm ci; full typecheck; 72/72 Node tests; high audit with 0 vulnerabilities; production build; locked Playwright 1.63.0 Chromium; 12/12 serial production tests in 2.3m on `127.0.0.1:3100`
-- squash merge: `1714bf111882decdcd21b5efb8a6ada53b2e7abe`
+Primary product PR:
+#36 — Teach Git graph foundations before diagnostic practice
 
-Initial PR #36 run `37410123085` failed only the new focus-indicator browser assertion (11/12 passed). Product CSS was fixed without weakening assertions, retries or timeouts.
+Primary final head:
+`14a89672a1c945b864db9dc52553207c09d992c1`
 
-Post-merge re-read found a literal `\\n` in the focus CSS source. Same-goal cleanup PR #37 corrected it.
-- final cleanup head: `c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
-- exact-head CI: run `37410861260`, job `112098762706` — SUCCESS
-- 72/72 Node; audit 0; build; 12/12 Chromium in 2.1m
-- squash merge / verified product main: `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+Primary exact-head CI:
+run `37410436717` / job `112097436461` — SUCCESS.
 
-Final product-main push CI: run `37411185039`, job `112099751819` — SUCCESS on exact `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`: 72/72 Node, audit 0, build, 12/12 Chromium in 2.0m.
+Same-goal corrective PR:
+#37 — Clean up Git foundations focus CSS
 
-Re-read the final documentation PR/merge/CI from LIVE GitHub; this file cannot prove its own future merge.
+Corrective final head:
+`c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
 
-## Current phase and delivered learning model
+Corrective exact-head CI:
+run `37410861260` / job `112098762706` — SUCCESS.
 
-Phase: v0.3 SIMULATED foundation; package 0.1.0; no release/tag.
+Merged product main:
+`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
 
-Delivered new lesson:
-- navigable Snapshot → Ref → Direct parent → Ancestry;
-- teaching fixture is disjoint from graph assessment fixture;
-- readiness self-check is React-local teaching state only;
-- successful readiness exposes a link into the existing graph diagnostic lab;
-- production browser test proves lesson activity leaves the persisted Git/CI assessment state unchanged.
+Post-merge main push CI:
+run `37411185039` / job `112099751819` — SUCCESS.
 
-This lesson grants NO diagnosis/verified/explained/transfer credit and is not a trusted assessment. Seven primary simulated incidents remain unchanged.
+Final same-goal gate: explicit checked-out revision assertion, npm ci, full typecheck, 72/72 Node tests, npm audit --audit-level=high with 0 vulnerabilities, production build, locked Playwright 1.63.0 Chromium, 12/12 serial production browser tests. Main tree and tested corrective head tree both equal `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
 
-Persistence remains Linux schema7/fixture5 and Git/CI schema4/fixture4. localStorage is forgeable and non-authoritative. Revision/graph pre-repair source-linked rationale remains immutable after lock; downstream revocation semantics remain unchanged. No learner Git/YAML/shell/subprocess/host/network execution exists.
+## Current phase
+
+v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
+
+Delivered:
+- Snapshot → Ref → Direct parent → Ancestry navigable Git foundations lesson.
+- Teaching fixture is disjoint from assessment fixture.
+- Self-check is local teaching state only: no Git/CI checkpoint writes, no assessment credit.
+- Lesson does not expose active graph incident SHAs or relation answer token.
+- Explicit handoff into existing graph diagnostic lab.
+- Responsive/mobile and visible-focus coverage.
+- PR #37 cleaned a literal CSS newline artifact without changing behavior.
+- Existing immutable pre-repair rationale, verification, revocation and transfer semantics remain unchanged.
+- Git/CI schema4/fixture4 and Linux schema7/fixture5 remain unchanged.
+- Learner environment remains SIMULATED; no learner host/Git/YAML/network execution.
 
 ## ONE highest-value frontier
 
-Candidate: reduce clerical full-SHA transcription in the existing graph diagnostic assessment while preserving the same reasoning contract.
+A **teaching-only Git evidence-reading bridge** between the new foundations lesson and the existing graph diagnostic assessment.
 
-Recommended bounded goal: use neutral source-bound structured commit/node/edge selection after evidence collection where it reduces transcription burden. Preserve source/fact independence, immutable pre-repair rationale, no early correctness oracle, operational-vs-learning separation, parent/ancestry semantics, downstream revocation and current checkpoint compatibility unless a real semantic change justifies a version bump. Red-team aggressively for answer leakage; do not replace reasoning with an obvious multiple-choice answer key. Do not add another incident in the same run.
+Candidate bounded goal:
+- introduce one third synthetic teaching fixture, disjoint from both the foundations and assessment fixtures;
+- present raw ref snapshot, checkout/build metadata and a small commit graph;
+- guide the learner to derive three predicates: consumed commit identity, ordered direct parents and ancestry reachability;
+- feedback may be instructional because this is teaching, not assessment;
+- no persistence, no diagnostic/verified/explained/transfer credit;
+- do not reveal active incident answers or relation token;
+- preserve immutable pre-repair reasoning and all downstream revocation in the real graph practice;
+- finish by handing off to the existing graph diagnostic lab.
+
+Rationale: concept definitions are now taught, but the product still jumps from definitions to evidence-heavy diagnosis. The highest-value missing capability is evidence synthesis, not another finite incident.
+
+Reassess this recommendation from LIVE evidence before implementation. Do not blindly follow stale wording.
 
 ## Read first
 
 - docs/project/PROJECT_STATE.md
+- docs/project/NEXT_RUN_PROMPT.md
 - docs/project/ROADMAP.md
 - docs/project/BACKLOG.md
 - docs/project/ARCHITECTURE.md
@@ -63,15 +85,19 @@ Recommended bounded goal: use neutral source-bound structured commit/node/edge s
 - docs/project/RUN_LOG.md
 - docs/project/GIT_GRAPH_CONTRACT.md
 - docs/project/GIT_REVISION_CONTRACT.md
-- relevant app/components/lib, all tests, package/lockfile, playwright.config.cjs and .github/workflows/ci.yml
+- relevant app/components/lib
+- all tests, package manifests and .github/workflows/ci.yml
 
-Inspect LIVE default/main, branches, open PRs, recent commits, push/PR CI and relevant logs before choosing work.
+## Operating loop
 
-## Hard constraints
+Inspect LIVE → reconcile concurrent/stale state → discovery/review → choose exactly ONE bounded primary goal → implement → test/security/UX/learning/red-team → documentation → PR → full exact FINAL-head CI → merge with `expected_head_sha` → confirm LIVE main and push CI → separate documentation closeout with full exact-head CI → new handoff → STOP.
 
-All current labs are explicitly SIMULATED. No arbitrary learner Git/YAML/shell/subprocess/host/network execution, credentials, Docker sockets/mounts or privileged workloads. No general free-form reasoning/certification claims. Preserve immutable pre-repair reasoning and downstream revocation. Never weaken old assertions, add retries or increase timeouts to hide races. Use expected_head_sha for merges. Re-read main before and after every merge.
-
-Continue the autonomous loop:
-RESUME → INSPECT LIVE REALITY → RECONCILE DOCS → DISCOVERY → COUNCIL REVIEW → SELECT ONE PRIMARY GOAL → IMPLEMENT → TEST → SECURITY/LEARNING/UX REVIEW → RED-TEAM → DOCUMENT → COMMIT → PR → FULL EXACT FINAL-HEAD CI → MERGE → RE-READ MAIN → SEPARATE DOCUMENTATION CLOSEOUT → FULL EXACT FINAL DOCS-HEAD CI → MERGE → CONFIRM FINAL MAIN/DOCS/OPEN PRS → OUTPUT NEW NEXT_RUN_PROMPT → STOP.
-
-Every merge requires exact final-head checkout assertion plus npm ci, full typecheck, all Node tests, high audit, production build, locked Chromium and all production browser tests. Inspect failing logs directly. Record exact head/run/job/counts/merge/version/risks/ONE next frontier without claiming unexecuted checks.
+Do not:
+- execute learner input on host;
+- force-push main;
+- merge failing or incomplete checks;
+- weaken assertions, retries or timeouts to hide failures;
+- let teaching/readiness state grant assessment credit;
+- mutate immutable pre-repair reasoning after lock;
+- bypass downstream revocation;
+- begin a second primary product goal in the same run.

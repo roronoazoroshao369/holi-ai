@@ -24,7 +24,7 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
-Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The graph causality slice is delivered. The next frontier is one mechanism-first Git foundations lesson leading into existing revision/graph practice, using different teaching fixtures and preserving assessment gates.
+Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The graph causality slice is delivered. The mechanism-first Git foundations lesson is now delivered with a separate teaching fixture and no assessment credit. The next learning gap is evidence synthesis: turning raw ref/checkout/build/graph observations into consumed-commit, direct-parent and ancestry predicates before the existing assessment.
 
 
 ## Git & CI vertical slice — producer/consumer contract
@@ -57,15 +57,10 @@ Six independent observations precede immutable class/rationale commitment. The i
 Transfer changes to a linear replayed series. Approved base is an ancestor through two edges while original PR-head identity is absent. The learner must distinguish parent count, ancestry and reviewed change series; an extra-change descendant fails despite preserving ancestry. These are deterministic synthetic exercises with visible finite grammar, not a general Git/rebase competence test. A foundations lesson should precede claims of a coherent near-zero learning path.
 
 
-## Git foundations lesson before graph assessment — 2026-10-06
+## Git foundations lesson — PR #36 / corrective PR #37
 
-A near-zero learner now gets an explicit teaching sequence before the graph diagnostic form:
+The learner now encounters a separate teaching-only sequence before graph assessment: Snapshot → Ref → Direct parent → Ancestry. Its fixture IDs are intentionally disjoint from the assessment graph corpus. The lesson uses React-local navigation and answer state only; it does not write the Git/CI checkpoint and cannot grant diagnosis, verified, explanation or transfer credit.
 
-1. **Snapshot identity** — a commit identifies an immutable snapshot; a branch name is not the snapshot itself.
-2. **Moving ref** — a branch ref can resolve to different commits over time while an existing commit identity remains fixed.
-3. **Direct parent** — a direct parent is exactly one parent edge away; ordered parent lists are properties of a concrete commit and any delivery policy must be read from its actual contract.
-4. **Ancestry** — an ancestor may be reachable through multiple parent edges and is not synonymous with direct parent.
+A four-question self-check gives immediate teaching feedback and reveals the CTA to the existing graph diagnostic lab only after all four concept distinctions are correct. This is readiness scaffolding, not mastery evidence. Browser regression verifies that completing the lesson leaves persisted Git/CI assessment state unchanged and that active graph incident SHAs/relation tokens are absent from the lesson.
 
-The lesson graph uses IDs that are disjoint from the graph incident/transfer fixtures. Its four-question readiness self-check is finite, visible, retryable and deliberately non-credit. Passing it only reveals navigation into the existing graph diagnostic lab; it does not set or infer diagnosis, verified, explanation or transfer state. A production browser invariant compares the full persisted Git/CI practice state before and after lesson use and requires exact equality.
-
-This closes a preparation gap, not a mastery gap. The assessment still has finite grammar and substantial SHA transcription, and the lesson self-check itself can be guessed. General Git competence, production debugging and trusted certification remain unsupported claims.
+The lesson closes vocabulary and mental-model debt, but not the full apprenticeship gap. A learner can know what a ref, direct parent and ancestor are while still struggling to infer those predicates from raw workflow/graph evidence. A future teaching-only evidence-reading bridge should address that gap using a third disjoint fixture, without weakening the assessment.
