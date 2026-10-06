@@ -78,3 +78,23 @@ The changed linear transfer traverses parent edges for approved-base ancestry an
 The lesson precedes `#git-graph-practice` and teaches four distinctions: immutable commit snapshot identity, movable refs, ordered one-edge direct parents and multi-edge ancestry. Immediate correctness feedback is permitted because this surface is explicitly teaching-only. The production browser regression verifies that completing the self-check leaves the persisted Git/CI assessment state byte-for-byte semantically unchanged and that assessment SHAs/relation tokens are absent from lesson copy.
 
 PR #37 corrected only a malformed literal newline in focus CSS. It introduced no architecture or state change.
+
+
+## Verified Cloudflare deployment shell
+
+The current public deployment is a **serving shell for the existing browser-only SIMULATED product**, not a real-execution lab runtime.
+
+Verified deployment state on 2026-10-06:
+- product main: `ae811270acd2d63b80b84aa5ad67d21957888534`;
+- static export is enabled only when `CF_PAGES=1`;
+- Cloudflare Worker: `holi-devops-web`;
+- Worker deployment id: `e534ef800b36468591f90f248a960e55`;
+- custom domain: `https://holi.shao.dpdns.org/`;
+- Worker custom-domain configuration is enabled and Cloudflare created the proxied DNS record;
+- Cloudflare Browser Rendering loaded the fully rendered application from the custom domain.
+
+The deployment path deliberately keeps the learning trust boundary unchanged. All current Linux/Git/CI exercises still execute as deterministic client-side state transitions. No learner input is passed to a shell, subprocess, Git process, container runtime or arbitrary network executor.
+
+A Cloudflare Pages project named `holi-devops` also exists, but its Git integration returned Cloudflare error `8000011`. It is therefore not the authoritative verified serving path. Future CI/CD work may repair or replace that integration, but must preserve exact-head verification and avoid unnecessary broad repository-write permissions or long-lived secrets.
+
+Future real labs remain a separate architecture boundary: browser -> authenticated learning API/gateway -> isolated disposable execution environment -> verifier. Public hosting of the simulator is not evidence that this boundary exists.
