@@ -33,6 +33,17 @@ jobs:
         run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run production browser regression
         run: ./node_modules/.bin/playwright test --config=playwright.config.cjs
+      - name: Build Cloudflare Pages static artifact
+        env:
+          CF_PAGES: "1"
+        run: npm run build
+      - name: Upload Cloudflare Pages static artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: holi-cloudflare-pages
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
