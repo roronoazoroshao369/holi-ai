@@ -25,7 +25,7 @@
 
 - Git revision now requires immutable source-linked rationale before repair, but the rubric is still a visible finite exact grammar. Copying a complete rationale remains possible; passing does not establish general Git reasoning. Next frontier: one mechanism-first Git foundations lesson leading into existing revision/graph practice, using different teaching fixtures and preserving assessment gates.
 - Git fixtures contain synthetic full-length repeating SHAs and build-start static ref snapshots. They do not model reflogs, fetch depth, races between moving refs, signatures, general merge conflicts/history, detached-HEAD editing or real Git object resolution. Tag transfer assumes a directly commit-targeted annotated tag.
-- Git/CI schema 4 / fixture 4 intentionally discard version-3 and older checkpoints, including artifact progress. Linux 7/5 is unaffected. Whole Git/CI reset clears both exercises; revision-only reset preserves artifact progress.
+- Git/CI schema 4 / fixture 4 intentionally discard version-3 and older checkpoints, including artifact progress. Linux 7/5 is unaffected. Whole Git/CI reset clears all three exercises; revision-only reset preserves artifact and graph progress.
 
 
 
