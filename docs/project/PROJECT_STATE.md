@@ -1,47 +1,60 @@
 # Project state
 
 Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation. Package remains 0.1.0; no release/tag created.
-Current branch: main after product PR #34 merge; separate documentation closeout follows with full exact-head CI required. This file cannot identify its own future documentation merge SHA. Re-read LIVE main/PRs/CI before relying on it.
-Last verified product main: 93bece59d54c937e8b38e5704bfca18e8d4a1c48; tree d929374e03fa651ba0ae99417334cc518994a3e8 matched the tested product tree and merged files were fetched again.
-Product PR #34: Teach integration graph diagnosis and changed linear-history transfer.
-Exact final product head: bbec3e01fa0f10c0667b39c1aa62160a9aef4027.
-Full exact-head CI: 37407112497 / job 112087009068 — SUCCESS. Checkout log and an explicit SHA assertion confirm this exact head, rather than an implicit PR integration ref.
-Gate: npm ci; full typecheck; 68/68 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; repository-locked Playwright 1.63.0 Chromium installation; 11/11 serial production Chromium tests (2.2m), next start --hostname 127.0.0.1 --port 3100. No failed remote product run.
 
-## Delivered goal contract
+Current verified product main: `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`.
+Product delivery PR #36 — **Teach Git graph foundations before diagnostic practice** — squash-merged as `1714bf111882decdcd21b5efb8a6ada53b2e7abe`.
+Same-goal cleanup PR #37 — **Clean up Git foundations focus CSS** — squash-merged as `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`.
 
-GOAL: one bounded SIMULATED integration graph incident with a meaningful linear-history transfer.
-WHY NOW / USER VALUE: green PR-head builds do not demonstrate that an approved base was integrated; the earlier corpus had no parents/ancestry mechanism.
-SCOPE: six neutral pre-repair sources; cloned immutable source-linked factual rationale and class; immutable checkout selection as sole repair; rebuild; separate consumed-commit and ordered-parent verification; post-repair explanation; changed rebase/fast-forward transfer; persistence and regression gates.
-NON-GOALS: real Git/Actions execution, general Git/workflow interpreter, accounts/infrastructure, trusted assessment.
-ACCEPTANCE: satisfied on the exact final head above. Missing sources/incomplete rationale cannot lock. Lock checks completeness without correctness feedback. Wrong source/fact/relation/class stays unverified after correct operational recovery. The initial request requires approved base as first parent and reviewed PR head as second parent. A two-parent candidate containing a different head fails. The changed linear request instead requires base ancestry and exactly reviewed fixture changes [p1,p2]; original head is not an ancestor, and a later descendant with p3 fails. Edit/rebuild/reverify/reset/refresh revoke affected confirmations; invalid/forged derived flags reject; siblings remain independent.
-TEST PLAN / EVIDENCE: full automated gate above; tests challenge each source/fact/relation, class, parent order, wrong head, cycle/unknown-object traversal, linear series, aliasing, downstream revocation and checkpoint invariants. Browser tests exercise draft/lock/completion refresh, wrong reasoning with successful recovery, forged/stale/corrupt state, independent reset scopes, denied Storage getter/methods, 390px overflow, visible focus and absent page/console errors. Existing Linux/artifact/revision tests were not changed or weakened; retries remain zero and timeouts unchanged.
-SECURITY IMPACT: finite pure client transitions; no learner shell/Git/YAML/network/host execution. localStorage remains forgeable, untrusted continuity data.
-LEARNING IMPACT: distinguish snapshot identity, ordered direct parents and ancestry; change the integration policy for transfer rather than merely substituting SHA literals. Change IDs are stipulated fixture facts, not proof of real rebase semantic equivalence.
-ROLLBACK: revert PR #34. Previous schema3 code rejects schema4 checkpoint; Linux needs no migration.
+This documentation closeout is intentionally separate. This file cannot name its own future documentation merge SHA. Re-read LIVE main, PRs and CI before relying on it.
 
-## Product truth / partial implementation
+## Verification evidence
 
-Seven primary SIMULATED incidents: four Linux permission/TCP incidents and three Git/CI artifact, revision and graph incidents. Permission/group, listener/socket, extraction-path, annotated-tag and linear-history transfers are bounded assessment steps, not extra runtime incidents. No CONTROLLED_EXECUTION or REAL_SANDBOX exists.
+PR #36 final product head: `14a89672a1c945b864db9dc52553207c09d992c1`.
+Full exact-head CI: run `37410436717`, job `112097436461` — SUCCESS. The workflow explicitly checked out and asserted that exact SHA, then completed npm ci, full typecheck, 72/72 Node tests, npm audit --audit-level=high with 0 vulnerabilities, production build, locked Playwright 1.63.0 Chromium installation and 12/12 serial production Chromium tests in 2.3m against `next start --hostname 127.0.0.1 --port 3100`.
 
-Artifact practice still locks only the causal class before repair and requests source-linked factual explanation afterward. Revision and graph practice lock factual source-linked rationale before repair. Do not claim uniform assessment strength across subsystems.
+The first PR #36 head `b20b79b29855d4b92f4085664a1ede40ec69855c` had run `37410123085` fail one of 12 browser tests at the new focus-indicator assertion; 11 passed. The finding was fixed in product CSS. Assertions, retries and timeouts were not weakened.
 
-Revision practice still checks checkout and release metadata against approved immutable SHA and keeps the existing annotated-tag object-to-commit transfer. Graph practice independently models ordered parents and bounded graph traversal; neither exercise grants prerequisite credit to siblings. Curriculum cards remain a proposed syllabus; no coherent near-zero-to-production course or trusted mastery model is complete.
+Post-merge source re-read caught a literal `\\n` between the two focus CSS rules. The browser behavior still worked, but source quality was not acceptable. PR #37 corrected only that malformed source line. Its exact final head `c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3` passed run `37410861260`, job `112098762706`: exact SHA assertion, npm ci, typecheck, 72/72 Node tests, audit 0, build, locked Chromium and 12/12 production tests in 2.1m.
+
+Final product-main push CI run `37411185039`, job `112099751819` also passed on exact `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`: 72/72 Node tests, audit 0 vulnerabilities, production build and 12/12 production Chromium tests in 2.0m. No open PR remained at product checkpoint.
+
+## Delivered primary goal
+
+GOAL: give a near-zero Git learner a mechanism-first mental model before the existing graph diagnostic assessment.
+
+Delivered:
+- one navigable four-step lesson: snapshot identity → moving ref → direct parent → ancestry;
+- a teaching graph fixture deliberately disjoint from the assessment fixture;
+- a four-question local readiness self-check;
+- an explicit handoff into the existing Git graph diagnostic lab;
+- browser proof that completing lesson navigation/readiness does not mutate the persisted Git/CI assessment state;
+- responsive 390px behavior, visible keyboard/programmatic focus and absence of page/console errors.
+
+The lesson is **teaching only**. It creates no assessment credit, no verified/explained/transfer flag and no new persistence schema. It is not an eighth incident and does not prove Git mastery.
+
+## Assessment and security invariants
+
+Seven primary SIMULATED incidents remain: four Linux permission/TCP incidents and three Git/CI artifact/revision/graph incidents. Permission/group, listener/socket, extraction-path, annotated-tag and linear-history transfers remain bounded assessment steps.
+
+Git graph/revision pre-repair rationale remains immutable after class lock. Correct operational recovery cannot rescue a wrong locked source/fact/relation/class. Rebuild/reverify/edit/reset still revoke downstream confirmations as before. No assertions, retries or timeouts were weakened.
+
+No learner input is executed as Git, YAML, shell, subprocess, network request or host command. The new lesson uses React-local navigation/select state only. No CONTROLLED_EXECUTION or REAL_SANDBOX exists.
 
 ## Persistence
 
-Linux schema7/fixture5 unchanged. Git/CI schema4/fixture4, key holi.devops.git-ci-practice. Schema4 adds graphPractice; fixture4 adds incident/transfer corpus. V3 and older shared Git/CI checkpoints intentionally discard, including previous artifact/revision progress; independent Linux continuity is unaffected. Review schema and fixture semantics separately on future changes.
+Linux remains schema 7 / fixture 5. Git/CI remains schema 4 / fixture 4 under `holi.devops.git-ci-practice`. No version bump was justified because the lesson does not participate in persisted assessment semantics. Git/CI v3 and older still intentionally discard; Linux continuity remains independent. localStorage completion remains forgeable and non-authoritative.
 
-Graph/revision rationale is editable only before class lock, then cloned and immutable until reset. Explanation and transfer drafts are separate. Graph-only reset preserves artifact/revision; revision-only reset preserves siblings; whole Git/CI reset clears all and remounts local selection drafts. Rebuild/reverify clear downstream explanation/transfer; edits revoke related confirmation. Missing locked rationale, altered evidence, impossible checkout/metadata/parent tuples and forged derived completion reject. Storage getter/method denial degrades to ephemeral practice.
+## Product truth and remaining limits
 
-## Verification / red-team / broken state
+The homepage now contains one delivered Git foundations lesson plus the existing SIMULATED labs. The broader curriculum cards remain a proposed syllabus; there is still no coherent zero-to-production course, trusted mastery model or real execution environment.
 
-No known blocker or broken behavior in this goal's verified scope. Product diff reviewed, no learner host-execution path introduced. Remote gate validated production desktop/mobile flows. Local npm ci/typecheck/68 Node tests/audit 0/build passed; local Chromium CDN returned invalid ZIP, so no local browser pass is claimed. Remote locked Chromium succeeded and all browser gates passed. CI now explicitly checks out and asserts PR-head identity before testing.
-
-Finite answers can be copied and retried; consistent developer-tool forgery can still display local completion. SHA transcription and finite grammar can measure clerical accuracy separately from conceptual understanding. Fixed graphs omit general Git resolution, races, shallow history, conflicts, signatures and real patch equivalence. Chromium-only coverage, small corpus, repeatable Linux random assignment, external binary provenance and design-only real isolation remain risks. No permanent security or performance guarantee is implied by this test run.
+The lesson improves conceptual preparation but its self-check is finite, visible, retryable and non-credit. The downstream graph assessment still imposes substantial full-SHA and finite-grammar transcription, so clerical accuracy can obscure conceptual reasoning. Fixed synthetic graphs omit real fetch depth, races, reflogs, conflicts, signatures, arbitrary object resolution and real patch equivalence. Chromium remains the only required browser engine. Client progress remains forgeable.
 
 ## ONE next frontier / candidate goal
 
-Highest-value frontier: a mechanism-first Git foundations lesson that leads a near-zero learner into an existing revision/graph practice, instead of adding another independent finite incident. Evidence: current page presents independent lab forms, sparse collapsed mental-model text and a substantial SHA/grammar transcription burden; curriculum remains a skeleton.
-Recommended bounded goal: one navigable lesson explaining snapshot identity, moving refs, direct parents and ancestry using different teaching fixtures, then an explicit handoff into one existing diagnostic lab. Readiness/navigation checkpoints must never grant diagnosis/verified/transfer credit. Preserve immutable pre-repair rationale, neutral incident copy and all regressions; do not leak the active fixture's answer in the lesson. Reassess this recommendation from LIVE evidence before implementation.
-External blockers: none for this completed simulated goal. Local browser binary download remains unavailable, but remote CI supplied the required verification. Real lab isolation/identity/quotas/TTL/network/cost controls remain future design work, not current functionality.
+Highest-value candidate: reduce clerical full-SHA transcription inside the **existing** Git graph diagnostic flow without adding another incident.
+
+Recommended bounded goal: after evidence has been inspected, replace dominant raw SHA transcription with neutral source-bound commit/node/edge selection where possible, while preserving source/fact independence, immutable pre-repair rationale, no early correctness oracle, exact verification/revocation semantics and the existing assessment answer boundary. The design must be red-teamed for answer leakage: structured selection must not turn the incident into an obvious multiple-choice answer key.
+
+Reassess this recommendation from LIVE evidence before implementation. Do not start a second incident merely to increase corpus size.
