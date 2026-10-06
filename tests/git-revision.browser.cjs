@@ -9,6 +9,7 @@ function errors(page, sink) {
 }
 async function collect(page) { for (const name of names) await page.getByRole('button', { name: 'Inspect ' + name, exact: true }).click(); }
 async function lock(page, hypothesis = 'revision-selection') {
+  await fillRationale(page);
   await page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true }).selectOption(hypothesis);
   await page.getByRole('button', { name: 'Lock Git revision hypothesis', exact: true }).click();
 }
@@ -16,6 +17,14 @@ async function repair(page, value = 'pin-intended-sha') {
   await page.getByRole('combobox', { name: 'Git revision repair', exact: true }).selectOption(value);
   await page.getByRole('button', { name: 'Apply Git revision repair', exact: true }).click();
   await page.getByRole('button', { name: 'Rebuild simulated release', exact: true }).click();
+}
+async function fillRationale(page) {
+  const facts = { symptom: 'passed:acceptance-not-met', workflow: 'refs/heads/release', refs: `refs/heads/release=${sha.built}`, build: sha.built, intent: sha.intended };
+  for (const slot of slots) {
+    await page.getByRole('combobox', { name: `Git revision rationale ${slot} source`, exact: true }).selectOption('git-revision:before:' + slot);
+    await page.getByRole('textbox', { name: `Git revision rationale ${slot} fact`, exact: true }).fill(facts[slot]);
+  }
+  await page.getByRole('textbox', { name: 'Git revision rationale relation', exact: true }).fill('checkout-ref-resolves-build-commit');
 }
 async function fillExplanation(page) {
   const facts = { symptom: 'passed:acceptance-not-met', workflow: 'refs/heads/release', refs: `refs/heads/release=${sha.built}`, build: sha.built, intent: sha.intended };
@@ -41,7 +50,10 @@ async function saved(page, predicate) {
     if (!v) return false;
     const s = v.state.revisionPractice;
     if (expression === 'complete') return s.transferPassed;
-    if (expression === 'fresh') return Object.keys(s.evidence).length === 0 && s.hypothesis === '' && !s.transferPassed;
+    if (expression === 'fresh') return Object.keys(s.evidence).length === 0 && s.hypothesis === '' && s.rationale === null && !s.transferPassed;
+    if (expression === 'rationale-draft') return s.hypothesis === '' && s.rationale?.sources.build.fact === 'b7'.repeat(20);
+    if (expression === 'rationale-locked') return s.hypothesis === 'revision-selection' && s.rationale?.sources.build.fact === 'b7'.repeat(20);
+    if (expression === 'wrong-rationale') return !s.verified && s.verification !== null && s.rationale?.sources.build.fact === 'b7'.repeat(20);
     if (expression === 'transfer-draft') return !s.transferPassed && s.transfer?.selectedRevision === 'c8'.repeat(20);
     if (expression === 'explanation-draft') return !s.explained && s.transfer === null && s.explanation?.sources.intent.fact === 'a4'.repeat(20);
     if (expression === 'wrong-diagnosis') return s.hypothesis === 'cache-content' && s.verification !== null && !s.verified;
@@ -148,8 +160,8 @@ test('Git revision restores fail closed and Storage getter denial remains epheme
     await saved(page, 'fresh');
     const value = structuredClone(fresh);
     if (mode === 'forged') value.state.revisionPractice.transferPassed = true;
-    if (mode === 'stale-schema') value.schemaVersion = 1;
-    if (mode === 'stale-fixture') value.fixtureVersion = 1;
+    if (mode === 'stale-schema') value.schemaVersion = 2;
+    if (mode === 'stale-fixture') value.fixtureVersion = 2;
     await page.evaluate(([key, value]) => localStorage.setItem(key, value), [key, mode === 'corrupt' ? '{bad' : JSON.stringify(value)]);
     await page.reload();
     await expect(page.getByRole('region', { name: 'Git CI simulated incident', exact: true })).toContainText('Checkpoint Git/CI cũ/hỏng đã bị loại bỏ an toàn');
@@ -166,4 +178,54 @@ test('Git revision restores fail closed and Storage getter denial remains epheme
   await blocked.getByRole('button', { name: 'Reset Git/CI incident', exact: true }).click();
   await expect(blocked.getByRole('combobox', { name: 'Git revision hypothesis', exact: true })).toBeDisabled();
   expect(blockedErrors).toEqual([]); await context.close(); expect(runtime).toEqual([]);
+});
+
+
+test('Git pre-repair rationale persists as draft, locks facts immutably and cannot be repaired retroactively', async ({ page }) => {
+  const runtime = []; errors(page, runtime); await page.goto('/');
+  const lab = page.getByRole('region', { name: 'Git revision simulated incident', exact: true });
+  const lockButton = page.getByRole('button', { name: 'Lock Git revision hypothesis', exact: true });
+  const buildFact = page.getByRole('textbox', { name: 'Git revision rationale build fact', exact: true });
+  await expect(buildFact).toHaveCount(0);
+  await collect(page);
+  await page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true }).selectOption('revision-selection');
+  await expect(lockButton).toBeDisabled();
+  await fillRationale(page);
+  // Correct facts/relation with an incorrect captured source still cannot earn learning.
+  await page.getByRole('combobox', { name: 'Git revision rationale refs source', exact: true }).selectOption('git-revision:before:build');
+  await lockButton.click(); await repair(page);
+  await page.getByRole('button', { name: 'Verify consumed revision', exact: true }).click();
+  await expect(lab).toContainText('Actual: ' + sha.intended);
+  await expect(lab).toContainText('Assessment chưa verified');
+  await expect(page.getByRole('region', { name: 'Git revision explanation', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Reset Git revision incident', exact: true }).click();
+  await collect(page);
+  await page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true }).selectOption('revision-selection');
+  await fillRationale(page);
+  await buildFact.fill(''); await expect(lockButton).toBeDisabled();
+  await expect(page.getByRole('region', { name: 'Git revision repair', exact: true })).toHaveCount(0);
+  await buildFact.fill(sha.intended); await saved(page, 'rationale-draft'); await page.reload();
+  await expect(buildFact).toHaveValue(sha.intended);
+  await expect(page.getByRole('region', { name: 'Git revision repair', exact: true })).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await buildFact.focus();
+  expect(await buildFact.evaluate(e => getComputedStyle(e).outlineStyle !== 'none' && getComputedStyle(e).outlineWidth !== '0px')).toBe(true);
+  await page.getByRole('combobox', { name: 'Git revision hypothesis', exact: true }).selectOption('revision-selection');
+  await lockButton.click(); await expect(buildFact).toBeDisabled();
+  await expect(page.getByRole('textbox', { name: 'Git revision rationale relation', exact: true })).toBeDisabled();
+  await saved(page, 'rationale-locked'); await page.reload(); await expect(buildFact).toBeDisabled(); await expect(buildFact).toHaveValue(sha.intended);
+  await repair(page); await page.getByRole('button', { name: 'Verify consumed revision', exact: true }).click();
+  await expect(lab).toContainText('Actual: ' + sha.intended);
+  await expect(lab).toContainText('Assessment chưa verified');
+  await expect(page.getByRole('region', { name: 'Git revision explanation', exact: true })).toHaveCount(0);
+  await saved(page, 'wrong-rationale'); await page.reload(); await expect(lab).toContainText('Assessment chưa verified');
+  // Derived flag cannot rescue the wrong locked fact on refresh.
+  await saved(page, 'wrong-rationale');
+  await page.evaluate(key => { const c = JSON.parse(localStorage.getItem(key)); c.state.revisionPractice.verified = true; localStorage.setItem(key, JSON.stringify(c)); }, key);
+  await page.reload(); await expect(lab).toContainText('0/5 nguồn đã thu'); await saved(page, 'fresh');
+  await collect(page); await lock(page);
+  await page.getByRole('button', { name: 'Reset Git revision incident', exact: true }).click(); await saved(page, 'fresh');
+  await collect(page); await expect(buildFact).toHaveValue('');
+  expect(runtime).toEqual([]);
 });
