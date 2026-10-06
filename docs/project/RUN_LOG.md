@@ -128,3 +128,25 @@ Next frontier: teach unfamiliar Git commit/ref causality before claiming broad G
 
 
 
+
+
+## 2026-10-06 — Git foundations lesson closeout
+
+LIVE reconciliation showed the incoming handoff at main `7f71b5d40d1f95261c2bfbc31ddf8fc2199c677e` was stale: PR #36 and same-goal corrective PR #37 had already merged, with no open PRs.
+
+Delivered product:
+- PR #36 `Teach Git graph foundations before diagnostic practice`
+  - final head `14a89672a1c945b864db9dc52553207c09d992c1`
+  - exact-head CI `37410436717` / job `112097436461`: SUCCESS
+  - merged as `1714bf111882decdcd21b5efb8a6ada53b2e7abe`
+- PR #37 `Clean up Git foundations focus CSS`
+  - final head `c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
+  - exact-head CI `37410861260` / job `112098762706`: SUCCESS
+  - merged as `d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+- post-merge main push CI `37411185039` / job `112099751819`: SUCCESS
+
+Final effective gate: explicit checkout/SHA assertion, npm ci, typecheck, 72 Node tests, audit 0 high vulnerabilities, build, locked Playwright Chromium and 12 production Chromium tests. Tested corrective tree and merged main tree: `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
+
+Learning/security review: lesson state is teaching-only/local, fixture IDs are disjoint, active assessment answers are not exposed, Git/CI schema4/fixture4 and Linux7/5 are unchanged, and no learner execution surface was introduced.
+
+Documentation closeout updates the stale project state/handoff and advances the single next candidate to a non-credit evidence-reading bridge before graph assessment.
