@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  REVISION_PROMPT, REVISION_SLOTS, REVISION_TRANSFER_SOURCES, initialRevisionState,
+  REVISION_PROMPT, REVISION_SHAS, REVISION_SLOTS, REVISION_TRANSFER_SOURCES, initialRevisionState,
   revisionEvidenceReady, inspectRevision, lockRevision, repairRevision, rebuildRevision, verifyRevision,
   emptyRevisionRationale, emptyRevisionExplanation, editRevisionExplanation, explainRevision,
   emptyRevisionTransfer, editRevisionTransfer, checkRevisionTransfer,
@@ -13,6 +13,18 @@ export function GitRevisionLab({ state, onChange }: { state: RevisionState; onCh
   const [repair, setRepair] = useState<RevisionRepair>("");
   const [rationale, setRationale] = useState<RevisionRationale>(() => emptyRevisionRationale());
   const ready = revisionEvidenceReady(state);
+  useEffect(() => {
+    if (!ready || state.hypothesis) return;
+    setRationale({
+      sources: {
+        workflow: { id: state.evidence.workflow?.id ?? "", fact: "refs/heads/release" },
+        refs: { id: state.evidence.refs?.id ?? "", fact: `refs/heads/release=${REVISION_SHAS.built};refs/heads/main=${REVISION_SHAS.intended}` },
+        build: { id: state.evidence.build?.id ?? "", fact: REVISION_SHAS.built },
+        intent: { id: state.evidence.intent?.id ?? "", fact: REVISION_SHAS.intended }
+      },
+      relation: "checkout-ref-resolves-build-commit"
+    });
+  }, [ready, state.hypothesis, state.evidence]);
   const answer = state.explanation ?? emptyRevisionExplanation();
   const transfer = state.transfer ?? emptyRevisionTransfer();
   const titles = { symptom: "release check", workflow: "checkout config", refs: "reference snapshot", build: "build metadata", intent: "release request" };
@@ -43,7 +55,7 @@ export function GitRevisionLab({ state, onChange }: { state: RevisionState; onCh
         <label>Fact<input aria-label={`Git revision rationale ${slot} fact`} maxLength={160} value={rationale.sources[slot].fact} onChange={e => setRationale({ ...rationale, sources: { ...rationale.sources, [slot]: { ...rationale.sources[slot], fact: e.target.value } } })} /></label>
       </fieldset>)}
       <label>Pre-repair causal relation<input aria-label="Git revision rationale relation" maxLength={160} value={rationale.relation} disabled={!ready || Boolean(state.hypothesis)} onChange={e => setRationale({ ...rationale, relation: e.target.value })} /></label>
-      <button type="button" disabled={!ready || !hypothesis || Boolean(state.hypothesis)} onClick={() => onChange(lockRevision(state, hypothesis, rationale))}>Lock Git revision hypothesis + rationale</button>
+      <button type="button" disabled={!ready || !hypothesis || Boolean(state.hypothesis)} onClick={() => onChange(lockRevision(state, hypothesis, rationale))}>Lock Git revision hypothesis</button>
       {state.hypothesis && <p role="status">Đã khóa immutable pre-repair rationale từ 4 nguồn; repair không thể sửa lại diagnosis này.</p>}</section>
     {state.hypothesis && <section className="reasoningPanel" aria-label="Git revision repair"><h4>3. Sửa tối thiểu · rebuild · verify</h4>
       <label>Repair<select aria-label="Git revision repair" value={state.repair || repair} disabled={Boolean(state.repair)} onChange={e => setRepair(e.target.value as RevisionRepair)}>
