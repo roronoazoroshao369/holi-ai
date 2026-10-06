@@ -1,6 +1,6 @@
 # Ordered backlog
 
-1. Deliver one mechanism-first Git foundations lesson leading into existing revision/graph practice, using different teaching fixtures and preserving assessment gates. Current independent forms and finite SHA grammar are not a coherent near-zero learning path. Do not add another incident merely to increase corpus count. Reassess the bounded lesson goal from LIVE discovery.
+1. Reduce clerical full-SHA transcription in the existing Git graph diagnostic flow without adding another incident. Prefer neutral source-bound commit/node/edge selection only after evidence collection. Preserve source/fact independence, immutable pre-repair rationale, no early correctness oracle, verification/revocation semantics and current persistence unless semantics truly change. Red-team for answer leakage before implementation.
 2. Decide whether independent randomized differential assignment needs deliberate counterbalancing only if repeat-attempt product requirements justify it. Current Web Crypto selection can repeat and is not balanced exposure.
 3. Add server identity/storage only when cross-device or trusted assessment requirements justify it. Never promote client progress/evidence/counterfactual state into certification.
 4. Continue verified curriculum slices before presenting planned Docker/Kubernetes/IaC/observability labs as implemented. Git & CI now has three verified SIMULATED slices (artifact handoff, commit/ref acceptance and integration graph), but the module is not broadly complete.
