@@ -13,8 +13,8 @@ import {
 export const CI_PRACTICE_STORAGE_KEY = "holi.devops.git-ci-practice";
 import { isValidRevisionState } from "./git-revision-simulator.ts";
 
-export const CI_PRACTICE_SCHEMA_VERSION = 2 as const;
-export const CI_FIXTURE_VERSION = 2 as const;
+export const CI_PRACTICE_SCHEMA_VERSION = 3 as const;
+export const CI_FIXTURE_VERSION = 3 as const;
 
 export type CiStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 export type CiLoadStatus = "empty" | "restored" | "discarded" | "unavailable";
@@ -123,3 +123,4 @@ export function clearCiPractice(storage: CiStorage): boolean {
     return false;
   }
 }
+
