@@ -8,6 +8,15 @@ export type RevisionSlot = typeof REVISION_SLOTS[number];
 export type RevisionEvidence = { id: string; slot: RevisionSlot; phase: "before-repair"; title: string; output: string };
 export type RevisionHypothesis = "" | "revision-selection" | "cache-content" | "deployment-target";
 export type RevisionRepair = "" | "pin-intended-sha" | "purge-cache" | "redirect-target" | "rebuild-only";
+export type RevisionRationale = {
+  sources: {
+    workflow: { id: string; fact: string };
+    refs: { id: string; fact: string };
+    build: { id: string; fact: string };
+    intent: { id: string; fact: string };
+  };
+  relation: string;
+};
 export type RevisionExplanation = {
   sources: Record<RevisionSlot, { id: string; fact: string }>;
   relation: string; repair: string;
@@ -19,7 +28,7 @@ export type RevisionTransfer = {
 };
 export type RevisionState = {
   evidence: Partial<Record<RevisionSlot, RevisionEvidence>>;
-  hypothesis: RevisionHypothesis; repair: RevisionRepair;
+  hypothesis: RevisionHypothesis; rationale: RevisionRationale | null; repair: RevisionRepair;
   run: null | { pipeline: "passed"; checkoutSha: string; metadataSha: string };
   verification: null | { actualSha: string; intendedSha: string };
   verified: boolean;
@@ -46,6 +55,15 @@ export const REVISION_TRANSFER_SOURCES = {
   branch: { id: "git-revision:transfer:branch", output: `refs/heads/main now -> ${REVISION_SHAS.branchNow}` },
   intent: { id: "git-revision:transfer:intent", output: "Reproduce the source tree of release v2.4; select an immutable COMMIT revision for checkout. The main branch has advanced since this release." }
 } as const;
+export function emptyRevisionRationale(): RevisionRationale {
+  return {
+    sources: {
+      workflow: { id: "", fact: "" }, refs: { id: "", fact: "" },
+      build: { id: "", fact: "" }, intent: { id: "", fact: "" }
+    },
+    relation: ""
+  };
+}
 export function emptyRevisionExplanation(): RevisionExplanation {
   return { sources: Object.fromEntries(REVISION_SLOTS.map(slot => [slot, { id: "", fact: "" }])) as RevisionExplanation["sources"], relation: "", repair: "" };
 }
@@ -53,7 +71,7 @@ export function emptyRevisionTransfer(): RevisionTransfer {
   return { tagSource: "", tagObject: "", targetCommit: "", branchSource: "", branchCommit: "", intentSource: "", selectedRevision: "", relation: "" };
 }
 export function initialRevisionState(): RevisionState {
-  return { evidence: {}, hypothesis: "", repair: "", run: null, verification: null, verified: false, explanation: null, explained: false, transfer: null, transferPassed: false };
+  return { evidence: {}, hypothesis: "", rationale: null, repair: "", run: null, verification: null, verified: false, explanation: null, explained: false, transfer: null, transferPassed: false };
 }
 function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -75,10 +93,28 @@ export function inspectRevision(state: RevisionState, slot: RevisionSlot): Revis
   if (state.repair || !REVISION_SLOTS.includes(slot)) return state;
   return { ...state, evidence: { ...state.evidence, [slot]: revisionEvidence(slot) } };
 }
-export function lockRevision(state: RevisionState, hypothesis: string): RevisionState {
+export function validRevisionRationale(answer: unknown): answer is RevisionRationale {
+  if (!keys(answer, ["sources", "relation"]) || !keys(answer.sources, ["workflow", "refs", "build", "intent"])) return false;
+  return texts({ relation: answer.relation }, ["relation"]) &&
+    ["workflow", "refs", "build", "intent"].every(slot => texts((answer.sources as Record<string, unknown>)[slot], ["id", "fact"]));
+}
+export function revisionRationaleMatches(state: RevisionState, answer: unknown): answer is RevisionRationale {
+  if (!validRevisionRationale(answer) || !revisionEvidenceReady(state)) return false;
+  const facts = {
+    workflow: "refs/heads/release",
+    refs: `refs/heads/release=${REVISION_SHAS.built};refs/heads/main=${REVISION_SHAS.intended}`,
+    build: REVISION_SHAS.built,
+    intent: REVISION_SHAS.intended
+  } as const;
+  return (["workflow", "refs", "build", "intent"] as const).every(slot =>
+    answer.sources[slot].id === state.evidence[slot]?.id && norm(answer.sources[slot].fact) === facts[slot]) &&
+    norm(answer.relation) === "checkout-ref-resolves-build-commit";
+}
+export function lockRevision(state: RevisionState, hypothesis: string, rationale?: RevisionRationale): RevisionState {
   if (state.hypothesis || state.repair || !revisionEvidenceReady(state) ||
-      !["revision-selection", "cache-content", "deployment-target"].includes(hypothesis)) return state;
-  return { ...state, hypothesis: hypothesis as RevisionHypothesis };
+      !["revision-selection", "cache-content", "deployment-target"].includes(hypothesis) ||
+      !validRevisionRationale(rationale)) return state;
+  return { ...state, hypothesis: hypothesis as RevisionHypothesis, rationale: structuredClone(rationale) };
 }
 export function repairRevision(state: RevisionState, repair: string): RevisionState {
   if (!state.hypothesis || state.repair || !revisionEvidenceReady(state) ||
@@ -94,7 +130,7 @@ export function verifyRevision(state: RevisionState): RevisionState {
   if (!state.run || !state.repair || !revisionEvidenceReady(state)) return state;
   const match = state.run.checkoutSha === REVISION_SHAS.intended && state.run.metadataSha === REVISION_SHAS.intended;
   return { ...state, verification: { actualSha: state.run.metadataSha, intendedSha: REVISION_SHAS.intended },
-    verified: match && state.hypothesis === "revision-selection" && state.repair === "pin-intended-sha",
+    verified: match && state.hypothesis === "revision-selection" && revisionRationaleMatches(state, state.rationale) && state.repair === "pin-intended-sha",
     explanation: null, explained: false, transfer: null, transferPassed: false };
 }
 export function validRevisionExplanation(answer: unknown): answer is RevisionExplanation {
@@ -145,14 +181,15 @@ export function isValidRevisionState(value: unknown): value is RevisionState {
       !["", "pin-intended-sha", "purge-cache", "redirect-target", "rebuild-only"].includes(value.repair as string)) return false;
   if (!["verified", "explained", "transferPassed"].every(k => typeof value[k] === "boolean")) return false;
   const s = value as unknown as RevisionState;
-  if (s.hypothesis && !revisionEvidenceReady(s) || s.repair && !s.hypothesis) return false;
+  if (s.rationale !== null && !validRevisionRationale(s.rationale)) return false;
+  if (s.hypothesis && (!revisionEvidenceReady(s) || !s.rationale) || !s.hypothesis && s.rationale !== null || s.repair && !s.hypothesis) return false;
   if (s.run !== null) {
     const sha = s.repair === "pin-intended-sha" ? REVISION_SHAS.intended : REVISION_SHAS.built;
     if (!s.repair || !equalRecord(s.run, { pipeline: "passed", checkoutSha: sha, metadataSha: sha })) return false;
   }
   if (s.verification !== null && (!s.run || !equalRecord(s.verification, { actualSha: s.run.metadataSha, intendedSha: REVISION_SHAS.intended }))) return false;
   const expectedVerified = Boolean(s.verification && s.run && s.run.checkoutSha === REVISION_SHAS.intended &&
-    s.run.metadataSha === REVISION_SHAS.intended && s.hypothesis === "revision-selection" && s.repair === "pin-intended-sha" && revisionEvidenceReady(s));
+    s.run.metadataSha === REVISION_SHAS.intended && s.hypothesis === "revision-selection" && revisionRationaleMatches(s, s.rationale) && s.repair === "pin-intended-sha" && revisionEvidenceReady(s));
   if (s.verified !== expectedVerified) return false;
   if (s.explanation !== null && (!s.verified || !validRevisionExplanation(s.explanation))) return false;
   // False is legal for an edited, not yet submitted, correct draft.
