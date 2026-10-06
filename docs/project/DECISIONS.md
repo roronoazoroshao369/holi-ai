@@ -83,3 +83,12 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 2026-10-06 — change transfer mechanism to linear replay: traverse base ancestry and collect exactly reviewed fixture changes [p1,p2]; do not require original PR-head identity or two parents. Change IDs are stipulated fixture evidence, never a claim of real rebase semantic equivalence. Keep old annotated-tag transfer and independent sibling credit.
 
 2026-10-06 — schema4 adds graphPractice, fixture4 adds corpus; older shared Git/CI progress intentionally discards, Linux7/5 unchanged. Explicitly checkout/assert exact PR-head SHA in CI; final head must pass complete gates and merge uses expected_head_sha. Next product leverage is one mechanism-first Git foundations lesson using separate teaching fixtures, rather than accumulating another independent finite form.
+
+
+2026-10-06 — PR #36: add one mechanism-first Git foundations lesson before graph assessment instead of another finite incident. Teach snapshot identity, moving refs, one-edge direct parents and multi-edge ancestry with a fixture disjoint from assessment. Keep readiness/navigation component-local: no Git/CI persistence write and no assessment credit. The lesson may give instructional self-check feedback because it is explicitly teaching, not grading.
+
+2026-10-06 — PR #36: preserve the graph assessment boundary. The lesson must not expose active incident SHAs or the canonical relation token, must not mutate immutable pre-repair rationale/verification/transfer state, and must hand off via a stable anchor to the existing diagnostic lab. Add Node coverage for fixture isolation/semantics and production-browser coverage for no-credit persistence, navigation, mobile overflow, focus and runtime errors.
+
+2026-10-06 — PR #37: post-merge re-read found a literal `\\n` embedded between two focus CSS rules. Treat this as a same-goal corrective defect, not a second product goal. Replace it with a real newline and require the complete exact-head gate again before merge. No assertions, retries, timeouts, schema, fixture or learning semantics changed.
+
+2026-10-06 — after the foundations lesson, the next candidate is not another incident but a teaching-only evidence-reading bridge: raw synthetic ref/checkout/build/graph evidence → consumed commit / ordered direct parents / ancestry predicates. Use a third disjoint fixture and keep assessment credit at zero.
