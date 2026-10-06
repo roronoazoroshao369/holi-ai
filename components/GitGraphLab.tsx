@@ -21,7 +21,7 @@ export function GitGraphLab({ state, onChange }: { state: GraphState; onChange: 
     </fieldset>)}<label>Relation<input aria-label={`Git graph ${phase} relation`} maxLength={160} disabled={phase === 'rationale' && Boolean(state.hypothesis)} value={answer.relation} onChange={e => change({ ...answer, relation: e.target.value })} /></label></>;
   }
   const grammar = <p>Facts grammar: symptom = PIPELINE_STATUS:acceptance-ACCEPTANCE_RESULT (lowercase, nối bằng dấu gạch ngang); review = BASE:PR_HEAD; graph = PR_HEAD=DIRECT_PARENT; workflow = checkout SHA; build = CHECKOUT:METADATA; intent = REQUESTED_COMMIT:FIRST_PARENT:SECOND_PARENT. Dùng SHA đầy đủ, không thêm khoảng trắng. Relation: pr-head-omits-required-base / cache-reuses-output / target-routes-delivery. Đây là grammar hữu hạn, chưa chấm văn bản tự do.</p>;
-  return <section className="revisionLab" aria-label="Git graph simulated incident">
+  return <section id="git-graph-practice" className="revisionLab" aria-label="Git graph simulated incident">
     <div className="ciLabHeader"><div><span className="kicker">GIT / SIMULATED</span><h3>{GRAPH_PROMPT.title}</h3><p>{GRAPH_PROMPT.summary}</p></div><div className="ciTruth"><strong>SIMULATED</strong><span>Commit và logs là fixture, không phải Git repo hoặc Actions runner thật.</span></div></div>
     <button type="button" className="secondaryButton" onClick={() => { onChange(initialGraphState()); setHypothesis(''); setCommit(''); }}>Reset Git graph incident</button>
     <div className="ciStatus"><b>Observed symptom</b><code>{GRAPH_PROMPT.symptom}</code></div>
