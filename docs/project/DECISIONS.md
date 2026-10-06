@@ -76,3 +76,10 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 2026-10-05: when the new Git/CI unavailable-storage copy made an existing Linux Playwright selector ambiguous, fix the product copy instead of weakening the established Linux regression. Cross-module additions must preserve existing browser tests without broad selectors becoming false positives.
 
 
+
+
+2026-10-06 — PR #34: model one finite integration graph incident, not another ref-token variant. Ordered approved-base/PR-head parents are an explicit delivery request, not a universal Git rule. Preserve six raw source/fact observations separately from the causal relation, clone rationale before repair, allow green operational recovery after wrong reasoning but withhold verified learning. Verify consumed commit and ordered parents separately.
+
+2026-10-06 — change transfer mechanism to linear replay: traverse base ancestry and collect exactly reviewed fixture changes [p1,p2]; do not require original PR-head identity or two parents. Change IDs are stipulated fixture evidence, never a claim of real rebase semantic equivalence. Keep old annotated-tag transfer and independent sibling credit.
+
+2026-10-06 — schema4 adds graphPractice, fixture4 adds corpus; older shared Git/CI progress intentionally discards, Linux7/5 unchanged. Explicitly checkout/assert exact PR-head SHA in CI; final head must pass complete gates and merge uses expected_head_sha. Next product leverage is one mechanism-first Git foundations lesson using separate teaching fixtures, rather than accumulating another independent finite form.

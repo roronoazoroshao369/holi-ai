@@ -25,3 +25,6 @@ PR #32 red-team: lock completeness is separate from grading; wrong source/fact/r
 
 Rollback: revert this product change; old Git/CI schema-2 implementation rejects schema-3 checkpoints. Linux contract needs no rollback migration.
 
+
+
+Current shared checkpoint after PR #34 is schema4/fixture4 because graphPractice and a new graph corpus were added. Historical schema3 above describes this revision goal; revision incident/rationale/tag semantics remain unchanged. V3 and older shared Git/CI checkpoints now discard. Revision-only reset preserves artifact and graph siblings; whole reset clears all. Linux remains7/5. See GIT_GRAPH_CONTRACT.md.

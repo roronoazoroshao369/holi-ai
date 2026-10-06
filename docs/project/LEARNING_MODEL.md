@@ -24,7 +24,7 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
-Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The next frontier is one unfamiliar Git merge-graph causality slice, rather than another ref-token quiz.
+Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The graph causality slice is delivered. The next frontier is one mechanism-first Git foundations lesson leading into existing revision/graph practice, using different teaching fixtures and preserving assessment gates.
 
 
 ## Git & CI vertical slice — producer/consumer contract
@@ -48,3 +48,10 @@ Five explanation source/fact pairs independently validate, then one changed tran
 
 PR #32 closes label-only pre-repair guessing: five captured source/fact pairs and a causal relation are committed with the class before repair. Complete wrong rationale can lock without grader feedback, but cannot verify learning even after correct repair. Post-repair explanation cannot rescue it. The draft persists before lock and is immutable after lock until reset. Grammar remains finite, visible and retryable, so copying a complete rationale or forging consistent local state remains possible. This is assisted local learning, not trusted mastery or arbitrary prose evaluation.
 
+
+
+## Graph causality and changed integration policy — PR #34
+
+Six independent observations precede immutable class/rationale commitment. The initial request requires ordered base/PR-head direct parents and consumed integration revision; a green PR-head build or two-parent commit containing a different head cannot satisfy it. Wrong factual reasoning remains unverified after correct recovery; later explanation cannot rewrite the lock.
+
+Transfer changes to a linear replayed series. Approved base is an ancestor through two edges while original PR-head identity is absent. The learner must distinguish parent count, ancestry and reviewed change series; an extra-change descendant fails despite preserving ancestry. These are deterministic synthetic exercises with visible finite grammar, not a general Git/rebase competence test. A foundations lesson should precede claims of a coherent near-zero learning path.
