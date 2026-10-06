@@ -15,7 +15,8 @@
 - Git/CI breadth gate D: delivered in PR #30: five pre-repair sources, locked class, minimal immutable revision selection, separate checkout/metadata SHA verification, source-linked explanation and annotated-tag commit transfer. Git/CI schema/fixture 2; Linux remains 7/5.
 - Git rationale gate: delivered in PR #32; source/fact/relation draft locks before repair, canonical rationale required for verified learning, Git/CI schema/fixture 3/3. No new incident added.
 - Git graph gate: delivered in PR #34; six source-linked pre-repair rationale fields, consumed-commit AND ordered-parent verification and changed linear-history ancestry/series transfer; Git/CI schema4/fixture4. Full exact-head 68 Node/11 production Chromium gates passed.
-- Next learning gate: one mechanism-first Git foundations lesson leading into existing revision/graph practice, using different teaching fixtures and preserving assessment gates. No assessment credit from lesson visits/navigation.
+- Git foundations gate: delivered in PR #36 with a navigable Snapshot → Ref → Direct parent → Ancestry lesson, a teaching fixture disjoint from assessment fixtures, non-credit readiness self-check and explicit handoff into graph practice. Same-goal CSS cleanup landed in PR #37. Git/CI schema4/fixture4 and Linux7/5 remain unchanged.
+- Next learning gate candidate: reduce clerical full-SHA transcription in the existing graph diagnostic flow with neutral source-bound node/edge selection, only if red-team proves it does not leak the answer or weaken immutable pre-repair reasoning.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
 - v0.5-v0.7: Docker, Kubernetes, CI/CD and IaC vertical slices with verifiers and cost budgets.
 - v0.8-v0.9: observability/SRE and unfamiliar cross-domain incidents.
