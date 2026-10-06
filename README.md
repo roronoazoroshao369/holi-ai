@@ -18,7 +18,7 @@ The current implementation contains:
 - DevOps curriculum skeleton from Linux → CI → Docker → Kubernetes → IaC/Cloud → Observability/SRE
 - Responsive learning-oriented landing page
 - Interactive deterministic Linux incident simulator
-- SIMULATED Git/CI artifact handoff Git revision acceptance and integration graph diagnosis with changed path/tag/linear-history transfers
+- SIMULATED Git/CI artifact handoff, Git revision acceptance and integration graph diagnosis with changed path/tag/linear-history transfers
 - Architecture plan for moving from simulation to isolated real execution labs
 - Explicit security constraints for learner-controlled workloads
 
