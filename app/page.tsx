@@ -93,7 +93,7 @@ export default function Home() {
             <div className="consoleChrome">
               <div className="consoleDots" aria-hidden="true"><i /><i /><i /></div>
               <span>holi://learning-runtime</span>
-              <span className="consoleLive"><i /> LIVE</span>
+              <span className="consoleLive"><i /> PUBLIC</span>
             </div>
 
             <div className="consoleBody">
@@ -130,7 +130,7 @@ export default function Home() {
               </div>
 
               <div className="runtimeFooter">
-                <span>PUBLIC SHELL</span>
+                <span>PUBLIC WEB SHELL</span>
                 <code>holi.shao.dpdns.org</code>
               </div>
             </div>
