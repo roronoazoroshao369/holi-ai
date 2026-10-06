@@ -177,3 +177,18 @@ Security/truth review:
 - Pages Git integration remains follow-up infrastructure debt, not a blocker for the verified live Worker route.
 
 Next product frontier remains the non-credit Git evidence-reading bridge before the graph diagnostic assessment.
+
+
+## 2026-10-06 — senior UI/UX overhaul and production promotion
+
+Reconciled LIVE main at `5afef4a84350e2fefef97048311fb3124fb3f186` and found concurrent PR #43 already targeting the user-requested visual overhaul. Reused and reviewed that branch rather than creating competing work.
+
+Design council review covered product hierarchy, visual language, frontend accessibility/responsiveness and learning UX. The delivered system replaced the flat mono-only presentation with a dark technical/editorial interface: split hero/runtime console, explicit product-truth signals, richer curriculum cards, learning-loop rail, sticky lab instruction rail, improved terminal/evidence surfaces, cohesive Git foundations/Git-CI framing, method cards and footer. No simulator/state-machine/persistence/assessment semantics changed.
+
+Refinement added clearer PUBLIC vs SIMULATED labels, larger microcopy/terminal/control text, dark form color-scheme/caret treatment and touch-safe hover behavior. Visual-QA head `f1648744e25e44f697dc20c35a87429aa1a10a66` passed full CI and generated reviewed 1440px desktop + 390px mobile full-page captures. A temporary preview bridge published the verified static artifact to `holi-devops-ui-preview`; Cloudflare Browser Rendering confirmed `https://holi-ui.shao.dpdns.org/`. The temporary `contents: write` permission and preview publisher were removed before final merge.
+
+Final clean PR #43 head `3f3b9c6c109c5520c6dc0e82fa7e3f9e7a08d3f0` passed CI `37489630664` and squash-merged as `ae043c1312f592392826aab7eb5b5514ef6da96a`. Post-merge main CI `37490280081` succeeded. The exact visually reviewed static artifact was promoted to production Worker `holi-devops-web` as deployment `5c47a1e596bf441995c7dbb48a88445c`. Cloudflare Browser Rendering loaded `https://holi.shao.dpdns.org/` and confirmed the new hero/runtime console, PUBLIC WEB SHELL truth label and SIMULATED boundary.
+
+Known non-blocking maintainability debt: globals.css still contains earlier compatibility/cascade rules ahead of the new design-system layer. Do not conflate this with visual failure; consolidate only as a bounded CSS-architecture task.
+
+Next product frontier remains the teaching-only Git evidence-reading bridge before the graph diagnostic assessment.

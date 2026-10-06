@@ -5,47 +5,59 @@ Resume autonomous operation of the REAL repository:
 
 IMPORTANT: this handoff can become stale immediately. Inspect LIVE GitHub first. The repository is authoritative.
 
-## Verified product + deployment checkpoint
+## Verified product + UI + deployment checkpoint
 
 Latest verified product main:
-`ae811270acd2d63b80b84aa5ad67d21957888534`
+`ae043c1312f592392826aab7eb5b5514ef6da96a`
 
-Deployment PR:
-#41 — Deploy current simulator safely to Cloudflare Pages
+Latest product PR:
+#43 — Overhaul Holi UI/UX visual system
 
-Final PR head:
-`51e72464deaac735ab9e22b4b173dbbab6e26d8e`
+Final clean PR head:
+`3f3b9c6c109c5520c6dc0e82fa7e3f9e7a08d3f0`
 
-Final exact-head CI:
-run `37472746232` — SUCCESS.
-
-Merged main:
-`ae811270acd2d63b80b84aa5ad67d21957888534`
+Exact-head CI:
+run `37489630664` — SUCCESS.
 
 Post-merge main CI:
-run `37473753263` — SUCCESS.
+run `37490280081` — SUCCESS.
 
-Cloudflare deployment:
+Visual QA evidence:
+- visual-QA head `f1648744e25e44f697dc20c35a87429aa1a10a66`;
+- full functional/browser CI succeeded;
+- desktop 1440px and mobile 390px full-page captures were reviewed;
+- no horizontal overflow at the mobile regression target;
+- temporary screenshot/static-preview publishing permissions were removed before merge.
+
+Current Cloudflare production:
 - Worker: `holi-devops-web`
-- deployment id: `e534ef800b36468591f90f248a960e55`
+- production deployment id: `5c47a1e596bf441995c7dbb48a88445c`
 - verified public URL: `https://holi.shao.dpdns.org/`
-- Worker custom-domain state: enabled
-- proxied DNS record exists for `holi.shao.dpdns.org`
-- Cloudflare Browser Rendering successfully loaded the fully rendered Holi DevOps Lab page from the live URL.
-
-Cloudflare Pages project `holi-devops` also exists, but its Git installation currently returns Cloudflare error `8000011`. Do not confuse that integration issue with the verified live Worker deployment.
+- Cloudflare Browser Rendering confirmed the redesigned hero/runtime console, `PUBLIC WEB SHELL`, `SIMULATED`, and fully rendered app.
 
 ## Current product truth
 
 Phase remains v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
 
-Deployment did not change the learner trust boundary:
-- current exercises remain deterministic browser simulations;
-- learner commands do not execute host shell, Git, YAML, Docker or network operations;
-- localStorage remains untrusted practice state, not server-authoritative mastery;
-- no D1, Container or Sandbox-backed learner execution is claimed.
+The production UI now uses the Holi dark technical/editorial design system:
+- sans-serif display hierarchy; monospace reserved for runtime/evidence surfaces;
+- responsive hero/runtime console;
+- explicit product-truth labels;
+- richer curriculum cards and learning-loop framing;
+- cohesive Linux lab, evidence/reasoning, Git foundations, Git/CI and method surfaces;
+- visible keyboard focus and reduced-motion handling;
+- responsive down to the 390px regression target.
 
-The Next.js config now enables static export only when `CF_PAGES=1`, preserving the normal repository CI/local production build path.
+Do not regress to the earlier flat mono-only visual treatment.
+
+Trust boundary remains unchanged:
+- learner exercises are deterministic browser simulations;
+- learner input does not execute host shell, Git, YAML, Docker or arbitrary network operations;
+- localStorage remains untrusted practice state;
+- no D1/Container/Sandbox-backed learner execution is claimed.
+
+Known visual-maintainability debt:
+- globals.css retains earlier compatibility/cascade rules before the new design-system layer. This is not a visual blocker but should be consolidated in a future bounded refactor if touching the CSS architecture.
 
 ## ONE highest-value product frontier
 
@@ -65,10 +77,7 @@ Reassess this recommendation from LIVE repository evidence before implementation
 
 ## Deployment follow-up debt
 
-Do not make deployment integration work the next product goal unless it blocks delivery, but keep these facts explicit:
-- Pages Git integration is unhealthy with error `8000011`;
-- current verified public serving path is the Worker custom domain;
-- any future continuous deployment automation must preserve exact-head CI and must not introduce broad repository write permissions or long-lived deployment secrets unnecessarily.
+Cloudflare Pages project `holi-devops` still has Git integration error `8000011`. The verified public serving path is the Worker custom domain. Do not broaden repository write permissions or introduce long-lived deploy secrets merely to repair convenience automation.
 
 ## Read first
 
@@ -101,4 +110,5 @@ Do not:
 - mutate immutable pre-repair reasoning after lock;
 - bypass downstream revocation;
 - claim real sandbox execution merely because the simulator is publicly deployed;
+- regress the production visual hierarchy without explicit visual evidence;
 - begin a second primary product goal in the same run.
