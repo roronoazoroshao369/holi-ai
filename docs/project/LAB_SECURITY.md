@@ -18,9 +18,12 @@ The mandatory production Chromium suite verifies browser behavior, both explicit
 
 The Git/CI incident does not execute YAML, git commands, shell commands, GitHub Actions jobs or network calls from learner input. Buttons and form fields select exact client-side state transitions only. The displayed workflow/job logs are fixture data, not observations from GitHub, the learner's machine or the CI runner executing repository tests.
 
-Git/CI persistence uses a separate localStorage key with schema 2 / fixture 2. Its validator rejects malformed reasoning shapes, stale versions, inconsistent evidence, impossible run status and forged derived completion flags. This protects local state invariants only. A learner with developer tools can still manufacture an internally consistent checkpoint, so Git/CI completion remains non-authoritative and must never grant execution, secrets, privileges or certification.
+Git/CI persistence uses a separate localStorage key with schema 3 / fixture 3. Its validator rejects malformed reasoning shapes, stale versions, inconsistent evidence, impossible run status and forged derived completion flags. This protects local state invariants only. A learner with developer tools can still manufacture an internally consistent checkpoint, so Git/CI completion remains non-authoritative and must never grant execution, secrets, privileges or certification.
 
 The Playwright production tests do execute the repository's built web application inside GitHub CI, but that is maintainer verification tooling. It is not learner-controlled execution and does not change the product boundary from SIMULATED to CONTROLLED_EXECUTION.
 
 
 Git revision extends the same SIMULATED boundary. Ref snapshots, commit SHAs, checkout/build metadata, release intent and tag objects are synthetic fixtures; no git command, YAML or learner text reaches host execution. Exact-match selected transitions do not fetch repositories, resolve real objects, spawn subprocesses or receive credentials. Strict revision checkpoint tuples/answer validation reject contradictions, not fully consistent forgery. Independent Linux checkpoint remains 7/5. Denied Storage getter/methods use ephemeral state and never imply durable completion.
+
+
+Pre-repair Git rationale is client-local typed data, not arbitrary executable prose. Strict shape/length, completeness at lock, canonical source/fact/relation verification and derived-flag validation reject inconsistent checkpoints. They do not establish authenticity or a client security boundary. Schema-v2 and older checkpoints discard; Linux 7/5 remains independent.

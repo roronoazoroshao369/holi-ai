@@ -7,7 +7,7 @@
 - Differential order is selected with browser Web Crypto at the UI boundary. Either cause may appear first, but independent random selection can repeat the same ordering; this is not statistical counterbalancing.
 - Differential order, evidence, reasoning, both counterfactual states, step and completion are persisted in localStorage and are forgeable through developer tools. A deliberately forged but internally consistent schema-v7 checkpoint can restore local completion. Never use it for certification, authorization, privileges or real execution.
 - Practice schema version 7 intentionally discards schema-v6 and older checkpoints. Linux fixture version remains 5 because incident definitions/command outputs did not change. Future shape and fixture-semantic changes must review these versions independently.
-- Production hydration, both transfer gates, both differential orderings and failure/recovery behavior are exercised by seven mandatory Chromium tests, but this is one browser engine and a narrow current flow rather than broad compatibility evidence.
+- Production hydration, both transfer gates, both differential orderings and failure/recovery behavior are exercised by eight mandatory Chromium tests, but this is one browser engine and a narrow current flow rather than broad compatibility evidence.
 - @playwright/test, playwright and playwright-core are exact-locked at 1.63.0 and are installed by npm ci before the normal high-severity npm audit. Chromium/FFmpeg binaries are still downloaded from Playwright's CDN at CI time; the locked package selects their revision, but npm audit does not audit those binary artifacts or CDN availability.
 - Permission fixtures assume healthy parent-directory traversal, ACL/SELinux and other configuration. The permission counterfactual simplifies effective-ID/group access and does not model ACLs, capabilities, namespaces or credential refresh behavior.
 - TCP fixtures and the listener counterfactual omit namespaces, firewall policy, bind-address complexity, service-manager/restart semantics and real kernel/socket behavior.
@@ -23,6 +23,7 @@
 - Separate Linux and Git/CI checkpoints reduce accidental schema coupling but create two client-local persistence contracts that must each be validated and regression-tested. Premature unification would increase migration risk without adding trusted state.
 
 
-- Git revision pre-repair hypothesis is currently a multiple-choice class. Full source-linked rationale is submitted after repair, so a learner can guess the class then reconstruct the explanation. Next frontier: immutable source-linked rationale before repair, without another primary scenario.
+- Git revision now requires immutable source-linked rationale before repair, but the rubric is still a visible finite exact grammar. Copying a complete rationale remains possible; passing does not establish general Git reasoning. Next frontier: one unfamiliar merge-graph relation, not another literal ref/SHA substitution.
 - Git fixtures contain synthetic full-length repeating SHAs and build-start static ref snapshots. They do not model reflogs, fetch depth, races between moving refs, signatures, merge graphs, detached-HEAD editing or real Git object resolution. Tag transfer assumes a directly commit-targeted annotated tag.
-- Git/CI schema 2 / fixture 2 intentionally discard version-1 checkpoints, including artifact progress. Linux 7/5 is unaffected. Whole Git/CI reset clears both exercises; revision-only reset preserves artifact progress.
+- Git/CI schema 3 / fixture 3 intentionally discard version-2 and older checkpoints, including artifact progress. Linux 7/5 is unaffected. Whole Git/CI reset clears both exercises; revision-only reset preserves artifact progress.
+

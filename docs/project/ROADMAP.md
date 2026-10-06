@@ -13,11 +13,13 @@
 - Dependency-hygiene gate: delivered in PR #26; @playwright/test/playwright/playwright-core are exact-locked at 1.63.0 and included in normal npm ci/audit.
 - Learning breadth gate C: delivered in PR #28 with the first Git & CI SIMULATED vertical slice: workflow/producer/consumer evidence -> locked causal hypothesis -> minimal artifact-contract repair -> green rerun -> source-linked explanation -> changed extraction-path transfer.
 - Git/CI breadth gate D: delivered in PR #30: five pre-repair sources, locked class, minimal immutable revision selection, separate checkout/metadata SHA verification, source-linked explanation and annotated-tag commit transfer. Git/CI schema/fixture 2; Linux remains 7/5.
-- Next learning gate: source-linked Git causal rationale locked before repair; strengthen the existing slice rather than add another token quiz.
+- Git rationale gate: delivered in PR #32; source/fact/relation draft locks before repair, canonical rationale required for verified learning, Git/CI schema/fixture 3/3. No new incident added.
+- Next learning gate: one unfamiliar Git merge-graph / PR-head versus integration-commit causality slice with parent/ancestry evidence and changed graph transfer, selected after LIVE discovery/review.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
 - v0.5-v0.7: Docker, Kubernetes, CI/CD and IaC vertical slices with verifiers and cost budgets.
 - v0.8-v0.9: observability/SRE and unfamiliar cross-domain incidents.
 - v1.0: coherent zero-to-production curriculum with demonstrated transfer, accessibility and operational readiness.
 
 No version is complete solely because its code exists. Consult PROJECT_STATE for actual verification/merge status.
+
 
