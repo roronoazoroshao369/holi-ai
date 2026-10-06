@@ -5,9 +5,6 @@ on:
   push:
     branches: [main]
 
-# TEMPORARY_UI_PREVIEW_BRIDGE: remove before merge.
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -36,63 +33,6 @@ jobs:
         run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run production browser regression
         run: ./node_modules/.bin/playwright test --config=playwright.config.cjs
-      - name: Capture UI review screenshots
-        if: github.event_name == 'pull_request' && github.head_ref == 'design/ui-ux-overhaul-v1'
-        run: |
-          npm run start -- --hostname 127.0.0.1 --port 3101 > "$RUNNER_TEMP/holi-ui-server.log" 2>&1 &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-          for i in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:3101/ >/dev/null; then break; fi
-            sleep 1
-          done
-          mkdir -p test-results/ui-review
-          node <<'NODE'
-          const { chromium } = require('@playwright/test');
-          (async () => {
-            const browser = await chromium.launch({ headless: true });
-            const desktop = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-            await desktop.goto('http://127.0.0.1:3101/', { waitUntil: 'networkidle' });
-            await desktop.screenshot({ path: 'test-results/ui-review/desktop.png', fullPage: true });
-            const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
-            await mobile.goto('http://127.0.0.1:3101/', { waitUntil: 'networkidle' });
-            await mobile.screenshot({ path: 'test-results/ui-review/mobile.png', fullPage: true });
-            await browser.close();
-          })().catch(error => { console.error(error); process.exit(1); });
-          NODE
-      - name: Upload UI review captures
-        if: github.event_name == 'pull_request' && github.head_ref == 'design/ui-ux-overhaul-v1'
-        uses: actions/upload-artifact@v4
-        with:
-          name: holi-ui-review-captures
-          path: test-results/ui-review/
-          if-no-files-found: error
-          retention-days: 2
-      - name: Build static UI preview
-        if: github.event_name == 'pull_request' && github.head_ref == 'design/ui-ux-overhaul-v1'
-        env:
-          CF_PAGES: "1"
-        run: npm run build
-      - name: Publish verified UI preview artifact branch
-        if: github.event_name == 'pull_request' && github.head_ref == 'design/ui-ux-overhaul-v1'
-        env:
-          ARTIFACT_BRANCH: deploy/cloudflare-ui-artifact
-          VERIFIED_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: |
-          export ARTIFACT_DIR="$RUNNER_TEMP/holi-ui-artifact"
-          rm -rf "$ARTIFACT_DIR"
-          mkdir -p "$ARTIFACT_DIR"
-          cp -R out/. "$ARTIFACT_DIR/"
-          cd "$ARTIFACT_DIR"
-          git init
-          git checkout -b "$ARTIFACT_BRANCH"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          printf '%s\n' "$VERIFIED_HEAD" > .holi-source-sha
-          git add .
-          git commit -m "Publish verified UI preview for $VERIFIED_HEAD"
-          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          git push --force origin "HEAD:refs/heads/$ARTIFACT_BRANCH"
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
