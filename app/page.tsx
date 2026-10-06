@@ -1,5 +1,6 @@
 import { LabTerminal } from "../components/LabTerminal";
 import { CiLab } from "../components/CiLab";
+import { GitFoundationsLesson } from "../components/GitFoundationsLesson";
 import { curriculum } from "../lib/curriculum";
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
         <nav>
           <a href="#path">Lộ trình</a>
           <a href="#lab">Lab</a>
+          <a href="#git-foundations">Git nền tảng</a>
           <a href="#principles">Cách học</a>
         </nav>
         <a className="navCta" href="#lab">Vào lab</a>
@@ -77,6 +79,8 @@ export default function Home() {
         </div>
         <LabTerminal />
       </section>
+
+      <GitFoundationsLesson />
 
       <section className="section ciLearningSection" id="git-ci-lab">
         <div className="sectionHeading">
