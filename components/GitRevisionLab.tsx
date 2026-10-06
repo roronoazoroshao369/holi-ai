@@ -3,14 +3,15 @@ import { useState } from "react";
 import {
   REVISION_PROMPT, REVISION_SLOTS, REVISION_TRANSFER_SOURCES, initialRevisionState,
   revisionEvidenceReady, inspectRevision, lockRevision, repairRevision, rebuildRevision, verifyRevision,
-  emptyRevisionExplanation, editRevisionExplanation, explainRevision,
+  emptyRevisionRationale, emptyRevisionExplanation, editRevisionExplanation, explainRevision,
   emptyRevisionTransfer, editRevisionTransfer, checkRevisionTransfer,
-  type RevisionState, type RevisionHypothesis, type RevisionRepair, type RevisionTransfer
+  type RevisionState, type RevisionHypothesis, type RevisionRationale, type RevisionRepair, type RevisionTransfer
 } from "../lib/git-revision-simulator";
 
 export function GitRevisionLab({ state, onChange }: { state: RevisionState; onChange: (next: RevisionState) => void }) {
   const [hypothesis, setHypothesis] = useState<RevisionHypothesis>("");
   const [repair, setRepair] = useState<RevisionRepair>("");
+  const [rationale, setRationale] = useState<RevisionRationale>(() => emptyRevisionRationale());
   const ready = revisionEvidenceReady(state);
   const answer = state.explanation ?? emptyRevisionExplanation();
   const transfer = state.transfer ?? emptyRevisionTransfer();
@@ -23,7 +24,7 @@ export function GitRevisionLab({ state, onChange }: { state: RevisionState; onCh
   return <section className="revisionLab" aria-label="Git revision simulated incident">
     <div className="ciLabHeader"><div><span className="kicker">GIT / SIMULATED</span><h3>{REVISION_PROMPT.title}</h3><p>{REVISION_PROMPT.summary}</p></div>
       <div className="ciTruth"><strong>SIMULATED</strong><span>Snapshot và SHA là fixture, không phải repo Git thật hoặc chứng nhận năng lực.</span></div></div>
-    <button type="button" className="secondaryButton" onClick={() => { onChange(initialRevisionState()); setHypothesis(""); setRepair(""); }}>Reset Git revision incident</button>
+    <button type="button" className="secondaryButton" onClick={() => { onChange(initialRevisionState()); setHypothesis(""); setRepair(""); setRationale(emptyRevisionRationale()); }}>Reset Git revision incident</button>
     <div className="ciStatus"><b>Observed symptom</b><code>{REVISION_PROMPT.symptom}</code></div>
     <details><summary>Understand · revision và kết quả vận hành</summary>
       <p>Commit SHA xác định snapshot. Ref là tên tham chiếu tới object; branch có thể di chuyển. Checkout quyết định cây nguồn build dùng. Test pass chỉ nói kiểm tra đã chạy thành công.</p>
@@ -32,10 +33,18 @@ export function GitRevisionLab({ state, onChange }: { state: RevisionState; onCh
       <div className="ciEvidenceActions">{REVISION_SLOTS.map(slot => <button key={slot} type="button" disabled={Boolean(state.repair)} onClick={() => onChange(inspectRevision(state, slot))}>Inspect {titles[slot]}</button>)}</div>
       <div className="evidenceBank">{REVISION_SLOTS.map(slot => state.evidence[slot] && <article key={slot}><strong>{state.evidence[slot]!.title}</strong><code>{state.evidence[slot]!.id}</code><pre>{state.evidence[slot]!.output}</pre></article>)}</div>
       <p>{Object.keys(state.evidence).length}/5 nguồn đã thu. Snapshot giữ nguyên sau repair.</p></section>
-    <section className="reasoningPanel"><h4>2. Khóa inference trước repair</h4>
+    <section className="reasoningPanel"><h4>2. Khóa source-linked inference trước repair</h4>
+      <p>Chọn causal class chưa đủ. Trước khi repair, khóa luôn các observation cụ thể và relation dùng để suy ra nguyên nhân. Rationale này bất biến sau khi khóa.</p>
       <label>Causal hypothesis<select aria-label="Git revision hypothesis" value={state.hypothesis || hypothesis} disabled={!ready || Boolean(state.hypothesis)} onChange={e => setHypothesis(e.target.value as RevisionHypothesis)}>
         <option value="">Chọn causal class</option><option value="revision-selection">Revision selection</option><option value="cache-content">Cached content</option><option value="deployment-target">Delivery target</option></select></label>
-      <button type="button" disabled={!ready || !hypothesis || Boolean(state.hypothesis)} onClick={() => onChange(lockRevision(state, hypothesis))}>Lock Git revision hypothesis</button></section>
+      {(["workflow", "refs", "build", "intent"] as const).map(slot => <fieldset key={slot} disabled={!ready || Boolean(state.hypothesis)}><legend>{titles[slot]} · pre-repair rationale</legend>
+        <label>Source<select aria-label={`Git revision rationale ${slot} source`} value={rationale.sources[slot].id} onChange={e => setRationale({ ...rationale, sources: { ...rationale.sources, [slot]: { ...rationale.sources[slot], id: e.target.value } } })}>
+          <option value="">Chọn source đã thu</option>{REVISION_SLOTS.map(s => <option key={s} value={state.evidence[s]?.id}>{state.evidence[s]?.id}</option>)}</select></label>
+        <label>Fact<input aria-label={`Git revision rationale ${slot} fact`} maxLength={160} value={rationale.sources[slot].fact} onChange={e => setRationale({ ...rationale, sources: { ...rationale.sources, [slot]: { ...rationale.sources[slot], fact: e.target.value } } })} /></label>
+      </fieldset>)}
+      <label>Pre-repair causal relation<input aria-label="Git revision rationale relation" maxLength={160} value={rationale.relation} disabled={!ready || Boolean(state.hypothesis)} onChange={e => setRationale({ ...rationale, relation: e.target.value })} /></label>
+      <button type="button" disabled={!ready || !hypothesis || Boolean(state.hypothesis)} onClick={() => onChange(lockRevision(state, hypothesis, rationale))}>Lock Git revision hypothesis + rationale</button>
+      {state.hypothesis && <p role="status">Đã khóa immutable pre-repair rationale từ 4 nguồn; repair không thể sửa lại diagnosis này.</p>}</section>
     {state.hypothesis && <section className="reasoningPanel" aria-label="Git revision repair"><h4>3. Sửa tối thiểu · rebuild · verify</h4>
       <label>Repair<select aria-label="Git revision repair" value={state.repair || repair} disabled={Boolean(state.repair)} onChange={e => setRepair(e.target.value as RevisionRepair)}>
         <option value="">Chọn thay đổi</option><option value="pin-intended-sha">Pin checkout vào commit SHA đã duyệt</option><option value="purge-cache">Xóa cache</option><option value="redirect-target">Đổi delivery target</option><option value="rebuild-only">Chỉ rebuild</option></select></label>
