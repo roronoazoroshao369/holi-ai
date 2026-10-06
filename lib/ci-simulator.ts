@@ -1,3 +1,4 @@
+import { initialGraphState, type GraphState } from "./git-graph-simulator.ts";
 import { initialRevisionState, type RevisionState } from "./git-revision-simulator.ts";
 
 export type CiEvidenceSlot = "workflow" | "producer" | "consumer";
@@ -34,6 +35,7 @@ export type CiTransferAnswer = {
 };
 
 export type CiLabState = {
+  graphPractice: GraphState;
   revisionPractice: RevisionState;
   evidenceSeen: Record<CiEvidenceSlot, boolean>;
   preRepairEvidence: Partial<Record<CiEvidenceSlot, CiEvidenceRecord>>;
@@ -102,6 +104,7 @@ export const CI_TRANSFER_EVIDENCE = {
 
 export function initialCiLabState(): CiLabState {
   return {
+    graphPractice: initialGraphState(),
     revisionPractice: initialRevisionState(),
     evidenceSeen: { workflow: false, producer: false, consumer: false },
     preRepairEvidence: {},
@@ -248,3 +251,4 @@ export function submitCiTransfer(state: CiLabState, answer: CiTransferAnswer): C
 export function resetCiLab(): CiLabState {
   return initialCiLabState();
 }
+

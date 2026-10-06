@@ -5,7 +5,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 
 module.exports = defineConfig({
   testDir: "./tests",
-  testMatch: ["learning-flow.browser.cjs", "ci-learning.browser.cjs", "git-revision.browser.cjs"],
+  testMatch: ["learning-flow.browser.cjs", "ci-learning.browser.cjs", "git-revision.browser.cjs", "git-graph.browser.cjs"],
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -29,3 +29,4 @@ module.exports = defineConfig({
     stderr: "pipe"
   }
 });
+
