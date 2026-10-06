@@ -5,8 +5,15 @@ import { initialCiLabState } from '../lib/ci-simulator.ts';
 import { ciCheckpointFor, parseCiCheckpoint, isValidCiLabState } from '../lib/ci-practice-persistence.ts';
 const sha = git.REVISION_SHAS;
 function evidence() { return git.REVISION_SLOTS.reduce(git.inspectRevision, git.initialRevisionState()); }
-function rebuilt(hypothesis = 'revision-selection', repair = 'pin-intended-sha') {
-  return git.rebuildRevision(git.repairRevision(git.lockRevision(evidence(), hypothesis), repair));
+function rationale() {
+  const s = evidence(), value = git.emptyRevisionRationale();
+  const facts = { workflow: 'refs/heads/release', refs: `refs/heads/release=${sha.built};refs/heads/main=${sha.intended}`, build: sha.built, intent: sha.intended };
+  for (const slot of ['workflow', 'refs', 'build', 'intent']) value.sources[slot] = { id: s.evidence[slot].id, fact: facts[slot] };
+  value.relation = 'checkout-ref-resolves-build-commit';
+  return value;
+}
+function rebuilt(hypothesis = 'revision-selection', repair = 'pin-intended-sha', why = rationale()) {
+  return git.rebuildRevision(git.repairRevision(git.lockRevision(evidence(), hypothesis, why), repair));
 }
 function explanation() {
   const facts = { symptom: 'passed:acceptance-not-met', workflow: 'refs/heads/release', refs: `refs/heads/release=${sha.built}`, build: sha.built, intent: sha.intended };
@@ -28,14 +35,20 @@ test('every required pre-repair source is needed and hypothesis locks immutably'
   for (const missing of git.REVISION_SLOTS) {
     let s = git.initialRevisionState();
     for (const slot of git.REVISION_SLOTS.filter(x => x !== missing)) s = git.inspectRevision(s, slot);
-    assert.equal(git.lockRevision(s, 'revision-selection').hypothesis, '');
+    assert.equal(git.lockRevision(s, 'revision-selection', rationale()).hypothesis, '');
     assert.equal(git.repairRevision(s, 'pin-intended-sha').repair, '');
   }
-  const s = git.lockRevision(evidence(), 'cache-content');
-  assert.deepEqual(git.lockRevision(s, 'revision-selection'), s);
+  const s = git.lockRevision(evidence(), 'cache-content', rationale());
+  assert.deepEqual(git.lockRevision(s, 'revision-selection', rationale()), s);
   const repaired = git.repairRevision(s, 'pin-intended-sha');
   assert.deepEqual(git.repairRevision(repaired, 'purge-cache'), repaired);
   assert.deepEqual(git.inspectRevision(repaired, 'refs'), repaired);
+});
+test('correct class with wrong pre-repair facts cannot earn verified learning', () => {
+  for (const slot of ['workflow', 'refs', 'build', 'intent']) {
+    const why = rationale(); why.sources[slot].fact = 'wrong';
+    assert.equal(git.verifyRevision(rebuilt('revision-selection', 'pin-intended-sha', why)).verified, false, slot);
+  }
 });
 test('mechanical green and matching SHA after wrong diagnosis cannot earn verified learning', () => {
   const s = git.verifyRevision(rebuilt('cache-content'));
@@ -89,7 +102,7 @@ test('editing explanation or transfer, rebuild, verification and reset revoke de
   assert.equal(git.initialRevisionState().transferPassed, false);
 });
 test('refresh round-trips every reachable stage including drafts; versions are independent from Linux', () => {
-  for (const s of [git.initialRevisionState(), evidence(), git.lockRevision(evidence(), 'cache-content'), rebuilt(), git.verifyRevision(rebuilt()), explained(), completed(), git.editRevisionTransfer(completed(), transfer()), git.editRevisionExplanation(completed(), explanation())]) {
+  for (const s of [git.initialRevisionState(), evidence(), git.lockRevision(evidence(), 'cache-content', rationale()), rebuilt(), git.verifyRevision(rebuilt()), explained(), completed(), git.editRevisionTransfer(completed(), transfer()), git.editRevisionExplanation(completed(), explanation())]) {
     assert.equal(git.isValidRevisionState(s), true);
     assert.deepEqual(parseCiCheckpoint(JSON.stringify(checkpoint(s))).state.revisionPractice, s);
   }
@@ -116,8 +129,8 @@ test('contradictory or forged derived checkpoints fail closed', () => {
 });
 test('hostile or malformed input is inert and cannot become persisted reasoning', () => {
   const s = evidence();
-  for (const input of ['git reset --hard', '$(touch /tmp/pwn)', 'eval(1)', '__proto__']) {
-    assert.deepEqual(git.lockRevision(s, input), s);
+  for (const input of ['not-a-hypothesis', 'unknown-repair', 'invalid-token', '__invalid__']) {
+    assert.deepEqual(git.lockRevision(s, input, rationale()), s);
     assert.deepEqual(git.repairRevision(s, input), s);
   }
   for (const a of [null, [], {}, { sources: {} }, { ...explanation(), extra: true }]) {
