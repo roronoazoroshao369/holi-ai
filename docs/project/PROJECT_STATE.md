@@ -1,6 +1,20 @@
 # Project state
 
-Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation. Package remains 0.1.0; no release/tag created.
+Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell. Package remains 0.1.0; no release/tag created.
+
+## Cloudflare deployment checkpoint
+
+Current verified LIVE product main: `ae811270acd2d63b80b84aa5ad67d21957888534` from PR #41 — **Deploy current simulator safely to Cloudflare Pages**.
+
+Deployment evidence:
+- PR #41 final head `51e72464deaac735ab9e22b4b173dbbab6e26d8e` passed exact-head CI run `37472746232` — SUCCESS;
+- PR #41 squash-merged as `ae811270acd2d63b80b84aa5ad67d21957888534`;
+- post-merge main push CI run `37473753263` — SUCCESS;
+- Cloudflare Worker `holi-devops-web` deployment id `e534ef800b36468591f90f248a960e55`;
+- custom Worker domain `https://holi.shao.dpdns.org/` is enabled and DNS is proxied through Cloudflare;
+- Cloudflare Browser Rendering successfully loaded the live URL and returned the fully rendered **Holi DevOps Lab** HTML, including the navigation, curriculum, Linux lab and Git foundations content.
+
+Deployment architecture remains intentionally narrow: the current browser-only simulator is statically exported for Cloudflare when `CF_PAGES=1`. This does **not** convert learner exercises into real shell/Git/network execution, does not add trusted mastery persistence, and does not authorize D1/Containers/Sandbox claims. The Pages project `holi-devops` exists, but its Git integration returned Cloudflare error `8000011`; the verified live route is currently backed by the separately deployed Worker shell.
 
 ## Latest verified product state
 
