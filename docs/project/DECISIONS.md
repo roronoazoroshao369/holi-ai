@@ -83,3 +83,10 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 2026-10-06 — change transfer mechanism to linear replay: traverse base ancestry and collect exactly reviewed fixture changes [p1,p2]; do not require original PR-head identity or two parents. Change IDs are stipulated fixture evidence, never a claim of real rebase semantic equivalence. Keep old annotated-tag transfer and independent sibling credit.
 
 2026-10-06 — schema4 adds graphPractice, fixture4 adds corpus; older shared Git/CI progress intentionally discards, Linux7/5 unchanged. Explicitly checkout/assert exact PR-head SHA in CI; final head must pass complete gates and merge uses expected_head_sha. Next product leverage is one mechanism-first Git foundations lesson using separate teaching fixtures, rather than accumulating another independent finite form.
+
+
+2026-10-06 — PR #36: add one mechanism-first Git foundations lesson before graph diagnosis instead of adding another finite incident. Use a separate teaching fixture for snapshot/ref/direct-parent/ancestry concepts. Readiness/navigation are explicitly non-credit and must not mutate the shared Git/CI checkpoint. No schema/fixture bump because assessment semantics and persisted state are unchanged.
+
+2026-10-06 — require a production browser invariant that lesson activity leaves the complete persisted Git/CI assessment state unchanged. Keep anti-leak checks against active graph fixture IDs/relation tokens and retain mobile/focus/runtime gates. Initial exact-head browser run found the new self-check lacked a guaranteed visible focus outline; fix product CSS, not assertions/retries/timeouts.
+
+2026-10-06 — post-merge source re-read is part of verification, not ceremony. It caught a literal `\\n` in the focus stylesheet even though browser behavior passed. PR #37 cleaned only that source defect and reran the complete exact-head gate before merge. Next product leverage is reducing graph SHA transcription burden without converting reasoning into an answer-revealing multiple-choice flow.
