@@ -213,7 +213,8 @@ footer strong { color:var(--text); }
   color: var(--bg);
   font-weight: 800;
 }
-.gitFoundations :focus { outline: 2px solid var(--accent2); outline-offset: 3px; }\n.gitFoundations :focus-visible { outline: 2px solid var(--accent2); outline-offset: 3px; }
+.gitFoundations :focus { outline: 2px solid var(--accent2); outline-offset: 3px; }
+.gitFoundations :focus-visible { outline: 2px solid var(--accent2); outline-offset: 3px; }
 .foundationLessonBody {
   border: 1px solid var(--line);
   border-top: 0;
