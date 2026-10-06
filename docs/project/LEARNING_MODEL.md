@@ -55,3 +55,17 @@ PR #32 closes label-only pre-repair guessing: five captured source/fact pairs an
 Six independent observations precede immutable class/rationale commitment. The initial request requires ordered base/PR-head direct parents and consumed integration revision; a green PR-head build or two-parent commit containing a different head cannot satisfy it. Wrong factual reasoning remains unverified after correct recovery; later explanation cannot rewrite the lock.
 
 Transfer changes to a linear replayed series. Approved base is an ancestor through two edges while original PR-head identity is absent. The learner must distinguish parent count, ancestry and reviewed change series; an extra-change descendant fails despite preserving ancestry. These are deterministic synthetic exercises with visible finite grammar, not a general Git/rebase competence test. A foundations lesson should precede claims of a coherent near-zero learning path.
+
+
+## Git foundations lesson before graph assessment — 2026-10-06
+
+A near-zero learner now gets an explicit teaching sequence before the graph diagnostic form:
+
+1. **Snapshot identity** — a commit identifies an immutable snapshot; a branch name is not the snapshot itself.
+2. **Moving ref** — a branch ref can resolve to different commits over time while an existing commit identity remains fixed.
+3. **Direct parent** — a direct parent is exactly one parent edge away; ordered parent lists are properties of a concrete commit and any delivery policy must be read from its actual contract.
+4. **Ancestry** — an ancestor may be reachable through multiple parent edges and is not synonymous with direct parent.
+
+The lesson graph uses IDs that are disjoint from the graph incident/transfer fixtures. Its four-question readiness self-check is finite, visible, retryable and deliberately non-credit. Passing it only reveals navigation into the existing graph diagnostic lab; it does not set or infer diagnosis, verified, explanation or transfer state. A production browser invariant compares the full persisted Git/CI practice state before and after lesson use and requires exact equality.
+
+This closes a preparation gap, not a mastery gap. The assessment still has finite grammar and substantial SHA transcription, and the lesson self-check itself can be guessed. General Git competence, production debugging and trusted certification remain unsupported claims.
