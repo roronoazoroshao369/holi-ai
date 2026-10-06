@@ -147,3 +147,51 @@ test('graph refresh rejects stale/corrupt/contradictory checkpoints and storage 
   }
   expect(runtime).toEqual([]);
 });
+
+
+test('foundations lesson teaches graph mental models without granting assessment credit', async ({ page }) => {
+  const runtime = []; errors(page, runtime);
+  await page.goto('/');
+  const lesson = page.getByRole('region', { name: 'Git foundations lesson', exact: true });
+  await expect(lesson).toBeVisible();
+  await expect(lesson).toContainText('TEACHING ONLY · KHÔNG TÍNH ĐIỂM');
+  await saved(page, 'fresh');
+
+  for (const clue of [S.head, S.integration, 'pr-head-omits-required-base']) {
+    await expect(lesson).not.toContainText(clue);
+  }
+
+  const before = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state, key);
+
+  await page.getByRole('button', { name: '2 · Ref', exact: true }).click();
+  await expect(page.getByRole('article', { name: 'Git ref concept', exact: true })).toContainText('Ref là tên có thể di chuyển');
+  await page.getByRole('button', { name: '3 · Direct parent', exact: true }).click();
+  await expect(page.getByRole('article', { name: 'Git direct parent concept', exact: true })).toContainText('đúng một cạnh');
+  await page.getByRole('button', { name: '4 · Ancestry', exact: true }).click();
+  await expect(page.getByRole('article', { name: 'Git ancestry concept', exact: true })).toContainText('cách nhiều cạnh');
+
+  await page.getByRole('combobox', { name: 'Git foundations snapshot answer', exact: true }).selectOption('commit');
+  await page.getByRole('combobox', { name: 'Git foundations ref answer', exact: true }).selectOption('moves');
+  await page.getByRole('combobox', { name: 'Git foundations direct parent answer', exact: true }).selectOption('one-edge');
+  await page.getByRole('combobox', { name: 'Git foundations ancestry answer', exact: true }).selectOption('multi-edge');
+  const check = page.getByRole('button', { name: 'Check foundations readiness', exact: true });
+  await check.click();
+  await expect(lesson.getByRole('status')).toContainText('Sẵn sàng vào graph diagnostic lab');
+
+  const after = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state, key);
+  expect(after).toEqual(before);
+
+  const handoff = page.getByRole('link', { name: 'Vào graph diagnostic lab →', exact: true });
+  await expect(handoff).toBeVisible();
+  await handoff.click();
+  await expect(lab(page)).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await check.focus(); await expect(check).toBeFocused();
+  expect(await check.evaluate(el => {
+    const s = getComputedStyle(el);
+    return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
+  })).toBe(true);
+  expect(runtime).toEqual([]);
+});
