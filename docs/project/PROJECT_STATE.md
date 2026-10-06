@@ -1,48 +1,50 @@
 # Project state
 
-Updated: 2026-10-05. Phase: v0.3 SIMULATED mastery-flow foundation. Package remains 0.1.0; no release/tag created.
-Verified product main: 1b614eb51984b8737efa545eb92c951adafa2640, re-read after PR #30 squash merge. Documentation closeout follows in a separate PR and must pass full exact-final-head CI before merge; the next operator must always re-read LIVE main.
-Product PR #30 final head: dc03b3c0a8a0ea1e2a728106c72d5395000fe00e.
-Exact-final-head CI: 37325201149 / job 111814058034 — SUCCESS.
-Gate: npm ci; full TypeScript typecheck; 53/53 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; Chromium from repository-locked Playwright 1.63.0; 7/7 production Chromium tests (52.1s) against next start --hostname 127.0.0.1 --port 3100.
+Updated: 2026-10-06. Phase: v0.3 SIMULATED mastery-flow foundation. Package remains 0.1.0; no release/tag created.
+Verified product main: 833b4906840d4c7e3e49b8bbcb0645d47823de3f, re-read after PR #32 squash merge; tree matched the verified product tree.
+Product PR #32 exact final head: 928fa71948ff99f5da85eb5be7678a56aacee79d.
+Full exact-final-head CI: 37404253657 / job 112078149690 — SUCCESS.
+Gate: npm ci; full TypeScript typecheck; 56/56 Node tests; npm audit --audit-level=high with 0 vulnerabilities; production build; Chromium from repository-locked Playwright 1.63.0; 8/8 production Chromium tests (1.3m) against next start --hostname 127.0.0.1 --port 3100.
+Documentation closeout follows in a separate PR and must pass full exact-final-head CI before merge. This file cannot identify its own final merge SHA; always re-read LIVE main/docs/open PRs/current CI.
 
-## Delivered current goal — Git commit/ref causality
+## Delivered goal — Git rationale before repair
 
-GOAL: complete one unfamiliar Git revision-selection vertical slice as explicit SIMULATED practice.
-USER VALUE: mechanically green release does not establish that approved source was built, nor that the learner diagnosed its causal defect.
-SCOPE: five immutable pre-repair sources; locked causal class; minimally sufficient checkout revision repair; rebuild; separate consumed-SHA verification; five source-linked explanation facts; materially changed annotated-tag-to-commit transfer; persistence and production browser coverage.
-NON-GOALS: actual Git/GitHub Actions execution, generic Git/YAML interpreter, accounts, Kubernetes/Docker/real sandbox, certification or trusted assessment.
-ACCEPTANCE: satisfied on the exact final product head above. Initial copy neutral; missing evidence blocks lock/repair; hypothesis immutable; correct repair after wrong diagnosis can match actual/intended SHA while verified remains false; green alone does not verify; wrong source/fact cannot be rescued by a correct relation; transfer distinguishes tag object, commit target and advanced main; edit/rebuild/reset/refresh revoke dependent confirmation; impossible/stale/corrupt state fails closed.
-SECURITY: pure browser fixture transitions; no learner shell/subprocess/git/YAML/network execution or credentials. localStorage is forgeable and never authoritative.
-ROLLBACK: revert PR #30; schema-1 implementation rejects schema-2 checkpoint. Linux needs no migration.
+GOAL: close label-only pre-repair guessing in the existing Git revision incident.
+USER VALUE: a correct repair and matching consumed commit cannot retroactively turn a wrong factual diagnosis into verified learning.
+SCOPE: five captured source ID/fact pairs and a relation drafted before repair, locked immutably with causal class; canonical rationale independently gates verification; persistence, aliasing, wrong-source/fact/relation and production browser regressions.
+NON-GOALS: additional incidents, generic grading/Git/YAML engines, actual Git/Actions execution, accounts, Kubernetes/Docker/real sandbox, trusted assessment or certification.
+ACCEPTANCE: satisfied on exact final head above. Missing evidence or incomplete rationale cannot lock/repair; lock checks completeness without correctness feedback; wrong class OR source/fact/relation blocks learning even with correct repair and matching checkout/metadata SHA; post-repair explanation cannot rescue the locked rationale. Existing annotated-tag transfer and all Linux/artifact regressions remain.
+ROLLBACK: revert PR #32; prior Git/CI schema-2 implementation rejects schema-3 checkpoint. Linux needs no migration.
 
 ## Product truth
 
-Six primary SIMULATED incidents: four Linux (two permission, two same-symptom TCP) and two Git/CI (artifact handoff, release acceptance). Permission/group and listener/socket counterfactuals plus artifact-path and annotated-tag transfers are assessment steps, not additional real environments.
+Six primary SIMULATED incidents: four Linux (two permission, two same-symptom TCP), two Git/CI (artifact handoff and release acceptance). Permission/group, listener/socket, extraction-path and annotated-tag transfers are assessment steps. No new scenario was added in this goal.
 
-Git artifact incident is preserved: web-dist producer versus site-dist consumer; correct artifact-output repair after wrong diagnosis may make pipeline green but cannot verify learning. Its changed transfer applies nested extraction semantics.
+Artifact incident remains web-dist producer versus site-dist consumer, with source-linked explanation and nested extraction transfer. Its pre-repair lock remains a causal class; source-linked factual explanation follows repair. Revision rationale strengthening does not claim that every subsystem now has that stronger pre-repair contract.
 
-Git revision incident: refs/heads/release resolves to synthetic a4… commit; approved build-start main snapshot is b7…; original checkout and release metadata both record a4…. Pinning checkout to approved immutable b7… is the minimal repair. Explicit verification checks checkout and metadata against intent; pipeline pass is insufficient. Original facts remain captured before repair for explanation.
+Git revision incident remains refs/heads/release -> synthetic a4… while intended build-start snapshot is b7…. Checkout and release metadata originally both record a4…. Pinning approved immutable b7… is minimal. Explicit verification checks BOTH checkout and metadata SHA, correct class/repair and canonical locked rationale. Pipeline pass alone is insufficient.
 
-Tag transfer: refs/tags/v2.4 points to c8… tag OBJECT, which targets d9… COMMIT, while main now points to e2…. The request explicitly asks for an immutable COMMIT identity; d9… is required. This does not deny that Git can checkout tag names. No real Git history/general Actions competence is claimed.
+Changed tag transfer remains refs/tags/v2.4 -> c8… tag OBJECT -> d9… COMMIT while main advances to e2…. Request requires immutable COMMIT identity d9…, not original incident SHA, tag object or moving branch. This does not deny that real Git can checkout tag names.
 
-## Persistence and reset truth
+## Persistence / revocation
 
-Linux: PRACTICE_SCHEMA_VERSION=7 / LINUX_FIXTURE_VERSION=5, unchanged.
-Git/CI: CI_PRACTICE_SCHEMA_VERSION=2 / CI_FIXTURE_VERSION=2 under holi.devops.git-ci-practice. Schema bumps for nested revision state, verification tuples and editable reasoning drafts; fixture bumps for expanded revision/tag assessment corpus. Version-1 checkpoints intentionally discard. The Linux/Git checkpoint contracts remain separate.
+Linux schema 7 / fixture 5 unchanged.
+Git/CI schema 3 / fixture 3, key holi.devops.git-ci-practice. Schema 3 adds persisted rationale draft/locked snapshot; fixture 3 changes assessment/completion rubric while incident outputs and tag corpus remain unchanged. Version-2 and older checkpoints intentionally discard, including artifact progress under the shared Git/CI checkpoint. Independent Linux state is unaffected.
 
-CiLab composes artifact state with revisionPractice; no cross-credit or unrelated prerequisite gate. Revision reset clears revision only; whole Git/CI reset clears both and remounts revision drafts. Editing explanation clears its confirmation and tag transfer; editing transfer clears its confirmation; rebuild/reverification clear downstream work. Storage method errors AND denied localStorage getter degrade to ephemeral practice.
+One rationale field is editable while hypothesis is empty and becomes a cloned immutable snapshot at lock. Core and UI block editing after lock until reset. Complete wrong rationale may restore as not-verified learning; missing locked rationale, malformed shape or contradictory derived flags fail closed. Post-repair explanation is separate. Repair/rebuild/reverify preserve rationale while clearing affected downstream confirmation. Revision-only reset clears revision including rationale and preserves artifact; whole Git/CI reset clears both and remounts local class/repair drafts. Denied Storage getter/methods remain ephemeral fallback.
 
-## Red-team and verification evidence
+## Red-team / verification
 
-Review found an explanation asking for a repair ID hidden in option DOM values. Product now displays the selected ID only after repair lock. Whole-module reset also remounts component-local drafts. Getter denial is caught at the browser boundary. Browser checkpoint tests poll the required semantic state before reload/injection to avoid first-save/reset races; retries remain zero. Existing Linux/artifact tests were not weakened.
+Council review confirmed LIVE weakness and approved one field with class as phase marker, avoiding duplicate draft/snapshot state. No blocker found. Advisory grammar ambiguity was fixed: PIPELINE_STATUS and ACCEPTANCE_RESULT identify the observation fields. Clone tests prevent input/draft alias mutation. Every pre-repair source ID/fact and relation is challenged independently, including correct class/relation plus wrong facts and a correct operational repair. Forged verified after wrong rationale is rejected on refresh; later explanation cannot rescue it.
 
-Initial product head b6d3b47c5866631f1d3086c298acefa2e0ae363f passed full CI 37324780829 / 111812605785 with 53 Node and 7 Chromium tests (1.0m). Final test-hardening commit dc03b3c0a8a0ea1e2a728106c72d5395000fe00e was independently verified by the exact-final-head run above. Local typecheck/53 tests/audit/build also passed; local Chromium CDN ZIP was invalid, so no local browser pass is claimed.
+Production Chromium tests cover neutral initial copy, missing sources/incomplete rationale, wrong diagnosis and wrong repair, wrong rationale source/fact, draft and locked refresh, wrong-rationale refresh, derived-flag injection, reset scopes, changed tag transfer/revocation, denied Storage getter/methods, mobile 390px overflow, visible focus and absent console/page errors. Selectors for rationale and explanation are distinct. Semantic persisted-state polling precedes reload/injection; zero retries and timeouts unchanged. Old Linux/artifact tests were not modified or weakened.
 
-## Remaining risks and ONE next frontier
+Local npm ci, typecheck, 56 Node tests, audit 0 vulnerabilities and production build passed; final UI grammar change was typechecked/tested and independently built in final-head CI. Local Chromium CDN returned invalid ZIP repeatedly, so no local browser success is claimed. Full remote CI gates passed on final head; no failing remote run occurred in this delivery.
 
-All scenarios remain finite, visible and retryable fixtures. Fully consistent forged client checkpoints may display completion. Source grammar is exact, not free-form grading. Git revision pre-repair diagnosis is currently a multiple-choice CLASS; its detailed source-linked rationale is submitted only after repair, so guessing that class can still earn a local pass. This is the next learning weakness to address.
+## Remaining risks / ONE next frontier
 
-Lock a source-linked Git revision causal rationale BEFORE repair, rather than only a multiple-choice causal label. Keep one existing incident and its tag transfer; do not add another scenario merely to increase gate count.
+All labs and answers remain finite, visible, retryable, synthetic fixtures. Typed exact grammar is not arbitrary prose assessment; copying complete rationale can still earn local progress. Fully consistent forged client checkpoints may display completion. No client state is authoritative or grants certification/execution.
 
-Chromium-only coverage; tiny corpus; simplified Linux/Git models; randomized Linux order may repeat; browser/FFmpeg CDN binaries are selected by locked Playwright but not npm-audited; real sandbox remains design-only. See RISKS and GIT_REVISION_CONTRACT.
+Current Git evidence does not model parent/ancestry/integration graphs, real Git history, fetch depth, race semantics, signatures or general Actions competence. Artifact pre-repair rationale is still class-only. Chromium-only browser coverage, small corpus, random Linux order may repeat, CDN browser/FFmpeg binary provenance outside npm audit and design-only real sandbox remain risks.
+
+ONE next frontier: a bounded SIMULATED Git merge-graph / PR-head versus integration-commit causality slice. Require parent/ancestry evidence and intended integration revision with immutable pre-repair rationale and a meaningful changed graph transfer, chosen after LIVE discovery/council review. Do not merely substitute SHA/ref literals. See NEXT_RUN_PROMPT.md.

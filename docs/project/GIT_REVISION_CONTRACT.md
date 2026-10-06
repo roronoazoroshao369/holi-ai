@@ -19,7 +19,9 @@ Acceptance/verification: five sources before lock/repair; immutable class and so
 
 No learner-provided git command, YAML, shell, subprocess, Docker socket, host mount, cloud credential or arbitrary code executes. All displayed logs/SHAs are fixture data. Scope excludes accounts, Kubernetes, Docker, real sandbox and unrelated infrastructure.
 
-Red-team before PR: review identified that the explanation requested a repair ID not visible in normal UI. Fixed by displaying the selected ID only after repair lock. Whole-module reset must also clear component-local revision drafts; an epoch remount enforces this. Storage getter denial must be caught before passing localStorage to persistence helpers. Production exact-final-head CI remains required before merge; local install/build alone is not a merge gate.
+Historical PR #30 red-team: review identified that the explanation requested a repair ID not visible in normal UI. Fixed by displaying the selected ID only after repair lock. Whole-module reset must also clear component-local revision drafts; an epoch remount enforces this. Storage getter denial must be caught before passing localStorage to persistence helpers. Production exact-final-head CI remains required before merge; local install/build alone is not a merge gate.
+
+PR #32 red-team: lock completeness is separate from grading; wrong source/fact/relation plus correct class/repair remains unverified. Clone aliasing, draft/locked refresh, forged verified, reset scope, mobile focus/overflow and runtime errors are tested. Grammar ambiguity was clarified without exposing an answer before evidence.
 
 Rollback: revert this product change; old Git/CI schema-2 implementation rejects schema-3 checkpoints. Linux contract needs no rollback migration.
 

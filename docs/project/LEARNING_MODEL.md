@@ -24,7 +24,7 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
-Playwright dependency reproducibility and Git/CI breadth are delivered. The current next learning frontier is pre-repair source-linked Git causal rationale, rather than another fixed token scenario.
+Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The next frontier is one unfamiliar Git merge-graph causality slice, rather than another ref-token quiz.
 
 
 ## Git & CI vertical slice — producer/consumer contract
@@ -42,8 +42,9 @@ This remains assisted deterministic practice. It demonstrates completion of a bo
 
 ## Git revision causality and annotated-tag transfer — PR #30
 
-A green release with unmet acceptance presents neutral copy. Five pre-repair sources distinguish cache/target hypotheses from checkout selection. Build-start ref snapshot plus actual checkout/metadata SHA and approved intent establish the consumed-revision relation. Repair choices open only after immutable class lock. Every repair may leave pipeline green, but only pinning the approved immutable commit changes consumed SHA. A separate verify action checks checkout and metadata against intent; even matching SHA after wrong diagnosis cannot verify learning.
+A green release with unmet acceptance presents neutral copy. Five pre-repair sources distinguish cache/target hypotheses from checkout selection. Build-start ref snapshot plus actual checkout/metadata SHA and approved intent establish the consumed-revision relation. Repair choices open only after immutable class and factual-rationale lock. Every repair may leave pipeline green, but only pinning the approved immutable commit changes consumed SHA. A separate verify action checks checkout and metadata against intent; even matching SHA after wrong class, source ID, fact or relation cannot verify learning.
 
 Five explanation source/fact pairs independently validate, then one changed transfer replaces branch -> commit with annotated tag object -> commit while main advances. The learner selects immutable target COMMIT, not original SHA, tag object or current branch. Exact grammar is visible, finite and retryable. Editing explanation or transfer revokes downstream pass; reset/rebuild/reverification revoke affected work and refresh validates semantic consistency.
 
-Current weakness: pre-repair lock records only a multiple-choice causal class; explanation occurs after repair. Next: require source-linked factual rationale when committing to diagnosis. This is assisted local learning, not trusted mastery or arbitrary prose evaluation.
+PR #32 closes label-only pre-repair guessing: five captured source/fact pairs and a causal relation are committed with the class before repair. Complete wrong rationale can lock without grader feedback, but cannot verify learning even after correct repair. Post-repair explanation cannot rescue it. The draft persists before lock and is immutable after lock until reset. Grammar remains finite, visible and retryable, so copying a complete rationale or forging consistent local state remains possible. This is assisted local learning, not trusted mastery or arbitrary prose evaluation.
+

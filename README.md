@@ -22,7 +22,7 @@ The current implementation contains:
 - Architecture plan for moving from simulation to isolated real execution labs
 - Explicit security constraints for learner-controlled workloads
 
-Git/CI adds artifact producer/consumer diagnosis and a mechanically green release with unmet acceptance. Revision practice requires checkout/ref/build/intent evidence, immutable diagnosis, minimal revision repair, explicit consumed-SHA verification, linked explanation and annotated-tag commit transfer. Git/CI checkpoint uses schema 2 / fixture 2 and discards v1; Linux remains 7/5. Seven production Chromium tests cover all existing Linux and artifact flows plus revision learning/persistence/storage failure. Everything remains SIMULATED and client-local, never certification.
+Git/CI adds artifact producer/consumer diagnosis and a mechanically green release with unmet acceptance. Revision practice requires checkout/ref/build/intent evidence, immutable source-linked diagnosis/rationale before repair, minimal revision repair, explicit consumed-SHA verification, linked explanation and annotated-tag commit transfer. Git/CI checkpoint uses schema 3 / fixture 3 and discards v2 and older; Linux remains 7/5. Eight production Chromium tests cover all existing Linux and artifact flows plus revision learning/persistence/storage failure. Everything remains SIMULATED and client-local, never certification.
 
 ## Run locally
 
@@ -83,6 +83,7 @@ See [docs/DEVOPS_PLATFORM_ARCHITECTURE.md](docs/DEVOPS_PLATFORM_ARCHITECTURE.md)
 ## Legacy documents
 
 The existing `docs/plan/` files belong to the previous AI-film concept. They are retained as historical documents; they are **not** the specification for the current product.
+
 
 
 

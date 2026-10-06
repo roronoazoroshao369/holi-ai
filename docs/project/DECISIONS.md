@@ -1,5 +1,12 @@
 # Decisions
 
+2026-10-06 PR #32: require source-linked factual rationale before revision repair. Persist one rationale field, draft while hypothesis is empty and immutable cloned snapshot after class lock. Lock requires five evidence and nonempty bounded source/fact/relation; correctness is evaluated at verification, not disclosed early. Wrong class/source/fact/relation cannot be rescued by correct repair or later explanation. Preserve existing incident/tag transfer; no extra scenario.
+
+2026-10-06: Git/CI schema 2 -> 3 for rationale shape; fixture 2 -> 3 for changed pre-repair completion rubric, with incident output/tag corpus unchanged. Discard v2/older rather than retroactively credit rationale. Linux remains independent 7/5. Core/DOM lock, clone alias checks, wrong-rationale round-trip, forged-flag rejection and semantic autosave polling are required.
+
+2026-10-06: after verified delivery, ONE frontier is Git merge-graph / PR-head versus integration-commit causality with parent/ancestry evidence. Refine a bounded SIMULATED incident in LIVE discovery/review; no generic interpreter or simultaneous scenarios.
+
+
 2026-10-05 PR #30: compose one Git revision machine with the existing artifact machine under Git/CI checkpoint. Bump Git/CI schema 1 -> 2 for persisted revision/run/verification/drafts and fixture 1 -> 2 for expanded revision/tag assessment corpus; discard v1. Preserve independent Linux 7/5. No generic interpreter, shared Linux engine or learner execution.
 
 2026-10-05: green pipeline is deliberately insufficient. Pinning intended immutable commit may fix the consumed SHA after wrong diagnosis, but verified requires correct locked class plus canonical pre-repair evidence and explicit checkout/metadata SHA verification. Source-linked rationale follows verification; label-only pre-repair guessing remains a named next frontier.
@@ -67,4 +74,5 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 2026-10-05: make the changed Git/CI transfer materially different from the original literal artifact-name mismatch. The transfer keeps the artifact name aligned and tests extraction-path semantics with a nested report path. Treat this as bounded assisted transfer, not mastery.
 
 2026-10-05: when the new Git/CI unavailable-storage copy made an existing Linux Playwright selector ambiguous, fix the product copy instead of weakening the established Linux regression. Cross-module additions must preserve existing browser tests without broad selectors becoming false positives.
+
 

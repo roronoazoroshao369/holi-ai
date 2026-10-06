@@ -1,38 +1,34 @@
 # NEXT_RUN_PROMPT
 
-Tiếp tục vận hành tự chủ repo THẬT roronoazoroshao369/holi-ai qua @GitHub, nhánh main. Báo cáo tiến độ, quyết định, bằng chứng, PR/CI/merge và bàn giao bằng TIẾNG VIỆT. Đọc LIVE repo trước; repo là nguồn sự thật và checkpoint này có thể đã cũ.
+Tiếp tục vận hành tự chủ repo THẬT roronoazoroshao369/holi-ai qua @GitHub, main. Báo cáo bằng TIẾNG VIỆT. Kiểm tra LIVE main, PR mở, recent commits và CI trước khi tin checkpoint này; repo là nguồn sự thật.
 
-Checkpoint sản phẩm: PR #30, head cuối dc03b3c0a8a0ea1e2a728106c72d5395000fe00e; CI 37325201149 / job 111814058034 SUCCESS. Thực chạy npm ci, full typecheck, 53/53 Node tests, audit 0 vulnerabilities, production build, Chromium từ Playwright 1.63.0 khóa trong repo, 7/7 production browser tests (52.1s), next start --hostname 127.0.0.1 --port 3100. Product squash merge 1b614eb51984b8737efa545eb92c951adafa2640 đã được đọc lại. Tài liệu closeout có PR riêng phải qua full exact-head CI; file này không tự khẳng định SHA merge cuối của chính PR tài liệu. Đọc lại main, PR mở và CI hiện tại.
+Checkpoint sản phẩm PR #32: final head 928fa71948ff99f5da85eb5be7678a56aacee79d; full exact-head CI 37404253657 / job 112078149690 SUCCESS, npm ci, full typecheck, 56/56 Node tests, audit 0 vulnerabilities, production build, repository-locked Playwright 1.63.0 Chromium install và 8/8 production Chromium tests (1.3m). Runtime: next start --hostname 127.0.0.1 --port 3100. Product squash merge 833b4906840d4c7e3e49b8bbcb0645d47823de3f đã đọc lại. Docs closeout có PR riêng và phải full exact-head CI trước merge; file này không tự khẳng định SHA cuối của chính PR docs. Đọc LIVE lại docs merge/main/CI.
 
-Hiện có sáu primary incidents SIMULATED: bốn Linux (permission và TCP) cùng hai Git/CI (artifact handoff và release acceptance). Hai Linux counterfactuals và artifact-path/annotated-tag transfer là các assessment bước tiếp theo. Không gọi là Linux host, Git repo hay Actions runner thật; không chứng nhận, CONTROLLED_EXECUTION hay REAL_SANDBOX. localStorage forgeable, không authoritative. Không mở rộng sang accounts, Kubernetes, Docker hay sandbox thật trong lượt này.
+Primary goal vừa giao: Git revision source-linked rationale khóa TRƯỚC repair. `rationale` là draft khi hypothesis trống, clone thành immutable snapshot khi lock. Năm source ID/fact và relation phải đủ; lock không chấm đúng/sai. Class/rationale sai + repair đúng có thể khớp checkout/metadata SHA nhưng verified learning vẫn false. Explanation sau repair riêng không bù được rationale sai. Draft/locked refresh, wrong IDs/facts/relation, clone alias, forged verified, reset và storage fallback có regression.
 
-Persistence: Linux schema 7 / fixture 5 không đổi. Git/CI schema 2 / fixture 2, key holi.devops.git-ci-practice, nested revisionPractice. V1 được discard có chủ đích. Giữ hai hợp đồng độc lập; nếu đổi semantics phải quyết định schema và fixture riêng.
+Sáu primary SIMULATED incidents: bốn Linux permission/TCP, hai Git/CI artifact/revision. Permission/listener/path/annotated-tag transfer là bước assessment. Không thêm scenario trong PR #32. Không gọi môi trường này là real Linux host/Git repository/Actions runner, CONTROLLED_EXECUTION, REAL_SANDBOX hay chứng nhận. localStorage forgeable và không authoritative.
 
-MỘT FRONTIER ĐỀ XUẤT: khóa lập luận Git revision có source/fact cụ thể TRƯỚC repair, thay vì chỉ khóa nhãn causal class từ dropdown. Giữ incident và annotated-tag transfer hiện tại; không thêm scenario/token quiz chỉ để tăng số gate.
+Persistence: Linux schema7/fixture5 không đổi. Git/CI schema3/fixture3, key holi.devops.git-ci-practice. Schema3 thêm rationale; fixture3 đổi pre-repair rubric, incident outputs/tag corpus không đổi. V2 và cũ hơn bị discard, gồm artifact progress trong shared Git/CI key. Không merge hai hợp đồng chỉ vì symmetry. Review schema và fixture độc lập khi đổi semantics.
 
-Lý do: learner hiện có thể đoán đúng class rồi viết source-linked explanation sau khi thấy repair outcome. Discovery/learning review phải kiểm tra liệu frontier còn đúng từ LIVE code; chọn thay đổi nhỏ nhất giải quyết weakness này. Không tạo grading engine hay workflow interpreter tổng quát.
+MỘT FRONTIER: giao một Git merge-graph / PR-head versus integration-commit causality vertical slice SIMULATED. Current Git corpus chưa có parent/ancestry/integration semantics. Discovery và council review phải chọn/refine một bounded incident cần hiểu quan hệ graph, không chỉ thay ref hoặc SHA literal. Candidate: mechanically green integration/release không chứng minh source revision chứa đúng sự kết hợp đã duyệt. Không blindly implement wording nếu LIVE evidence/review chọn bounded mechanism tốt hơn trong frontier này. Không đồng thời thêm nhiều Git scenarios.
 
-Acceptance:
-- Initial title/summary/button/source name trung tính, không leak đáp án.
-- Evidence được thu trước lock/repair; rationale trước sửa gắn với source ID và fact độc lập, cộng causal relation trong grammar hữu hạn.
-- Locked class/rationale bất biến đến reset; fact/source sai không được bù bởi relation đúng.
-- Repair đúng sau diagnosis/rationale sai có thể làm actual SHA khớp nhưng không verified learning.
-- Verify checkout SHA VÀ release metadata SHA đối chiếu intended commit, không chỉ màu pipeline.
-- Explanation sau repair không được sửa lại bad pre-repair rationale theo hồi tố.
-- Giữ transfer thay đổi representation: annotated tag OBJECT → target COMMIT, trong khi main đã tiến lên; không copy SHA incident đầu.
-- Edit/rebuild/reverify/reset/refresh thu hồi các completion phụ thuộc đúng phạm vi.
-- Restore fail closed với stale/corrupt/impossible/forged-derived flags; getter hoặc Storage methods bị chặn phải fallback ephemeral.
-- Giữ toàn bộ regression Linux/artifact/revision; không giảm assertion, thêm retry hay tăng timeout để che race. Poll semantic persisted state trước reload/injection.
-- Không tuyên bố chấm reasoning văn bản tự do nếu vẫn dùng typed finite grammar.
+Acceptance cho frontier:
+- Initial symptom/title/summary/source name trung tính, không leak “wrong head/merge/parent” hoặc corrective repair.
+- Evidence đủ để phân biệt các plausible causes: PR head, base snapshot, integration commit và parents/ancestry, workflow consumed revision, produced metadata và intended integration request.
+- Observation/source fact độc lập với causal inference. Immutable source-linked rationale TRƯỚC repair; correct relation không bù wrong ID/fact. Không early grader oracle.
+- Minimal simulated repair, rebuild và separate verification of actual consumed commit AND required graph relationship; green alone không competence.
+- Correct repair sau wrong diagnosis/rationale có thể vận hành thành công nhưng không verified. Explanation sau repair không retroactively cứu rationale.
+- Một transfer thay đổi graph representation/relation có ý nghĩa, không chỉ SHA/ref substitution hoặc thêm shallow quizzes. Chọn sau learning review, giữ existing annotated-tag transfer.
+- Revocation đúng trên draft edit/lock/rebuild/reverify/reset/restart/refresh; stale/corrupt/impossible/forged derived flags fail closed. Getter/Storage methods denied fallback ephemeral.
+- Không chấm arbitrary free-form reasoning nếu grammar vẫn deterministic typed.
+- Giữ toàn bộ Linux/artifact/revision/rationale regressions. Không giảm assertion, thêm retries hoặc tăng timeout để che race. Poll semantic persisted state trước reload/injection.
 
-Đọc ít nhất docs/project/PROJECT_STATE.md, ROADMAP.md, BACKLOG.md, ARCHITECTURE.md, DECISIONS.md, RISKS.md, LEARNING_MODEL.md, LAB_SECURITY.md, RUN_LOG.md, GIT_REVISION_CONTRACT.md; lib/ci-simulator.ts, git-revision-simulator.ts, ci-practice-persistence.ts, linux-simulator.ts, practice-persistence.ts, curriculum.ts; components/CiLab.tsx, GitRevisionLab.tsx, LabTerminal.tsx; app/page.tsx, globals.css; mọi tests; playwright.config.cjs; .github/workflows/ci.yml; package.json/package-lock.json. Kiểm tra recent commits, PR mở và job logs.
+Đọc LIVE ít nhất PROJECT_STATE, ROADMAP, BACKLOG, ARCHITECTURE, DECISIONS, RISKS, LEARNING_MODEL, LAB_SECURITY, RUN_LOG, PRODUCT, GIT_REVISION_CONTRACT; lib/ci-simulator.ts, git-revision-simulator.ts, ci-practice-persistence.ts, linux-simulator.ts, practice-persistence.ts, curriculum.ts; components/CiLab.tsx, GitRevisionLab.tsx, LabTerminal.tsx; app/page.tsx/globals.css; mọi tests; playwright.config.cjs; .github/workflows/ci.yml; package.json/package-lock.json. Đọc relevant job logs và recent commits/open PRs.
 
-Không learner input nào được execute git/YAML/shell/subprocess; không Docker socket, privileged container, host filesystem mount, cloud/control-plane credentials. Không dùng hidden client state làm security boundary. Giữ pure transitions nhỏ; không ép Git vào Linux simulator.
+Thin pure transitions, không generic Git/YAML/workflow interpreter. Không learner git command/YAML/shell/subprocess/host/network execution, Docker socket/privileged container/mount/credentials. Không accounts/Kubernetes/Docker/real sandbox/unrelated infrastructure. Hidden client state không security boundary.
 
-Loop trong lượt: inspect LIVE → reconcile docs → discovery → council review → một primary goal → acceptance → implement → typecheck/unit/build → security/learning/UX red-team → production browser → fix → exact FINAL-head CI → merge → đọc lại main → documentation closeout → full exact docs-head CI → merge → đọc lại final main/docs/PR mở → xuất NEXT_RUN_PROMPT mới → DỪNG.
+Loop: LIVE reality → reconcile docs → discovery → council review → chọn MỘT goal/observable criteria → implement smallest vertical slice → static/typecheck/unit/audit/build → security/learning/UX red-team → production browser → fix → full exact FINAL product-head CI → protected merge → re-read main → separate durable docs closeout → full exact FINAL docs-head CI → protected merge → re-read final main/docs/open PRs → new NEXT_RUN_PROMPT → STOP. Không dừng ở plan/code/PR/nonfinalCI. Không bắt đầu primary goal kế tiếp trong lượt.
 
-Red-team bắt buộc: leakage, repair quá sớm, hypothesis/rationale mutable, right-label/wrong-facts bypass, green-only completion, checkpoint forge/refresh/reset, transfer chỉ đổi token, host execution, selector collision, mobile overflow, focus và console/page errors. Sửa finding trước gate cuối.
+Red-team: leakage, premature repair, mutable locked rationale, right label/wrong source/fact, green-only completion, forged state/reset/refresh, token-only transfer, host execution, selector ambiguity, mobile overflow, visible keyboard focus, console/page errors. Fix findings trước final gates. Xem failing logs trực tiếp, không đoán từ status.
 
-Trước merge cần đúng FINAL HEAD qua npm ci, full typecheck, toàn bộ Node tests, npm audit --audit-level=high, production build, Chromium từ Playwright runtime khóa trong repo và mọi production browser tests. Đọc failing logs trực tiếp, không đoán nguyên nhân từ status. Merge có expected_head_sha; không merge head đã đổi sau CI.
-
-Sau product merge: đọc lại main; cập nhật durable controls bằng sự thật đã verify, ghi exact head/run/job/counts/merge/version decisions/red-team/remaining risks và MỘT frontier kế tiếp. PR tài liệu riêng phải qua full exact-final-head CI. Sau docs merge đọc lại main, docs và PR mở. Không dừng ở plan/implementation/open PR/non-final CI; không tự bắt đầu primary goal kế tiếp trong cùng lượt.
+Merge bắt buộc exact final head qua npm ci, full typecheck, complete Node tests, npm audit --audit-level=high, production build, Chromium từ repository-locked Playwright và tất cả production browser tests. Merge expected_head_sha để chặn race. Không claim step chưa chạy. Sau merge đọc main và ghi exact product head/run/job/counts/merge/version/red-team/remaining risks/ONE frontier. Docs PR cũng full exact-head gate; đọc final main và durable docs, bảo đảm không unexpected open PR.

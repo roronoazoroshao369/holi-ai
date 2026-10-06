@@ -1,5 +1,16 @@
 # Run log
 
+2026-10-06 — pre-repair Git rationale run: LIVE main 36ef647f34ed7e12ea014980a7502accc53042fe, no open PR, main CI 37326616707 / job 111818891967 SUCCESS. Read LIVE NEXT_RUN_PROMPT and required controls/code. Council confirmed class-only lock allowed guessing then post-outcome explanation. Selected only rationale hardening of the existing incident/tag transfer.
+
+Added five source ID/fact pairs and relation as persisted draft before lock. Class lock clones rationale and prevents edits until reset. Completeness is checked without correctness feedback; correct repair can match checkout/metadata SHA after a wrong rationale but verified remains false. Post-repair explanation stays separate. Git/CI schema/fixture 3/3 (shape/rubric), v2 discard; Linux 7/5 unchanged. No learner host execution introduced.
+
+Red-team found no blocker. Low advisory about ambiguous PIPELINE grammar fixed to PIPELINE_STATUS:acceptance-ACCEPTANCE_RESULT. Unit cases validate every source/fact/relation independently, clone aliasing, immutability, wrong rationale refresh, impossible derived flags and revocation. Browser adds missing/incomplete rationale, wrong source and wrong fact despite matching SHA, draft/locked refresh, forged verified rejection, reset, mobile/focus/runtime; distinct exact selectors and semantic autosave polling preserve old assertions/retries/timeouts.
+
+Local npm ci/typecheck/56 tests/audit 0/build passed; Chromium local CDN ZIP invalid, no local browser pass claimed. PR #32 exact final head 928fa71948ff99f5da85eb5be7678a56aacee79d passed CI 37404253657 / job 112078149690: npm ci, full typecheck, 56/56 Node, high audit 0 vulnerabilities, production build, locked Playwright Chromium install, next start --hostname 127.0.0.1 --port 3100, 8/8 serial production Chromium tests (1.3m). No failed remote product run. Protected squash merge 833b4906840d4c7e3e49b8bbcb0645d47823de3f; main re-read, exact tree b118ff11d38c58bd3b16e5008d71fc4947f95a96 matched product, code/versions/contract fetched again. Documentation closeout separately gated; no docs merge or final docs CI self-claim here.
+
+Reconciled stale PRODUCT description that mentioned only permission exercise. Remaining typed/visible/forgeable limitations retained. ONE frontier: unfamiliar Git merge-graph / PR-head versus integration-commit causality, selected/refined after next LIVE review. This execution stops after docs closeout and handoff.
+
+
 2026-10-05 — Git commit/ref run: live main d1e926e9d98df298e849c571cd973159e8a8defe matched checkpoint; no open PR. Re-read required controls and code, prior CI and recent commits. Selected one release-acceptance mechanism instead of another artifact token quiz. PR #30 composes five evidence sources, locked causal class, minimal SHA pin, rebuild, separate checkout/metadata revision verification, five source-linked facts and changed annotated-tag transfer. Pipeline may remain green after wrong diagnosis/repair; operational color cannot earn learning.
 
 Version decisions: Git/CI schema 2 for revisionPractice/run/verification/editable drafts; fixture 2 for corpus expansion; discard v1. Linux remains 7/5. No learner-controlled Git, YAML, shell, subprocess, host/network execution or credentials. Revision-only reset preserves artifact; whole Git/CI reset clears both and remounts drafts.
@@ -106,4 +117,5 @@ Initial PR #28 head 5f1e378e79db401be25e1c8279a3f584d09a6095 passed npm ci, type
 PR #28 exact final head 03915755c2cdf4ec9744def78eff187f125935ea passed CI 37318719562 / job 111791991295: npm ci; typecheck; 43/43 Node tests; npm audit with 0 vulnerabilities; production build; locked Playwright Chromium install; production `next start --hostname 127.0.0.1 --port 3100`; 5/5 serial Chromium tests passed in 41.1s. PR #28 squash-merged as 0dd9c4c4956ee92531dd1e8c5af56dd2f4a2fe6b. Main was re-read and confirmed to contain the Git/CI simulator, explicit SIMULATED UI and expanded browser suite.
 
 Next frontier: teach unfamiliar Git commit/ref causality before claiming broad Git & CI competence. Avoid another artifact-token variant; require branch/ref/commit evidence, minimal revision-selection repair and changed transfer.
+
 
