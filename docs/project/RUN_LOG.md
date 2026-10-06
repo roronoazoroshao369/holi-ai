@@ -150,3 +150,30 @@ Final effective gate: explicit checkout/SHA assertion, npm ci, typecheck, 72 Nod
 Learning/security review: lesson state is teaching-only/local, fixture IDs are disjoint, active assessment answers are not exposed, Git/CI schema4/fixture4 and Linux7/5 are unchanged, and no learner execution surface was introduced.
 
 Documentation closeout updates the stale project state/handoff and advances the single next candidate to a non-credit evidence-reading bridge before graph assessment.
+
+
+## 2026-10-06 — Cloudflare deployment closeout
+
+Reconciled LIVE main at `e658f4b1d11174512560330371a8ec8bae8166f6` and found no open PR except the deployment work created in this run. Selected one bounded deployment goal: publish the current browser-only SIMULATED product without changing its learner execution trust boundary.
+
+Implementation and verification:
+- PR #41 added conditional Next.js static export under `CF_PAGES=1` while preserving the normal `next build` / `next start` CI path.
+- Temporary artifact-publishing CI permissions used during deployment handoff were removed before final PR verification.
+- PR #41 final head `51e72464deaac735ab9e22b4b173dbbab6e26d8e` passed exact-head CI run `37472746232`.
+- PR #41 squash-merged as `ae811270acd2d63b80b84aa5ad67d21957888534`.
+- Main push CI run `37473753263` completed SUCCESS.
+
+Cloudflare:
+- write access was restored;
+- Pages project `holi-devops` was created, but its Git integration returned Cloudflare error `8000011`;
+- verified static build was deployed to Worker `holi-devops-web`, deployment id `e534ef800b36468591f90f248a960e55`;
+- Worker custom domain `holi.shao.dpdns.org` was attached and Cloudflare created the proxied DNS record;
+- Cloudflare Browser Rendering loaded `https://holi.shao.dpdns.org/` and returned the fully rendered Holi DevOps Lab page, establishing public deployment success independently of the connector's outbound-fetch restriction.
+
+Security/truth review:
+- public hosting does not imply real learner command execution;
+- no D1/Container/Sandbox learner runtime was introduced;
+- localStorage practice state remains non-authoritative;
+- Pages Git integration remains follow-up infrastructure debt, not a blocker for the verified live Worker route.
+
+Next product frontier remains the non-credit Git evidence-reading bridge before the graph diagnostic assessment.
