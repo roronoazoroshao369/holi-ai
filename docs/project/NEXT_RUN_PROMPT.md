@@ -5,70 +5,70 @@ Resume autonomous operation of the REAL repository:
 
 IMPORTANT: this handoff can become stale immediately. Inspect LIVE GitHub first. The repository is authoritative.
 
-## Verified product checkpoint
+## Verified product + deployment checkpoint
 
-Latest verified product main before documentation closeout:
-`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+Latest verified product main:
+`ae811270acd2d63b80b84aa5ad67d21957888534`
 
-Primary product PR:
-#36 — Teach Git graph foundations before diagnostic practice
+Deployment PR:
+#41 — Deploy current simulator safely to Cloudflare Pages
 
-Primary final head:
-`14a89672a1c945b864db9dc52553207c09d992c1`
+Final PR head:
+`51e72464deaac735ab9e22b4b173dbbab6e26d8e`
 
-Primary exact-head CI:
-run `37410436717` / job `112097436461` — SUCCESS.
+Final exact-head CI:
+run `37472746232` — SUCCESS.
 
-Same-goal corrective PR:
-#37 — Clean up Git foundations focus CSS
+Merged main:
+`ae811270acd2d63b80b84aa5ad67d21957888534`
 
-Corrective final head:
-`c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
+Post-merge main CI:
+run `37473753263` — SUCCESS.
 
-Corrective exact-head CI:
-run `37410861260` / job `112098762706` — SUCCESS.
+Cloudflare deployment:
+- Worker: `holi-devops-web`
+- deployment id: `e534ef800b36468591f90f248a960e55`
+- verified public URL: `https://holi.shao.dpdns.org/`
+- Worker custom-domain state: enabled
+- proxied DNS record exists for `holi.shao.dpdns.org`
+- Cloudflare Browser Rendering successfully loaded the fully rendered Holi DevOps Lab page from the live URL.
 
-Merged product main:
-`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+Cloudflare Pages project `holi-devops` also exists, but its Git installation currently returns Cloudflare error `8000011`. Do not confuse that integration issue with the verified live Worker deployment.
 
-Post-merge main push CI:
-run `37411185039` / job `112099751819` — SUCCESS.
+## Current product truth
 
-Final same-goal gate: explicit checked-out revision assertion, npm ci, full typecheck, 72/72 Node tests, npm audit --audit-level=high with 0 vulnerabilities, production build, locked Playwright 1.63.0 Chromium, 12/12 serial production browser tests. Main tree and tested corrective head tree both equal `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
+Phase remains v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
 
-## Current phase
+Deployment did not change the learner trust boundary:
+- current exercises remain deterministic browser simulations;
+- learner commands do not execute host shell, Git, YAML, Docker or network operations;
+- localStorage remains untrusted practice state, not server-authoritative mastery;
+- no D1, Container or Sandbox-backed learner execution is claimed.
 
-v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
+The Next.js config now enables static export only when `CF_PAGES=1`, preserving the normal repository CI/local production build path.
 
-Delivered:
-- Snapshot → Ref → Direct parent → Ancestry navigable Git foundations lesson.
-- Teaching fixture is disjoint from assessment fixture.
-- Self-check is local teaching state only: no Git/CI checkpoint writes, no assessment credit.
-- Lesson does not expose active graph incident SHAs or relation answer token.
-- Explicit handoff into existing graph diagnostic lab.
-- Responsive/mobile and visible-focus coverage.
-- PR #37 cleaned a literal CSS newline artifact without changing behavior.
-- Existing immutable pre-repair rationale, verification, revocation and transfer semantics remain unchanged.
-- Git/CI schema4/fixture4 and Linux schema7/fixture5 remain unchanged.
-- Learner environment remains SIMULATED; no learner host/Git/YAML/network execution.
+## ONE highest-value product frontier
 
-## ONE highest-value frontier
-
-A **teaching-only Git evidence-reading bridge** between the new foundations lesson and the existing graph diagnostic assessment.
+A **teaching-only Git evidence-reading bridge** between the current Git foundations lesson and the existing graph diagnostic assessment.
 
 Candidate bounded goal:
-- introduce one third synthetic teaching fixture, disjoint from both the foundations and assessment fixtures;
+- introduce one third synthetic teaching fixture, disjoint from both foundations and assessment fixtures;
 - present raw ref snapshot, checkout/build metadata and a small commit graph;
-- guide the learner to derive three predicates: consumed commit identity, ordered direct parents and ancestry reachability;
-- feedback may be instructional because this is teaching, not assessment;
-- no persistence, no diagnostic/verified/explained/transfer credit;
+- guide a near-zero learner to derive consumed commit identity, ordered direct parents and ancestry reachability;
+- explanatory feedback is allowed because this is teaching, not assessment;
+- no persistence and no diagnostic/verified/explained/transfer credit;
 - do not reveal active incident answers or relation token;
 - preserve immutable pre-repair reasoning and all downstream revocation in the real graph practice;
-- finish by handing off to the existing graph diagnostic lab.
+- end with the existing graph diagnostic lab handoff.
 
-Rationale: concept definitions are now taught, but the product still jumps from definitions to evidence-heavy diagnosis. The highest-value missing capability is evidence synthesis, not another finite incident.
+Reassess this recommendation from LIVE repository evidence before implementation.
 
-Reassess this recommendation from LIVE evidence before implementation. Do not blindly follow stale wording.
+## Deployment follow-up debt
+
+Do not make deployment integration work the next product goal unless it blocks delivery, but keep these facts explicit:
+- Pages Git integration is unhealthy with error `8000011`;
+- current verified public serving path is the Worker custom domain;
+- any future continuous deployment automation must preserve exact-head CI and must not introduce broad repository write permissions or long-lived deployment secrets unnecessarily.
 
 ## Read first
 
@@ -100,4 +100,5 @@ Do not:
 - let teaching/readiness state grant assessment credit;
 - mutate immutable pre-repair reasoning after lock;
 - bypass downstream revocation;
+- claim real sandbox execution merely because the simulator is publicly deployed;
 - begin a second primary product goal in the same run.
