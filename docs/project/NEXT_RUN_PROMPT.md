@@ -1,28 +1,103 @@
 # NEXT_RUN_PROMPT
 
 Resume autonomous operation of the REAL repository:
-roronoazoroshao369/holi-ai through @GitHub. Default branch: main. Communicate in VIETNAMESE.
+`roronoazoroshao369/holi-ai` through @GitHub. Default branch: `main`. Communicate in VIETNAMESE.
 
-Last verified product main: 93bece59d54c937e8b38e5704bfca18e8d4a1c48.
-Latest verified product merge: #34 — Teach integration graph diagnosis and changed linear-history transfer.
-Product final head bbec3e01fa0f10c0667b39c1aa62160a9aef4027; full exact-head CI 37407112497 / job 112087009068 SUCCESS: explicit checkout/SHA assertion, npm ci, full typecheck, 68/68 Node tests, audit 0 vulnerabilities, production build, locked Playwright 1.63.0 Chromium, 11/11 production tests (2.2m), next start on 127.0.0.1:3100. Merged tree matched tested tree and key merged files were fetched again. Documentation closeout follows separately; re-read its final merge/head/CI from LIVE GitHub instead of treating this file as its own merge proof.
+IMPORTANT: this handoff can become stale immediately. Inspect LIVE GitHub first. The repository is authoritative.
 
-Current phase: v0.3 SIMULATED foundation; package0.1.0, no release/tag.
-Completed: one graph incident with six source snapshots and immutable factual rationale before repair. A green PR-head build omits the requested base; verification checks consumed revision AND ordered approved-base/PR-head parents. A two-parent candidate of another head fails. Changed linear/rebase transfer requires base ancestry and exactly fixture changes [p1,p2], not two parents/original-head ancestry; a descendant adding p3 fails. Separate explanation, revocation, refresh, stale/forged state and denied Storage getter/methods are verified. Existing annotated-tag transfer and all previous tests retained unchanged.
+## Verified product checkpoint
 
-Persistence: Linux schema7/fixture5 unchanged. Git/CI schema4/fixture4 adds graphPractice/corpus; v3 and older shared checkpoints discard including artifact/revision progress. Graph-only and revision-only reset preserve siblings; whole Git/CI reset clears all. Review schema and fixture independently. localStorage is forgeable, non-authoritative. Seven primary simulated incidents, bounded transfers and a curriculum skeleton do not prove general Git/DevOps mastery.
+Latest verified product main before documentation closeout:
+`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
 
-ONE highest-value frontier: mechanism-first Git foundations lesson leading a near-zero learner into existing practice, instead of another finite incident. Recommended goal: one navigable lesson for snapshot/ref/direct-parent/ancestry mental models with different teaching fixtures, then explicit entry into one existing diagnostic lab. Readiness/navigation state must not award assessment credit or leak active fixture answers. Discovery/council review must refine this bounded goal from LIVE evidence; do not blindly follow stale wording.
+Primary product PR:
+#36 — Teach Git graph foundations before diagnostic practice
 
-Read first: docs/project/PROJECT_STATE.md, ROADMAP.md, BACKLOG.md, ARCHITECTURE.md, DECISIONS.md, RISKS.md, PRODUCT.md, LEARNING_MODEL.md, LAB_SECURITY.md, RUN_LOG.md, GIT_GRAPH_CONTRACT.md, GIT_REVISION_CONTRACT.md; relevant app/components/lib, all tests, package/lockfile, playwright.config.cjs and .github/workflows/ci.yml. Inspect default/main/branches/open PRs/recent commits/CI and relevant logs before choosing work.
+Primary final head:
+`14a89672a1c945b864db9dc52553207c09d992c1`
 
-Hard constraints: all current labs explicitly SIMULATED. No arbitrary learner Git/YAML/shell/subprocess/host/network execution, credentials, Docker sockets/mounts or privileged workloads. No general free-form reasoning/certification claims. Preserve finite source/fact independence, immutable pre-repair reasoning, no early correctness oracle, separate operational/learning verification and downstream revocation. Do not weaken old assertions, add retries or increase timeouts to conceal races. Poll semantic persisted state before reload/injection. No unrelated infrastructure/accounts/real sandbox shortcut.
+Primary exact-head CI:
+run `37410436717` / job `112097436461` — SUCCESS.
 
-IMPORTANT:
-This handoff may already be stale.
-Inspect the live GitHub repository first.
-The repository is authoritative.
+Same-goal corrective PR:
+#37 — Clean up Git foundations focus CSS
 
-Continue the autonomous multi-expert loop: RESUME → INSPECT LIVE REALITY → RECONCILE DOCS → DISCOVERY → COUNCIL REVIEW → SELECT ONE PRIMARY GOAL → IMPLEMENT → TEST → SECURITY/LEARNING/UX REVIEW → RED-TEAM → DOCUMENT → COMMIT → PR → FULL EXACT FINAL-HEAD CI → MERGE WHEN ALL GATES PASS → RE-READ MAIN → SEPARATE DOCUMENTATION CLOSEOUT → FULL EXACT FINAL DOCS-HEAD CI → MERGE → CONFIRM FINAL MAIN/DOCS/OPEN PRs → OUTPUT NEW NEXT_RUN_PROMPT → STOP. Do not start a second primary goal.
+Corrective final head:
+`c6fb8ea6d813a11d60b9cc299e3694220e3bdfd3`
 
-Every merge requires exact final-head checkout assertion plus npm ci/full typecheck/all Node tests/high audit/production build/locked Chromium/all production browser tests, reviewed diff and no in-scope blocker. Use expected_head_sha to block head races and re-read main before/after merge. Inspect failing logs directly and fix material findings. Record exact head/run/job/counts/merge/version/risks/ONE next frontier without claiming unexecuted checks.
+Corrective exact-head CI:
+run `37410861260` / job `112098762706` — SUCCESS.
+
+Merged product main:
+`d3674796e3633ee4aa70e8c0d4949fdd5c4a6c3c`
+
+Post-merge main push CI:
+run `37411185039` / job `112099751819` — SUCCESS.
+
+Final same-goal gate: explicit checked-out revision assertion, npm ci, full typecheck, 72/72 Node tests, npm audit --audit-level=high with 0 vulnerabilities, production build, locked Playwright 1.63.0 Chromium, 12/12 serial production browser tests. Main tree and tested corrective head tree both equal `48eb4573522d21e7bb14a145318a7ce8e369fa1b`.
+
+## Current phase
+
+v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
+
+Delivered:
+- Snapshot → Ref → Direct parent → Ancestry navigable Git foundations lesson.
+- Teaching fixture is disjoint from assessment fixture.
+- Self-check is local teaching state only: no Git/CI checkpoint writes, no assessment credit.
+- Lesson does not expose active graph incident SHAs or relation answer token.
+- Explicit handoff into existing graph diagnostic lab.
+- Responsive/mobile and visible-focus coverage.
+- PR #37 cleaned a literal CSS newline artifact without changing behavior.
+- Existing immutable pre-repair rationale, verification, revocation and transfer semantics remain unchanged.
+- Git/CI schema4/fixture4 and Linux schema7/fixture5 remain unchanged.
+- Learner environment remains SIMULATED; no learner host/Git/YAML/network execution.
+
+## ONE highest-value frontier
+
+A **teaching-only Git evidence-reading bridge** between the new foundations lesson and the existing graph diagnostic assessment.
+
+Candidate bounded goal:
+- introduce one third synthetic teaching fixture, disjoint from both the foundations and assessment fixtures;
+- present raw ref snapshot, checkout/build metadata and a small commit graph;
+- guide the learner to derive three predicates: consumed commit identity, ordered direct parents and ancestry reachability;
+- feedback may be instructional because this is teaching, not assessment;
+- no persistence, no diagnostic/verified/explained/transfer credit;
+- do not reveal active incident answers or relation token;
+- preserve immutable pre-repair reasoning and all downstream revocation in the real graph practice;
+- finish by handing off to the existing graph diagnostic lab.
+
+Rationale: concept definitions are now taught, but the product still jumps from definitions to evidence-heavy diagnosis. The highest-value missing capability is evidence synthesis, not another finite incident.
+
+Reassess this recommendation from LIVE evidence before implementation. Do not blindly follow stale wording.
+
+## Read first
+
+- docs/project/PROJECT_STATE.md
+- docs/project/NEXT_RUN_PROMPT.md
+- docs/project/ROADMAP.md
+- docs/project/BACKLOG.md
+- docs/project/ARCHITECTURE.md
+- docs/project/DECISIONS.md
+- docs/project/RISKS.md
+- docs/project/PRODUCT.md
+- docs/project/LEARNING_MODEL.md
+- docs/project/LAB_SECURITY.md
+- docs/project/RUN_LOG.md
+- docs/project/GIT_GRAPH_CONTRACT.md
+- docs/project/GIT_REVISION_CONTRACT.md
+- relevant app/components/lib
+- all tests, package manifests and .github/workflows/ci.yml
+
+## Operating loop
+
+Inspect LIVE → reconcile concurrent/stale state → discovery/review → choose exactly ONE bounded primary goal → implement → test/security/UX/learning/red-team → documentation → PR → full exact FINAL-head CI → merge with `expected_head_sha` → confirm LIVE main and push CI → separate documentation closeout with full exact-head CI → new handoff → STOP.
+
+Do not:
+- execute learner input on host;
+- force-push main;
+- merge failing or incomplete checks;
+- weaken assertions, retries or timeouts to hide failures;
+- let teaching/readiness state grant assessment credit;
+- mutate immutable pre-repair reasoning after lock;
+- bypass downstream revocation;
+- begin a second primary product goal in the same run.
