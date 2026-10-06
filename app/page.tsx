@@ -84,7 +84,7 @@ export default function Home() {
             <span className="kicker">FOUNDATION VERTICAL SLICE</span>
             <h2>Git & CI: điều tra từ evidence.</h2>
           </div>
-          <p>Hai incident SIMULATED: artifact delivery và release acceptance. Khóa diagnosis, sửa tối thiểu, kiểm tra output thực sự rồi giải thích và áp dụng vào tình huống mới.</p>
+          <p>Ba incident SIMULATED: artifact delivery, release acceptance và delivery graph. Khóa diagnosis, sửa tối thiểu, kiểm tra output thực sự rồi giải thích và áp dụng vào tình huống mới.</p>
         </div>
         <CiLab />
       </section>
@@ -107,3 +107,4 @@ export default function Home() {
     </main>
   );
 }
+

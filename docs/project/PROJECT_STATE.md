@@ -1,5 +1,19 @@
 # Project state
 
+## Active goal contract — 2026-10-06 (implementation ready, remote gates pending)
+
+LIVE baseline e1ca8cefbc69327d87d21d10a9eff5f5e4b1c7ef, docs PR #33 merged, main CI 37404961378 successful; no open PR/issues. This section supersedes the historical delivered-goal frontier below until closeout.
+GOAL: one bounded SIMULATED integration graph incident with meaningful linear-history transfer.
+WHY NOW / USER VALUE: green PR-head builds do not demonstrate that an approved base was integrated; existing corpus has no parents/ancestry mechanism.
+SCOPE: six neutral pre-repair sources, immutable source-linked factual rationale plus class, minimal immutable checkout selection, rebuild, separate consumed-commit and ordered-parent verification, post-repair explanation, changed rebase/fast-forward transfer, versioned persistence and regression gates.
+NON-GOALS: real Git/Actions execution, generic Git interpreter, new infrastructure, accounts, trusted assessment.
+ACCEPTANCE: incomplete evidence/rationale cannot lock; lock offers no correctness oracle; wrong class/source/fact/relation stays unverified after correct operational recovery; required base and PR head are ordered direct parents in the first contract; linear transfer instead requires base ancestry and the reviewed change series, with original head absent from ancestry; all edit/rebuild/reverify/reset/refresh paths revoke affected confirmation; invalid/forged derived flags reject; independent old flows remain tested.
+TEST PLAN: full typecheck, all Node tests, audit, production build, all locked Playwright Chromium tests including wrong reasoning/commit, linear transfer, persistence, stale/corrupt state, denied storage, mobile/focus/runtime errors; full exact final-head GitHub CI before each product/docs merge.
+SECURITY IMPACT: pure finite client transitions only; no learner shell/network/host execution; local completion remains forgeable and untrusted.
+LEARNING IMPACT: distinguish snapshot identity, ordered merge parents and ancestry; change the integration contract for transfer instead of substituting literals.
+LOCAL EVIDENCE: npm ci, full typecheck, 68/68 Node tests, audit 0 vulnerabilities, production build passed. Local Playwright Chromium download returned invalid ZIP; no local browser pass claimed. Remote exact-final-head gate and product/docs merge are pending. CI now explicitly checks out and asserts the PR head SHA; it no longer relies on an implicit integration ref.
+ROLLBACK: revert the product PR; old schema rejects new checkpoint. Linux schema7/fixture5 unchanged. Git/CI shape/corpus move independently to schema4/fixture4; older shared Git/CI progress discarded explicitly.
+
 Updated: 2026-10-06. Phase: v0.3 SIMULATED mastery-flow foundation. Package remains 0.1.0; no release/tag created.
 Verified product main: 833b4906840d4c7e3e49b8bbcb0645d47823de3f, re-read after PR #32 squash merge; tree matched the verified product tree.
 Product PR #32 exact final head: 928fa71948ff99f5da85eb5be7678a56aacee79d.
