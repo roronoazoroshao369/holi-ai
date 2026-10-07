@@ -1,32 +1,32 @@
 # Project state
 
-Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell and redesigned production UI/UX system. Package remains 0.1.0; no release/tag created.
+Updated 2026-10-07. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell and redesigned production UI/UX system. Package remains 0.1.0; no release/tag created.
 
-## Current primary goal — Git evidence-reading bridge
+## Latest verified learning delivery — Git evidence-reading bridge
 
-Status: implementation branch `feature/git-evidence-reading-bridge`; not yet merged or verified at this checkpoint.
+Current verified LIVE product main: `a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf` from PR #45 — **Teach Git evidence synthesis before graph assessment**.
 
-**GOAL:** add one teaching-only bridge between Git foundations and the existing graph diagnostic assessment so a near-zero learner must synthesize raw evidence into three predicates: consumed commit identity, ordered direct parents and ancestry reachability.
+Verification evidence:
+- PR #45 exact final head `d9ad0b1471704a786e85113a8ea8a5ee91b4a5a4` passed full CI run `37553518542` — SUCCESS;
+- production Chromium regression: **12/12 passed** on the exact PR head;
+- PR #45 squash-merged as `a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf`;
+- post-merge main CI run `37553882776` — SUCCESS;
+- deployment packaging PR #46 was intentionally **closed without merge** after full CI + static artifact publication; its temporary write permission never entered `main`;
+- verified artifact marker `.holi-source-sha` = `a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf`;
+- Cloudflare Worker `holi-devops-web` production deployment id `ad055836b8894c368568c44d6153c0d6`;
+- production HTML now references build id `HstoA1D70-SXSg4-1SOL5` and page chunk `page-36a147e4a3373130.js`, with the prior page chunk absent.
 
-**WHY NOW / USER VALUE:** foundations currently teach snapshot/ref/parent/ancestry concepts, but the next interaction jumps directly into the scored graph incident. The missing learning step is evidence synthesis rather than another incident.
+Delivered learning slice:
+- third synthetic Git teaching fixture, disjoint from both foundations and graph assessment fixtures;
+- three raw evidence sources: ref snapshot, checkout/build metadata and compact commit graph;
+- learner derives consumed commit identity, ordered direct parents and ancestry reachability before entering the scored graph incident;
+- wrong predicates keep the assessment handoff locked and receive explanatory teaching feedback;
+- correct predicates reveal the existing graph diagnostic CTA;
+- bridge state is React-local only and leaves the Git/CI persisted checkpoint unchanged;
+- no schema/fixture bump, no assessment/mastery credit and no real Git/Actions/shell/network execution;
+- 390px overflow and visible keyboard focus remain covered by production browser regression.
 
-**SCOPE:** a third synthetic fixture disjoint from foundations and assessment; raw ref snapshot, checkout/build metadata and commit graph; component-local answers; explanatory feedback; CTA into the existing graph assessment only after all three predicates are correct.
-
-**NON-GOALS:** no new persisted assessment field, no schema/fixture version bump for Git/CI practice, no scoring/mastery credit, no active incident answer leakage, no real Git/Actions/shell/network execution and no change to graph assessment invariants.
-
-**ACCEPTANCE CRITERIA:**
-- bridge fixture IDs are disjoint from both existing teaching and assessment fixtures;
-- learner sees raw evidence before answering;
-- each predicate fails independently and the combined bridge fails closed;
-- wrong bridge answers do not open the assessment handoff;
-- correct bridge answers open the existing graph diagnostic CTA;
-- completing the bridge leaves the Git/CI persisted checkpoint byte-for-byte semantically unchanged;
-- 390px viewport has no horizontal overflow and keyboard focus remains visible;
-- full repository exact-head CI passes before merge.
-
-**SECURITY / LEARNING IMPACT:** presentation and local teaching state only. Security boundary remains pure client-side SIMULATED transitions. Learning impact is a deliberate evidence → predicate synthesis step with feedback, explicitly outside assessment credit.
-
-**ROLLBACK:** revert the product PR; no storage migration is required because the bridge writes no persistent state.
+The bridge closes the immediate apprenticeship gap between knowing graph vocabulary and synthesizing predicates from raw evidence. It remains finite, visible and retryable teaching, not trusted mastery.
 
 ## UI/UX production checkpoint
 
@@ -123,16 +123,16 @@ A consistent developer-tools forgery can still manufacture local completion in p
 
 - Passing current labs still demonstrates completion of a small deterministic corpus, not general Git/DevOps competence.
 - Full-length SHA and finite grammar transcription can measure clerical accuracy separately from conceptual understanding.
-- The foundations lesson teaches four graph concepts, but it does **not yet teach the diagnostic move from raw evidence to predicates** such as “what revision was consumed?”, “what are the ordered direct parents?” and “is base reachable by ancestry?”.
+- The new evidence bridge now teaches the diagnostic move from raw evidence to consumed-commit, ordered-parent and ancestry predicates, but the fixture is still finite, visible and retryable; this is scaffolding rather than general Git competence.
 - Chromium-only browser coverage and Playwright-managed browser binary provenance remain explicit limits.
 - Real sandbox isolation/identity/quotas/TTL/network/cost controls remain design-only.
 
 ## ONE next frontier / candidate goal
 
-Highest-value frontier: **a non-credit Git evidence-reading bridge between the foundations lesson and the existing graph assessment**.
+Highest-value frontier: **reduce clerical SHA/token transcription in Git graph assessment without weakening causal evidence requirements**.
 
-Recommended bounded goal: use a third teaching-only fixture, disjoint from both current lesson and assessment fixtures, to guide a near-zero learner from raw synthetic evidence (ref snapshot, checkout/build metadata and a small commit graph) to three predicates: consumed commit identity, ordered direct parents and ancestry reachability. Give explanatory feedback in the teaching exercise, but do not persist readiness, grant assessment credit, expose active incident answers or alter graph assessment state. End with the existing diagnostic lab handoff.
+Recommended bounded goal: redesign the graph rationale/verification input mechanics so learners bind claims to captured evidence and derive predicates from observed values instead of manually retyping long synthetic SHAs. Preserve immutable pre-repair commitment, source linkage, wrong-reasoning failure, ordered-parent/ancestry semantics, downstream revocation and all current security boundaries. The objective is to measure reasoning rather than copy accuracy, not to expose the answer or convert assessment into multiple-choice guessing.
 
-Why this is preferable to another incident: the conceptual definitions are now present; the remaining jump is **evidence synthesis**, while the current assessment still carries substantial finite-SHA/grammar burden. Reassess this recommendation against LIVE repository evidence before implementation.
+Why now: the evidence-synthesis bridge removes the conceptual jump; the remaining nearby usability risk is that full-length SHA and finite grammar transcription can fail independently of conceptual understanding. Reassess against LIVE repository evidence before implementation.
 
 External blockers: none for the completed SIMULATED goal. Real execution remains gated on a separately verified isolation architecture.
