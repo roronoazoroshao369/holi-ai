@@ -2,6 +2,32 @@
 
 Updated 2026-10-06. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell and redesigned production UI/UX system. Package remains 0.1.0; no release/tag created.
 
+## Current primary goal — Git evidence-reading bridge
+
+Status: implementation branch `feature/git-evidence-reading-bridge`; not yet merged or verified at this checkpoint.
+
+**GOAL:** add one teaching-only bridge between Git foundations and the existing graph diagnostic assessment so a near-zero learner must synthesize raw evidence into three predicates: consumed commit identity, ordered direct parents and ancestry reachability.
+
+**WHY NOW / USER VALUE:** foundations currently teach snapshot/ref/parent/ancestry concepts, but the next interaction jumps directly into the scored graph incident. The missing learning step is evidence synthesis rather than another incident.
+
+**SCOPE:** a third synthetic fixture disjoint from foundations and assessment; raw ref snapshot, checkout/build metadata and commit graph; component-local answers; explanatory feedback; CTA into the existing graph assessment only after all three predicates are correct.
+
+**NON-GOALS:** no new persisted assessment field, no schema/fixture version bump for Git/CI practice, no scoring/mastery credit, no active incident answer leakage, no real Git/Actions/shell/network execution and no change to graph assessment invariants.
+
+**ACCEPTANCE CRITERIA:**
+- bridge fixture IDs are disjoint from both existing teaching and assessment fixtures;
+- learner sees raw evidence before answering;
+- each predicate fails independently and the combined bridge fails closed;
+- wrong bridge answers do not open the assessment handoff;
+- correct bridge answers open the existing graph diagnostic CTA;
+- completing the bridge leaves the Git/CI persisted checkpoint byte-for-byte semantically unchanged;
+- 390px viewport has no horizontal overflow and keyboard focus remains visible;
+- full repository exact-head CI passes before merge.
+
+**SECURITY / LEARNING IMPACT:** presentation and local teaching state only. Security boundary remains pure client-side SIMULATED transitions. Learning impact is a deliberate evidence → predicate synthesis step with feedback, explicitly outside assessment credit.
+
+**ROLLBACK:** revert the product PR; no storage migration is required because the bridge writes no persistent state.
+
 ## UI/UX production checkpoint
 
 Current verified LIVE product main: `ae043c1312f592392826aab7eb5b5514ef6da96a` from PR #43 — **Overhaul Holi UI/UX visual system**.
