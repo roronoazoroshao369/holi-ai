@@ -13,19 +13,22 @@ import {
   isDifferentialScenario,
   permissionTransferAnswerMatches,
   permissionTransferSatisfied,
+  pathTransferAnswerMatches,
+  pathTransferSatisfied,
   scenarios,
   targetReached,
   validCausalTransferShape,
   validPermissionTransferShape,
+  validPathTransferShape,
   type DifferentialOrder,
   type LabState
 } from "./linux-simulator.ts";
 
 export const PRACTICE_STORAGE_KEY = "holi.devops.linux-practice";
-export const PRACTICE_SCHEMA_VERSION = 7 as const;
-export const LINUX_FIXTURE_VERSION = 5 as const;
+export const PRACTICE_SCHEMA_VERSION = 8 as const;
+export const LINUX_FIXTURE_VERSION = 6 as const;
 
-type Completion = { guided: boolean; transfer: boolean; differential: boolean };
+type Completion = { guided: boolean; transfer: boolean; pathSearch: boolean; differential: boolean };
 export type PracticeCheckpoint = {
   schemaVersion: typeof PRACTICE_SCHEMA_VERSION;
   fixtureVersion: typeof LINUX_FIXTURE_VERSION;
@@ -43,11 +46,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function expectedCompletion(state: LabState): Completion {
   const inDifferential = isDifferentialScenario(state.scenario);
   const permissionDone = permissionTransferSatisfied(state);
+  const pathDone = pathTransferSatisfied(state);
+  const beyondTransfer = state.scenario === "path-search" || inDifferential;
   return {
     guided: state.scenario !== "guided" || state.explained,
-    transfer: inDifferential ? permissionDone : state.scenario === "transfer" && state.explained && permissionDone,
+    transfer: beyondTransfer ? permissionDone : state.scenario === "transfer" && state.explained && permissionDone,
+    pathSearch: inDifferential ? pathDone : state.scenario === "path-search" && state.explained && pathDone,
     differential: inDifferential && state.differentialStep === 1 && state.explained &&
-      permissionDone && causalTransferSatisfied(state)
+      permissionDone && pathDone && causalTransferSatisfied(state)
   };
 }
 
@@ -58,6 +64,11 @@ function validIncident(state: LabState): boolean {
   if (fixture.family === "file-access") {
     return state.incident.kind === "file-access" &&
       (state.incident.mode === "600" || state.incident.mode === "644" || state.incident.mode === "640");
+  }
+  if (fixture.family === "path-access") {
+    return state.incident.kind === "path-access" &&
+      state.incident.fileMode === "644" &&
+      (state.incident.directoryMode === "700" || state.incident.directoryMode === "711");
   }
 
   if (state.incident.kind !== "tcp-service" || typeof state.incident.processRunning !== "boolean") return false;
@@ -75,6 +86,9 @@ function incidentIsInitial(state: LabState): boolean {
   if (fixture.family === "file-access") {
     return state.incident.kind === "file-access" && state.incident.mode === "600";
   }
+  if (fixture.family === "path-access") {
+    return state.incident.kind === "path-access" && state.incident.directoryMode === "700" && state.incident.fileMode === "644";
+  }
   return state.incident.kind === "tcp-service" &&
     state.incident.processRunning === fixture.initialProcessRunning &&
     state.incident.listenerPort === fixture.initialPort;
@@ -82,7 +96,7 @@ function incidentIsInitial(state: LabState): boolean {
 
 export function isValidLabState(value: unknown): value is LabState {
   if (!isRecord(value)) return false;
-  if (value.scenario !== "guided" && value.scenario !== "transfer" &&
+  if (value.scenario !== "guided" && value.scenario !== "transfer" && value.scenario !== "path-search" &&
       value.scenario !== "differential-listener" && value.scenario !== "differential-process") return false;
   if (value.differentialOrder !== "listener-first" && value.differentialOrder !== "process-first") return false;
   if (value.differentialStep !== 0 && value.differentialStep !== 1) return false;
@@ -103,6 +117,8 @@ export function isValidLabState(value: unknown): value is LabState {
   if (typeof value.permissionTransferPassed !== "boolean") return false;
   if (value.causalTransfer !== null && !validCausalTransferShape(value.causalTransfer)) return false;
   if (typeof value.causalTransferPassed !== "boolean") return false;
+  if (value.pathTransfer !== null && !validPathTransferShape(value.pathTransfer)) return false;
+  if (typeof value.pathTransferPassed !== "boolean") return false;
 
   if (!isRecord(value.preRepairEvidence)) return false;
   if (Object.keys(value.preRepairEvidence).some(key => !evidenceSlots.includes(key as typeof evidenceSlots[number]))) return false;
@@ -128,10 +144,20 @@ export function isValidLabState(value: unknown): value is LabState {
       (state.scenario !== "transfer" || !state.explained)) return false;
   if (state.permissionTransferPassed) {
     const currentPermission = state.scenario === "transfer" && state.explained;
-    const carriedPermission = isDifferentialScenario(state.scenario);
+    const carriedPermission = state.scenario === "path-search" || isDifferentialScenario(state.scenario);
     if (!currentPermission && !carriedPermission) return false;
   }
-  if (isDifferentialScenario(state.scenario) && !permissionTransferSatisfied(state)) return false;
+  if ((state.scenario === "path-search" || isDifferentialScenario(state.scenario)) && !permissionTransferSatisfied(state)) return false;
+
+  if (state.pathTransferPassed && !pathTransferAnswerMatches(state.pathTransfer)) return false;
+  if (state.pathTransfer !== null && !state.pathTransferPassed &&
+      (state.scenario !== "path-search" || !state.explained)) return false;
+  if (state.pathTransferPassed) {
+    const currentPath = state.scenario === "path-search" && state.explained;
+    const carriedPath = isDifferentialScenario(state.scenario);
+    if (!currentPath && !carriedPath) return false;
+  }
+  if (isDifferentialScenario(state.scenario) && !pathTransferSatisfied(state)) return false;
 
   if (state.causalTransferPassed && !causalTransferAnswerMatches(state.causalTransfer)) return false;
   if (state.causalTransfer !== null && !state.causalTransferPassed &&
@@ -159,6 +185,7 @@ export function checkpointFor(state: LabState): PracticeCheckpoint {
       preRepairEvidence: structuredClone(state.preRepairEvidence),
       reasoning: state.reasoning ? structuredClone(state.reasoning) : null,
       permissionTransfer: state.permissionTransfer ? structuredClone(state.permissionTransfer) : null,
+      pathTransfer: state.pathTransfer ? structuredClone(state.pathTransfer) : null,
       causalTransfer: state.causalTransfer ? structuredClone(state.causalTransfer) : null
     },
     completed: expectedCompletion(state)
@@ -171,12 +198,13 @@ export function parseCheckpoint(raw: string): PracticeCheckpoint | null {
   if (!isRecord(value)) return null;
   if (value.schemaVersion !== PRACTICE_SCHEMA_VERSION || value.fixtureVersion !== LINUX_FIXTURE_VERSION) return null;
   if (!isValidLabState(value.state) || !isRecord(value.completed)) return null;
-  for (const key of ["guided", "transfer", "differential"] as const) {
+  for (const key of ["guided", "transfer", "pathSearch", "differential"] as const) {
     if (typeof value.completed[key] !== "boolean") return null;
   }
   const expected = expectedCompletion(value.state);
   if (value.completed.guided !== expected.guided ||
       value.completed.transfer !== expected.transfer ||
+      value.completed.pathSearch !== expected.pathSearch ||
       value.completed.differential !== expected.differential) return null;
   return value as PracticeCheckpoint;
 }
@@ -201,6 +229,7 @@ export function loadPractice(
         preRepairEvidence: structuredClone(checkpoint.state.preRepairEvidence),
         reasoning: checkpoint.state.reasoning ? structuredClone(checkpoint.state.reasoning) : null,
         permissionTransfer: checkpoint.state.permissionTransfer ? structuredClone(checkpoint.state.permissionTransfer) : null,
+        pathTransfer: checkpoint.state.pathTransfer ? structuredClone(checkpoint.state.pathTransfer) : null,
         causalTransfer: checkpoint.state.causalTransfer ? structuredClone(checkpoint.state.causalTransfer) : null
       }
     };
