@@ -4,11 +4,14 @@ import {
   causalTransferSatisfied,
   checkCausalTransfer,
   checkPermissionTransfer,
+  checkPathTransfer,
   differentialScenario,
   editCausalTransfer,
   editPermissionTransfer,
+  editPathTransfer,
   emptyCausalTransfer,
   emptyPermissionTransfer,
+  emptyPathTransfer,
   evidenceReady,
   evidenceSlots,
   editReasoning,
@@ -18,10 +21,12 @@ import {
   initialLabState,
   isDifferentialScenario,
   permissionTransferSatisfied,
+  pathTransferSatisfied,
   recordHypothesis,
   scenarios,
   type CausalTransferAnswer,
   type PermissionTransferAnswer,
+  type PathTransferAnswer,
   type ReasoningAnswer,
   type DifferentialOrder,
   type DifferentialStep,
@@ -56,6 +61,7 @@ export function LabTerminal() {
   const [hypothesisFeedback, setHypothesisFeedback] = useState("");
   const [feedback, setFeedback] = useState("");
   const [permissionTransferFeedback, setPermissionTransferFeedback] = useState("");
+  const [pathTransferFeedback, setPathTransferFeedback] = useState("");
   const [transferFeedback, setTransferFeedback] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const [storageUsable, setStorageUsable] = useState(false);
@@ -112,6 +118,7 @@ export function LabTerminal() {
       setHypothesisFeedback("");
       setFeedback("");
       setPermissionTransferFeedback("");
+      setPathTransferFeedback("");
       setTransferFeedback("");
     }
     setCommand("");
@@ -136,6 +143,9 @@ export function LabTerminal() {
     const carriedPermissionTransfer = permissionTransferSatisfied(state) && state.permissionTransfer
       ? structuredClone(state.permissionTransfer)
       : null;
+    const carriedPathTransfer = pathTransferSatisfied(state) && state.pathTransfer
+      ? structuredClone(state.pathTransfer)
+      : null;
     setState(initialLabState(
       nextScenario,
       state.differentialOrder,
@@ -143,7 +153,9 @@ export function LabTerminal() {
       carriedTransfer,
       Boolean(carriedTransfer),
       carriedPermissionTransfer,
-      Boolean(carriedPermissionTransfer)
+      Boolean(carriedPermissionTransfer),
+      carriedPathTransfer,
+      Boolean(carriedPathTransfer)
     ));
     setLines(welcome);
     setCommand("");
@@ -151,6 +163,7 @@ export function LabTerminal() {
     setHypothesisFeedback("");
     setFeedback("");
     setPermissionTransferFeedback("");
+    setPathTransferFeedback("");
     setTransferFeedback("");
   }
 
@@ -199,6 +212,8 @@ export function LabTerminal() {
   const answer = state.reasoning ?? emptyReasoning();
   const permissionTransferAnswer = state.permissionTransfer ?? emptyPermissionTransfer();
   const permissionSatisfied = permissionTransferSatisfied(state);
+  const pathTransferAnswer = state.pathTransfer ?? emptyPathTransfer();
+  const pathSatisfied = pathTransferSatisfied(state);
   const transferAnswer = state.causalTransfer ?? emptyCausalTransfer();
   const transferSatisfied = causalTransferSatisfied(state);
   const evidenceLabels = { symptom: "E1 · symptom", identity: "E2 · " + fixture.identityLabel, resource: "E3 · " + fixture.resourceLabel };
@@ -207,12 +222,18 @@ export function LabTerminal() {
     setState(editReasoning(state, next));
     setFeedback("");
     if (state.scenario === "transfer") setPermissionTransferFeedback("");
+    if (state.scenario === "path-search") setPathTransferFeedback("");
     if (state.scenario === "differential-listener") setTransferFeedback("");
   }
 
   function updatePermissionTransfer(next: PermissionTransferAnswer) {
     setState(editPermissionTransfer(state, next));
     setPermissionTransferFeedback("");
+  }
+
+  function updatePathTransfer(next: PathTransferAnswer) {
+    setState(editPathTransfer(state, next));
+    setPathTransferFeedback("");
   }
 
   function updateCausalTransfer(next: CausalTransferAnswer) {
@@ -248,8 +269,8 @@ export function LabTerminal() {
         <summary>Mental model: tách observation khỏi conclusion</summary>
         <p>HTTP/curl chỉ cho biết symptom. Cùng một connection failure có thể xuất phát từ các causal layer khác nhau.
           Hãy kiểm tra process state và socket state trước khi khóa hypothesis; đừng suy ra nguyên nhân từ tên hoặc thứ tự fixture.</p>
-        <p>Fixture permission giả định directory traversal, ACL/SELinux và cấu hình khác đang khỏe. Các health incident là simulator deterministic, không phải network stack thật.
-          Trong production cần kiểm tra thêm namespace, firewall, bind address, service manager và logs.</p>
+        <p>Hai fixture permission đầu giả định directory traversal khỏe; path-search fixture tách riêng file-read khỏi parent-directory search (x). ACL/SELinux vẫn nằm ngoài mô hình.
+          Các health incident là simulator deterministic, không phải network stack thật; production còn cần namespace, firewall, bind address, service manager và logs.</p>
       </details>
 
       <h3>{fixture.title}</h3>
@@ -404,6 +425,68 @@ export function LabTerminal() {
         <p role="status">{permissionTransferFeedback}</p>
       </section>}
 
+      {state.scenario === "path-search" && state.explained && <section className="reasoningPanel" aria-label="Dự đoán path-search transfer">
+        <h4>Path-search transfer · đổi parent path, giữ file readable</h4>
+        <p>Ở fixture gốc, file mode 644 nhưng parent <code>/srv/private/site</code> mode 700 chặn search. Với path mới <code>/srv/private/archive</code> cũng mode 700, hãy bind evidence gốc và dự đoán symptom/repair target. Chỉ chmod file 644 lần nữa không giải quyết traversal.</p>
+        <form onSubmit={event => {
+          event.preventDefault();
+          const result = checkPathTransfer(state, pathTransferAnswer);
+          setState(result);
+          setPathTransferFeedback(result.pathTransferPassed
+            ? "Đúng: read bit của file không thay thế search (x) trên từng parent directory."
+            : "Chưa đúng. Giữ file readable, đổi sang parent khác mode 700 và xác định repair phải nhắm vào directory search.");
+        }}>
+          <fieldset>
+            <legend>Evidence gốc</legend>
+            <label>Nguồn identity path-search
+              <select aria-label="Nguồn identity path-search" value={pathTransferAnswer.identityEvidenceId}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, identityEvidenceId: event.target.value })}>{evidenceOptions()}</select>
+            </label>
+            <label>Fact identity path-search
+              <input aria-label="Fact identity path-search" maxLength={100} value={pathTransferAnswer.identityFact}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, identityFact: event.target.value })} />
+            </label>
+            <label>Nguồn path gốc
+              <select aria-label="Nguồn path gốc" value={pathTransferAnswer.pathEvidenceId}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, pathEvidenceId: event.target.value })}>{evidenceOptions()}</select>
+            </label>
+            <label>Fact parent gốc
+              <input aria-label="Fact parent gốc" maxLength={100} value={pathTransferAnswer.pathFact}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, pathFact: event.target.value })} />
+            </label>
+            <label>Fact file readable
+              <input aria-label="Fact file readable" maxLength={100} value={pathTransferAnswer.fileFact}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, fileFact: event.target.value })} />
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Changed path</legend>
+            <label>Parent mới
+              <input aria-label="Parent mới" maxLength={100} value={pathTransferAnswer.changedParent}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, changedParent: event.target.value })} />
+            </label>
+            <label>Mode parent mới
+              <input aria-label="Mode parent mới" maxLength={100} value={pathTransferAnswer.changedParentMode}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, changedParentMode: event.target.value })} />
+            </label>
+            <label>Dự đoán HTTP path-search
+              <input aria-label="Dự đoán HTTP path-search" maxLength={100} value={pathTransferAnswer.predictedSymptom}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, predictedSymptom: event.target.value })} />
+            </label>
+            <label>Repair target path-search
+              <input aria-label="Repair target path-search" maxLength={100} value={pathTransferAnswer.repairNeed}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, repairNeed: event.target.value })} />
+            </label>
+            <label>Quan hệ path-search
+              <input aria-label="Quan hệ path-search" maxLength={100} value={pathTransferAnswer.causalClaim}
+                onChange={event => updatePathTransfer({ ...pathTransferAnswer, causalClaim: event.target.value })} />
+            </label>
+          </fieldset>
+          <button type="submit">Kiểm tra path-search transfer</button>
+        </form>
+        <p role="status">{pathTransferFeedback}</p>
+      </section>}
+
       {state.scenario === "differential-listener" && state.explained && <section className="reasoningPanel" aria-label="Dự đoán counterfactual">
         <h4>Counterfactual transfer · đổi evidence, dự đoán hệ quả</h4>
         <p>Giữ nguyên observation rằng process api-server đang chạy. Trước bất kỳ repair nào, giả sử socket observation đổi từ listener đã quan sát sang <code>127.0.0.1:8080</code>. Dùng đúng hai snapshot gốc để ghi fact ban đầu, rồi dự đoán symptom của curl 8080, repair listener còn cần hay không và quan hệ nhân quả.</p>
@@ -460,14 +543,16 @@ export function LabTerminal() {
 
       {state.explained && state.scenario === "guided" && <button onClick={() => advanceScenario("transfer")}>Thử tình huống permission mới</button>}
       {state.explained && state.scenario === "transfer" && permissionSatisfied &&
+        <button onClick={() => advanceScenario("path-search")}>Thử HTTP 403 do path-search</button>}
+      {state.explained && state.scenario === "path-search" && permissionSatisfied && pathSatisfied &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 0), 0)}>Thử differential diagnosis</button>}
-      {state.explained && inDifferential && state.differentialStep === 0 && permissionSatisfied &&
+      {state.explained && inDifferential && state.differentialStep === 0 && permissionSatisfied && pathSatisfied &&
         (state.scenario !== "differential-listener" || transferSatisfied) &&
         <button onClick={() => advanceScenario(differentialScenario(state.differentialOrder, 1), 1)}>Thử case cùng symptom</button>}
-      {state.explained && inDifferential && state.differentialStep === 1 && permissionSatisfied && transferSatisfied &&
-        <p role="status">Hoàn tất bốn tình huống luyện tập và hai causal transfer gates: permission case kiểm tra hệ quả khi group membership đổi, còn listener case kiểm tra hệ quả khi socket evidence đổi. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
+      {state.explained && inDifferential && state.differentialStep === 1 && permissionSatisfied && pathSatisfied && transferSatisfied &&
+        <p role="status">Hoàn tất năm tình huống luyện tập và ba transfer gates: group membership, parent-directory search và listener evidence. Đây vẫn chỉ là tín hiệu thực hành cục bộ, chưa phải chứng nhận mastery.</p>}
 
-      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại. Permission transfer đã pass được giữ khi vào/reset health differential; listener counterfactual đã pass được giữ khi reset process case đứng sau nó. Reset ngay trên transfer/listener case sẽ xóa draft của gate thuộc case đó. Hidden health-case assignment được giữ. Nút “Học lại từ đầu” xóa toàn bộ và chọn lại assignment. Transcript terminal không được persist.</p>
+      <p>Lệnh <code>reset</code> xóa observations/hypothesis của tình huống hiện tại. Permission transfer được carry qua path-search/health; path-search transfer được carry vào health differential; listener counterfactual được giữ khi reset process case đứng sau nó. Reset ngay trên case sở hữu gate sẽ xóa draft chưa pass của gate đó. Hidden health-case assignment được giữ. Nút “Học lại từ đầu” xóa toàn bộ và chọn lại assignment. Transcript terminal không được persist.</p>
     </div>
   );
 }
