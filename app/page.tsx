@@ -11,8 +11,8 @@ const operatingLoop = [
 ] as const;
 
 const productSignals = [
-  ["07", "incident mô phỏng", "Linux + Git/CI"],
-  ["02", "causal transfer", "khác failure shape"],
+  ["08", "incident mô phỏng", "Linux + Git/CI"],
+  ["03", "transfer gates", "khác causal relation"],
   ["12", "browser regression", "production Chromium"],
   ["01", "trust boundary", "learner input không chạy host"]
 ] as const;
@@ -187,8 +187,8 @@ export default function Home() {
             <span className="kicker">PRACTICAL LAB / MVP</span>
             <h2>Cùng symptom.<br />Khác nguyên nhân.</h2>
             <p>
-              Lab hiện tại vẫn là simulator deterministic trong browser. Sau hai file-permission case,
-              người học gặp hai health incident có cùng connection-refused symptom nhưng process/socket evidence dẫn tới nguyên nhân khác nhau.
+              Lab hiện tại vẫn là simulator deterministic trong browser. Sau hai file-permission case, người học phải phân biệt
+              file-read với parent-directory search dưới HTTP 403, rồi mới gặp hai health incident cùng connection-refused symptom nhưng khác process/socket cause.
             </p>
 
             <div className="labFlow">
