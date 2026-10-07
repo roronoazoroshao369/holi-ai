@@ -129,8 +129,9 @@ test("production flow differentiates same connection symptom using process and s
   collectRuntimeErrors(page, runtimeErrors);
 
   await page.goto("/");
-  await expect(page.getByText("08")).toBeVisible();
-  await expect(page.getByText("03")).toBeVisible();
+  const productSignals = page.locator(".signalGrid");
+  await expect(productSignals.getByText("08", { exact: true })).toBeVisible();
+  await expect(productSignals.getByText("03", { exact: true })).toBeVisible();
   await expect(page.getByText(/parent-directory search dưới HTTP 403/)).toBeVisible();
   await expect(page.getByText(/Tiến trình thực hành được lưu trên trình duyệt này/)).toBeVisible();
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
