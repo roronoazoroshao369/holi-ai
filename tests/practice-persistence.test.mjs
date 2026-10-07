@@ -176,7 +176,7 @@ test("valid partial and completed checkpoints round-trip across all incident cas
   }
 });
 
-test("completion requires permission transfer before differential and both transfer gates at the end", () => {
+test("completion requires permission and path-search transfer before differential and all transfer gates at the end", () => {
   assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, pathSearch: false, differential: false });
   assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, pathSearch: false, differential: false });
 
@@ -186,7 +186,7 @@ test("completion requires permission transfer before differential and both trans
   transferWithoutCounterfactual = explain(transferWithoutCounterfactual, reasoningFor(transferWithoutCounterfactual));
   assert.deepEqual(checkpointFor(transferWithoutCounterfactual).completed, { guided: true, transfer: false, pathSearch: false, differential: false });
 
-  assert.deepEqual(checkpointFor(completed("differential-listener", "listener-first", 0)).completed, { guided: true, transfer: true, pathSearch: false, differential: false });
+  assert.deepEqual(checkpointFor(completed("differential-listener", "listener-first", 0)).completed, { guided: true, transfer: true, pathSearch: true, differential: false });
 
   const listenerPassed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
   const finalProcess = checkpointFor(completed("differential-process", "listener-first", 1, listenerPassed.causalTransfer, true));
