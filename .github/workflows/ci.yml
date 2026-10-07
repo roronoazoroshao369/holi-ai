@@ -55,7 +55,7 @@ jobs:
           const path = require('path');
           const root = path.resolve('out');
           const files = {};
-          const allowed = /\\.(?:html|txt|js|css|json)$/;
+          const allowed = /\.(?:html|txt|js|css|json)$/;
           function walk(dir) {
             for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
               const full = path.join(dir, entry.name);
@@ -68,19 +68,19 @@ jobs:
             }
           }
           walk(root);
-          const manifests = Object.keys(files).filter(p => /^_next\\/static\\/[^/]+\\/_buildManifest\\.js$/.test(p));
-          const pages = Object.keys(files).filter(p => /^_next\\/static\\/chunks\\/app\\/page-[a-f0-9]+\\.js$/.test(p));
+          const manifests = Object.keys(files).filter(p => /^_next\/static\/[^/]+\/_buildManifest\.js$/.test(p));
+          const pages = Object.keys(files).filter(p => /^_next\/static\/chunks\/app\/page-[a-f0-9]+\.js$/.test(p));
           if (manifests.length !== 1 || pages.length !== 1) throw new Error('Unexpected Next artifact shape');
           const buildId = manifests[0].split('/')[2];
           const pageChunk = path.posix.basename(pages[0]);
           const worker = `const FILES=${JSON.stringify(files)};
           const TYPES={".html":"text/html; charset=utf-8",".txt":"text/plain; charset=utf-8",".js":"application/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".json":"application/json; charset=utf-8"};
           function typeFor(path){for(const [ext,type] of Object.entries(TYPES)){if(path.endsWith(ext)) return type;}return "application/octet-stream";}
-          export default {async fetch(request){const url=new URL(request.url);let path=decodeURIComponent(url.pathname);if(path==="/")path="/index.html";if(path.endsWith("/"))path+="index.html";const key=path.replace(/^\\\\//,"");const body=FILES[key];if(body===undefined){const fallback=FILES["404.html"];return new Response(request.method==="HEAD"?null:fallback,{status:404,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-cache"}});}const headers={"content-type":typeFor(key),"x-content-type-options":"nosniff"};if(key.startsWith("_next/static/"))headers["cache-control"]="public, max-age=31536000, immutable";else headers["cache-control"]="no-cache";return new Response(request.method==="HEAD"?null:body,{status:200,headers});}};`;
+          export default {async fetch(request){const url=new URL(request.url);let path=decodeURIComponent(url.pathname);if(path==="/")path="/index.html";if(path.endsWith("/"))path+="index.html";const key=path.replace(/^\\//,"");const body=FILES[key];if(body===undefined){const fallback=FILES["404.html"];return new Response(request.method==="HEAD"?null:fallback,{status:404,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-cache"}});}const headers={"content-type":typeFor(key),"x-content-type-options":"nosniff"};if(key.startsWith("_next/static/"))headers["cache-control"]="public, max-age=31536000, immutable";else headers["cache-control"]="no-cache";return new Response(request.method==="HEAD"?null:body,{status:200,headers});}};`;
           fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, 'worker.js'), worker);
-          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-source-sha'), process.env.VERIFIED_SOURCE + '\\n');
-          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-build-id'), buildId + '\\n');
-          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-page-chunk'), pageChunk + '\\n');
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-source-sha'), process.env.VERIFIED_SOURCE + '\n');
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-build-id'), buildId + '\n');
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-page-chunk'), pageChunk + '\n');
           console.log(JSON.stringify({ files: Object.keys(files).length, bytes: Buffer.byteLength(worker), buildId, pageChunk }));
           NODE
       - name: Publish verified Worker deployment artifact
