@@ -185,6 +185,7 @@ export function checkpointFor(state: LabState): PracticeCheckpoint {
       preRepairEvidence: structuredClone(state.preRepairEvidence),
       reasoning: state.reasoning ? structuredClone(state.reasoning) : null,
       permissionTransfer: state.permissionTransfer ? structuredClone(state.permissionTransfer) : null,
+      pathTransfer: state.pathTransfer ? structuredClone(state.pathTransfer) : null,
       causalTransfer: state.causalTransfer ? structuredClone(state.causalTransfer) : null
     },
     completed: expectedCompletion(state)
@@ -197,12 +198,13 @@ export function parseCheckpoint(raw: string): PracticeCheckpoint | null {
   if (!isRecord(value)) return null;
   if (value.schemaVersion !== PRACTICE_SCHEMA_VERSION || value.fixtureVersion !== LINUX_FIXTURE_VERSION) return null;
   if (!isValidLabState(value.state) || !isRecord(value.completed)) return null;
-  for (const key of ["guided", "transfer", "differential"] as const) {
+  for (const key of ["guided", "transfer", "pathSearch", "differential"] as const) {
     if (typeof value.completed[key] !== "boolean") return null;
   }
   const expected = expectedCompletion(value.state);
   if (value.completed.guided !== expected.guided ||
       value.completed.transfer !== expected.transfer ||
+      value.completed.pathSearch !== expected.pathSearch ||
       value.completed.differential !== expected.differential) return null;
   return value as PracticeCheckpoint;
 }
@@ -227,6 +229,7 @@ export function loadPractice(
         preRepairEvidence: structuredClone(checkpoint.state.preRepairEvidence),
         reasoning: checkpoint.state.reasoning ? structuredClone(checkpoint.state.reasoning) : null,
         permissionTransfer: checkpoint.state.permissionTransfer ? structuredClone(checkpoint.state.permissionTransfer) : null,
+        pathTransfer: checkpoint.state.pathTransfer ? structuredClone(checkpoint.state.pathTransfer) : null,
         causalTransfer: checkpoint.state.causalTransfer ? structuredClone(checkpoint.state.causalTransfer) : null
       }
     };
