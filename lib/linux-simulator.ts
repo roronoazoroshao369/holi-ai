@@ -541,7 +541,7 @@ export function initialEvidence(scenario: ScenarioId, slot: EvidenceSlot): Evide
   } else if (fixture.family === "path-access") {
     output = slot === "symptom" ? "HTTP/1.1 403 Forbidden"
       : slot === "identity" ? fixture.identity
-      : "drwxr-xr-x root root /\ndrwx------ root root /srv/private/site\n-rw-r--r-- root root /srv/private/site/index.html";
+      : "drwxr-xr-x root root /\ndrwxr-xr-x root root /srv\ndrwxr-xr-x root root /srv/private\ndrwx------ root root /srv/private/site\n-rw-r--r-- root root /srv/private/site/index.html";
   } else {
     output = slot === "symptom" ? "curl: (7) Failed to connect to 127.0.0.1 port 8080: Connection refused"
       : slot === "identity" ? (fixture.initialProcessRunning ? "842 app api-server" : "no matching api-server process")
@@ -684,7 +684,7 @@ function executePathAccessScenario(state: LabState, command: string, fixture: Pa
   if (command === fixture.commands.resource) {
     const next = withObservation(state, "resource");
     const directory = state.incident.directoryMode === "700" ? "drwx------" : "drwx--x--x";
-    return { state: next, lines: [{ kind: "output", text: "drwxr-xr-x root root /\n" + directory + " root root " + fixture.parentPath + "\n-rw-r--r-- root root " + fixture.path }] };
+    return { state: next, lines: [{ kind: "output", text: "drwxr-xr-x root root /\ndrwxr-xr-x root root /srv\ndrwxr-xr-x root root /srv/private\n" + directory + " root root " + fixture.parentPath + "\n-rw-r--r-- root root " + fixture.path }] };
   }
   if (command === fixture.commands.identity) {
     return { state: withObservation(state, "identity"), lines: [{ kind: "output", text: fixture.identity }] };
