@@ -1782,3 +1782,45 @@ footer {
     transform: none;
   }
 }
+
+
+/* Git teaching evidence bridge: instructional synthesis, not assessment state. */
+.evidenceBridge {
+  display: grid;
+  gap: 24px;
+}
+.evidenceBridge .evidenceBank {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.evidenceBridge .evidenceBank article {
+  min-height: 168px;
+}
+.evidenceBridge .evidenceBank pre {
+  font-size: 11px;
+}
+.bridgeFeedback {
+  padding: 14px 16px;
+  border-left: 2px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  background: rgba(201,255,82,.025);
+  color: var(--muted-strong);
+}
+.bridgeFeedback p {
+  margin: 0;
+}
+.bridgeFeedback ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+.bridgeFeedback code {
+  color: var(--text);
+  font-family: var(--mono);
+}
+@media (max-width: 900px) {
+  .evidenceBridge .evidenceBank {
+    grid-template-columns: 1fr;
+  }
+}
