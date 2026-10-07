@@ -1,5 +1,5 @@
 export type Line = { kind: "output" | "success" | "error"; text: string };
-export type ScenarioId = "guided" | "transfer" | "differential-listener" | "differential-process";
+export type ScenarioId = "guided" | "transfer" | "path-search" | "differential-listener" | "differential-process";
 export type DifferentialScenarioId = "differential-listener" | "differential-process";
 export type DifferentialOrder = "listener-first" | "process-first";
 export type DifferentialStep = 0 | 1;
@@ -18,12 +18,13 @@ export type Hypothesis = "" | "permission" | "network" | "process";
 export type FileMode = "600" | "644" | "640";
 export type IncidentState =
   | { kind: "file-access"; mode: FileMode }
+  | { kind: "path-access"; directoryMode: "700" | "711"; fileMode: "644" }
   | { kind: "tcp-service"; processRunning: boolean; listenerPort: 8080 | 9090 | null };
 export type ObservationState = { symptom: boolean; resource: boolean; identity: boolean };
 
 type ScenarioBase = {
   title: string;
-  family: "file-access" | "tcp-service";
+  family: "file-access" | "path-access" | "tcp-service";
   summary: string;
   resourceLabel: string;
   identityLabel: string;
@@ -48,6 +49,14 @@ type FileScenario = ScenarioBase & {
   identity: string;
   targetMode: "644" | "640";
 };
+type PathAccessScenario = ScenarioBase & {
+  family: "path-access";
+  path: string;
+  parentPath: string;
+  worker: string;
+  identity: string;
+  targetDirectoryMode: "711";
+};
 type TcpServiceScenario = ScenarioBase & {
   family: "tcp-service";
   service: string;
@@ -57,7 +66,7 @@ type TcpServiceScenario = ScenarioBase & {
   targetPort: 8080;
   repairAction: "configure-listener" | "start-service";
 };
-type ScenarioDefinition = FileScenario | TcpServiceScenario;
+type ScenarioDefinition = FileScenario | PathAccessScenario | TcpServiceScenario;
 
 const differentialTitle = "Health endpoint differential diagnosis";
 const differentialSummary = "Client cannot connect to 127.0.0.1:8080. Diagnose from process and socket evidence before choosing a causal class.";
@@ -109,6 +118,29 @@ export const scenarios = {
       resource: "ls -l /srv/reports/status.html",
       identity: "id report-worker",
       repair: "chmod 640 /srv/reports/status.html"
+    }
+  },
+  "path-search": {
+    title: "3. HTTP 403 do path-search",
+    family: "path-access",
+    summary: "File đã readable nhưng worker vẫn bị 403 vì một parent directory thiếu quyền search (x). Chẩn đoán theo path component, không chmod file theo quán tính.",
+    resourceLabel: "path components",
+    identityLabel: "danh tính worker",
+    correctHypothesis: "permission",
+    path: "/srv/private/site/index.html",
+    parentPath: "/srv/private/site",
+    worker: "www-data",
+    identity: "uid=33(www-data) gid=33(www-data) groups=33(www-data)",
+    targetDirectoryMode: "711",
+    explanation: "parent-search-required",
+    explanationPrompt: "Vì sao file mode 644 vẫn có thể trả 403, và repair tối thiểu nằm ở đâu?",
+    readme: "Symptom: HTTP 403 for /private/index.html. Worker: www-data. The file itself is mode 644. Collect HTTP, effective identity and every path component with namei-style evidence before repair. A parent directory may block traversal even when the file is readable.",
+    repairSyntax: "chmod MODE DIRECTORY",
+    commands: {
+      symptom: "curl localhost/private",
+      resource: "namei -l /srv/private/site/index.html",
+      identity: "id www-data",
+      repair: "chmod 711 /srv/private/site"
     }
   },
   "differential-listener": {
@@ -173,6 +205,8 @@ export type LabState = {
   permissionTransferPassed: boolean;
   causalTransfer: CausalTransferAnswer | null;
   causalTransferPassed: boolean;
+  pathTransfer: PathTransferAnswer | null;
+  pathTransferPassed: boolean;
   hypothesis: Hypothesis;
   repairedWithEvidence: boolean;
   verified: boolean;
@@ -181,13 +215,13 @@ export type LabState = {
 
 function initialIncident(scenario: ScenarioId): IncidentState {
   const fixture = scenarios[scenario];
-  return fixture.family === "file-access"
-    ? { kind: "file-access", mode: "600" }
-    : {
-        kind: "tcp-service",
-        processRunning: fixture.initialProcessRunning,
-        listenerPort: fixture.initialPort
-      };
+  if (fixture.family === "file-access") return { kind: "file-access", mode: "600" };
+  if (fixture.family === "path-access") return { kind: "path-access", directoryMode: "700", fileMode: "644" };
+  return {
+    kind: "tcp-service",
+    processRunning: fixture.initialProcessRunning,
+    listenerPort: fixture.initialPort
+  };
 }
 
 export function initialLabState(
@@ -197,7 +231,9 @@ export function initialLabState(
   causalTransfer: CausalTransferAnswer | null = null,
   causalTransferPassed = false,
   permissionTransfer: PermissionTransferAnswer | null = null,
-  permissionTransferPassed = false
+  permissionTransferPassed = false,
+  pathTransfer: PathTransferAnswer | null = null,
+  pathTransferPassed = false
 ): LabState {
   const resolvedStep: DifferentialStep = differentialStep ??
     (isDifferentialScenario(scenario) && differentialScenario(differentialOrder, 0) !== scenario ? 1 : 0);
@@ -221,6 +257,8 @@ export function initialLabState(
     permissionTransferPassed,
     causalTransfer: causalTransfer ? structuredClone(causalTransfer) : null,
     causalTransferPassed,
+    pathTransfer: pathTransfer ? structuredClone(pathTransfer) : null,
+    pathTransferPassed,
     hypothesis: "",
     repairedWithEvidence: false,
     verified: false,
@@ -238,6 +276,9 @@ function incidentIsInitial(state: LabState): boolean {
   if (fixture.family === "file-access") {
     return state.incident.kind === "file-access" && state.incident.mode === "600";
   }
+  if (fixture.family === "path-access") {
+    return state.incident.kind === "path-access" && state.incident.directoryMode === "700" && state.incident.fileMode === "644";
+  }
   return state.incident.kind === "tcp-service" &&
     state.incident.processRunning === fixture.initialProcessRunning &&
     state.incident.listenerPort === fixture.initialPort;
@@ -247,6 +288,9 @@ export function targetReached(state: LabState): boolean {
   const fixture = scenarios[state.scenario];
   if (fixture.family === "file-access") {
     return state.incident.kind === "file-access" && state.incident.mode === fixture.targetMode;
+  }
+  if (fixture.family === "path-access") {
+    return state.incident.kind === "path-access" && state.incident.directoryMode === fixture.targetDirectoryMode && state.incident.fileMode === "644";
   }
   return state.incident.kind === "tcp-service" &&
     state.incident.processRunning &&
@@ -419,6 +463,72 @@ export function checkPermissionTransfer(state: LabState, answer: PermissionTrans
   };
 }
 
+export type PathTransferAnswer = {
+  identityEvidenceId: string;
+  identityFact: string;
+  pathEvidenceId: string;
+  pathFact: string;
+  fileFact: string;
+  changedParent: string;
+  changedParentMode: string;
+  predictedSymptom: string;
+  repairNeed: string;
+  causalClaim: string;
+};
+
+export function emptyPathTransfer(): PathTransferAnswer {
+  return {
+    identityEvidenceId: "",
+    identityFact: "",
+    pathEvidenceId: "",
+    pathFact: "",
+    fileFact: "",
+    changedParent: "",
+    changedParentMode: "",
+    predictedSymptom: "",
+    repairNeed: "",
+    causalClaim: ""
+  };
+}
+
+export function validPathTransferShape(value: unknown): value is PathTransferAnswer {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const answer = value as Record<string, unknown>;
+  const keys = ["identityEvidenceId", "identityFact", "pathEvidenceId", "pathFact", "fileFact", "changedParent", "changedParentMode", "predictedSymptom", "repairNeed", "causalClaim"];
+  if (Object.keys(answer).length !== keys.length || !keys.every(key => Object.hasOwn(answer, key))) return false;
+  return keys.every(key => typeof answer[key] === "string" && (answer[key] as string).length <= 100);
+}
+
+export function pathTransferAnswerMatches(answer: unknown): boolean {
+  if (!validPathTransferShape(answer)) return false;
+  const normalized = (value: string) => value.trim().toLowerCase();
+  return answer.identityEvidenceId === "path-search:before:identity" &&
+    normalized(answer.identityFact) === "33:www-data" &&
+    answer.pathEvidenceId === "path-search:before:resource" &&
+    normalized(answer.pathFact) === "700:/srv/private/site" &&
+    normalized(answer.fileFact) === "644:/srv/private/site/index.html" &&
+    normalized(answer.changedParent) === "/srv/private/archive" &&
+    normalized(answer.changedParentMode) === "700" &&
+    normalized(answer.predictedSymptom) === "403" &&
+    normalized(answer.repairNeed) === "directory-search" &&
+    normalized(answer.causalClaim) === "parent-search-required";
+}
+
+export function pathTransferSatisfied(state: LabState): boolean {
+  return state.pathTransferPassed && pathTransferAnswerMatches(state.pathTransfer);
+}
+
+export function editPathTransfer(state: LabState, answer: PathTransferAnswer): LabState {
+  if (state.scenario !== "path-search" || !state.explained || !validPathTransferShape(answer)) return state;
+  return { ...state, pathTransfer: structuredClone(answer), pathTransferPassed: false };
+}
+
+export function checkPathTransfer(state: LabState, answer: PathTransferAnswer): LabState {
+  if (state.scenario !== "path-search" || !state.explained || !reasoningMatches(state, state.reasoning) ||
+      !validPathTransferShape(answer)) return state;
+  return { ...state, pathTransfer: structuredClone(answer), pathTransferPassed: pathTransferAnswerMatches(answer) };
+}
+
 // Canonical immutable fixture output, captured only by a diagnostic command before repair.
 // An ID identifies a source, not a trusted learner or an anti-cheat credential.
 export function initialEvidence(scenario: ScenarioId, slot: EvidenceSlot): EvidenceRecord {
@@ -428,6 +538,10 @@ export function initialEvidence(scenario: ScenarioId, slot: EvidenceSlot): Evide
     output = slot === "symptom" ? "HTTP/1.1 403 Forbidden"
       : slot === "identity" ? fixture.identity
       : "-rw------- 1 " + fixture.owner + " " + fixture.group + " 1842 Oct 5 " + fixture.path;
+  } else if (fixture.family === "path-access") {
+    output = slot === "symptom" ? "HTTP/1.1 403 Forbidden"
+      : slot === "identity" ? fixture.identity
+      : "drwxr-xr-x root root /\ndrwx------ root root /srv/private/site\n-rw-r--r-- root root /srv/private/site/index.html";
   } else {
     output = slot === "symptom" ? "curl: (7) Failed to connect to 127.0.0.1 port 8080: Connection refused"
       : slot === "identity" ? (fixture.initialProcessRunning ? "842 app api-server" : "no matching api-server process")
@@ -464,7 +578,9 @@ export function reasoningMatches(state: LabState, answer: unknown): boolean {
   const fixture = scenarios[state.scenario];
   const claims = fixture.family === "file-access"
     ? { symptom: "403", identity: state.scenario === "guided" ? "33:www-data" : "1001:report-worker,web", resource: "600" }
-    : { symptom: "refused", identity: fixture.initialProcessRunning ? "present" : "absent", resource: fixture.initialPort === null ? "none" : "9090" };
+    : fixture.family === "path-access"
+      ? { symptom: "403", identity: "33:www-data", resource: "700-parent-644-file" }
+      : { symptom: "refused", identity: fixture.initialProcessRunning ? "present" : "absent", resource: fixture.initialPort === null ? "none" : "9090" };
   const normalized = (s: string) => s.trim().toLowerCase();
   if (!evidenceSlots.every(slot => answer[slot].evidenceId === state.preRepairEvidence[slot]?.id &&
       normalized(answer[slot].claim) === claims[slot])) return false;
@@ -472,7 +588,7 @@ export function reasoningMatches(state: LabState, answer: unknown): boolean {
   return new Set(answer.mechanism.evidenceIds).size === 2 &&
     supportingIds.every(id => answer.mechanism.evidenceIds.includes(id!)) &&
     normalized(answer.mechanism.claim) === fixture.explanation &&
-    normalized(answer.target) === (fixture.family === "file-access" ? fixture.targetMode : String(fixture.targetPort));
+    normalized(answer.target) === (fixture.family === "file-access" ? fixture.targetMode : fixture.family === "path-access" ? fixture.targetDirectoryMode : String(fixture.targetPort));
 }
 
 export function editReasoning(state: LabState, answer: ReasoningAnswer): LabState {
@@ -482,6 +598,7 @@ export function editReasoning(state: LabState, answer: ReasoningAnswer): LabStat
     reasoning: structuredClone(answer),
     explained: false,
     ...(state.scenario === "transfer" ? { permissionTransfer: null, permissionTransferPassed: false } : {}),
+    ...(state.scenario === "path-search" ? { pathTransfer: null, pathTransferPassed: false } : {}),
     ...(state.scenario === "differential-listener" ? { causalTransfer: null, causalTransferPassed: false } : {})
   };
 }
@@ -490,12 +607,14 @@ export function explain(state: LabState, answer: ReasoningAnswer): LabState {
   if (!state.verified || !state.repairedWithEvidence || !targetReached(state) || !validReasoningShape(answer)) return state;
   const explained = reasoningMatches(state, answer);
   const revokePermissionTransfer = state.scenario === "transfer" && (!explained || !state.explained);
+  const revokePathTransfer = state.scenario === "path-search" && (!explained || !state.explained);
   const revokeCausalTransfer = state.scenario === "differential-listener" && (!explained || !state.explained);
   return {
     ...state,
     reasoning: structuredClone(answer),
     explained,
     ...(revokePermissionTransfer ? { permissionTransfer: null, permissionTransferPassed: false } : {}),
+    ...(revokePathTransfer ? { pathTransfer: null, pathTransferPassed: false } : {}),
     ...(revokeCausalTransfer ? { causalTransfer: null, causalTransferPassed: false } : {})
   };
 }
@@ -556,6 +675,41 @@ function executeFileScenario(state: LabState, command: string, fixture: FileScen
           : "Service healthy; assessment incomplete. Check minimal access and pre-repair evidence. Reset if you repaired blindly.")
       }]
     };
+  }
+  return null;
+}
+
+function executePathAccessScenario(state: LabState, command: string, fixture: PathAccessScenario): { state: LabState; lines: Line[] } | null {
+  if (state.incident.kind !== "path-access") return null;
+  if (command === fixture.commands.resource) {
+    const next = withObservation(state, "resource");
+    const directory = state.incident.directoryMode === "700" ? "drwx------" : "drwx--x--x";
+    return { state: next, lines: [{ kind: "output", text: "drwxr-xr-x root root /\n" + directory + " root root " + fixture.parentPath + "\n-rw-r--r-- root root " + fixture.path }] };
+  }
+  if (command === fixture.commands.identity) {
+    return { state: withObservation(state, "identity"), lines: [{ kind: "output", text: fixture.identity }] };
+  }
+  if (command === "chmod 644 " + fixture.path) {
+    return { state: { ...state, verified: false, explained: false, reasoning: null, pathTransfer: null, pathTransferPassed: false },
+      lines: [{ kind: "error", text: "File is already 644. HTTP remains blocked because parent-directory search permission is unchanged." }] };
+  }
+  if (command === fixture.commands.repair) {
+    const repairedWithEvidence = incidentIsInitial(state)
+      ? evidenceReady(state) && state.hypothesis === fixture.correctHypothesis
+      : state.repairedWithEvidence;
+    return {
+      state: { ...state, incident: { kind: "path-access", directoryMode: "711", fileMode: "644" }, repairedWithEvidence,
+        verified: false, explained: false, reasoning: null, pathTransfer: null, pathTransferPassed: false },
+      lines: [{ kind: "output", text: "Parent directory search permission updated without changing file read/write bits. Verify HTTP." }]
+    };
+  }
+  if (command === fixture.commands.symptom) {
+    const healthy = state.incident.directoryMode === "711" && state.incident.fileMode === "644";
+    if (!healthy) return { state: withObservation(state, "symptom"), lines: [{ kind: "error", text: "HTTP/1.1 403 Forbidden" }] };
+    const verified = state.repairedWithEvidence && targetReached(state);
+    return { state: { ...state, verified }, lines: [{ kind: "success", text: "HTTP/1.1 200 OK\n" + (verified
+      ? "Evidence-backed path-search repair verified. Explain why readable file bits were insufficient."
+      : "HTTP is healthy, but the evidence/least-privilege diagnosis gate is incomplete.") }] };
   }
   return null;
 }
@@ -638,7 +792,8 @@ export function execute(state: LabState, command: string): { state: LabState; li
       state.differentialOrder === "listener-first" &&
       state.differentialStep === 1 &&
       causalTransferSatisfied(state);
-    const preservePermissionTransfer = isDifferentialScenario(state.scenario) && permissionTransferSatisfied(state);
+    const preservePermissionTransfer = (state.scenario === "path-search" || isDifferentialScenario(state.scenario)) && permissionTransferSatisfied(state);
+    const preservePathTransfer = isDifferentialScenario(state.scenario) && pathTransferSatisfied(state);
     return {
       state: initialLabState(
         state.scenario,
@@ -647,7 +802,9 @@ export function execute(state: LabState, command: string): { state: LabState; li
         preservePriorTransfer ? state.causalTransfer : null,
         preservePriorTransfer,
         preservePermissionTransfer ? state.permissionTransfer : null,
-        preservePermissionTransfer
+        preservePermissionTransfer,
+        preservePathTransfer ? state.pathTransfer : null,
+        preservePathTransfer
       ),
       lines: [{
         kind: "output",
@@ -669,7 +826,9 @@ export function execute(state: LabState, command: string): { state: LabState; li
 
   const result = fixture.family === "file-access"
     ? executeFileScenario(state, cmd, fixture)
-    : executeTcpServiceScenario(state, cmd, fixture);
+    : fixture.family === "path-access"
+      ? executePathAccessScenario(state, cmd, fixture)
+      : executeTcpServiceScenario(state, cmd, fixture);
   if (result) return result;
 
   return { state, lines: [{ kind: "error", text: "Command unavailable in this SIMULATED environment. Type help." }] };
