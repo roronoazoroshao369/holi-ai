@@ -1,17 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkCausalTransfer, checkPermissionTransfer, differentialScenario, editCausalTransfer, editPermissionTransfer, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
+import { checkCausalTransfer, checkPermissionTransfer, checkPathTransfer, differentialScenario, editCausalTransfer, editPermissionTransfer, editPathTransfer, execute, initialLabState, recordHypothesis, explain, editReasoning, scenarios } from "../lib/linux-simulator.ts";
 
 
 function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) {
   const scenario = state.scenario;
-  const file = scenarios[scenario].family === "file-access";
+  const family = scenarios[scenario].family;
+  const file = family === "file-access";
+  const path = family === "path-access";
   return {
-    symptom: { evidenceId: scenario + ":before:symptom", claim: file ? "403" : "refused" },
-    identity: { evidenceId: scenario + ":before:identity", claim: file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent") },
-    resource: { evidenceId: scenario + ":before:resource", claim: file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
+    symptom: { evidenceId: scenario + ":before:symptom", claim: file || path ? "403" : "refused" },
+    identity: { evidenceId: scenario + ":before:identity", claim: path ? "33:www-data" : file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent") },
+    resource: { evidenceId: scenario + ":before:resource", claim: path ? "700-parent-644-file" : file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
     mechanism: { evidenceIds: [scenario + ":before:resource", scenario + ":before:identity"], claim: mechanism },
-    target: file ? scenarios[scenario].targetMode : "8080"
+    target: path ? "711" : file ? scenarios[scenario].targetMode : "8080"
   };
 }
 
@@ -39,6 +41,22 @@ function permissionCounterfactualFor(overrides = {}) {
     predictedSymptom: "403",
     repairNeed: "required",
     causalClaim: "group-membership-required",
+    ...overrides
+  };
+}
+
+function pathCounterfactualFor(overrides = {}) {
+  return {
+    identityEvidenceId: "path-search:before:identity",
+    identityFact: "33:www-data",
+    pathEvidenceId: "path-search:before:resource",
+    pathFact: "700:/srv/private/site",
+    fileFact: "644:/srv/private/site/index.html",
+    changedParent: "/srv/private/archive",
+    changedParentMode: "700",
+    predictedSymptom: "403",
+    repairNeed: "directory-search",
+    causalClaim: "parent-search-required",
     ...overrides
   };
 }
@@ -121,6 +139,38 @@ test("permission counterfactual changes only group membership after the minimal 
   state = checkPermissionTransfer(state, permissionCounterfactualFor());
   assert.equal(state.permissionTransferPassed, true);
   assert.deepEqual(state.permissionTransfer, permissionCounterfactualFor());
+});
+
+test("path-search separates readable file bits from parent traversal and rejects blind file chmod", () => {
+  let state = diagnosed("path-search");
+  const evidenceBefore = structuredClone(state.preRepairEvidence);
+  const blind = execute(state, "chmod 644 /srv/private/site/index.html");
+  assert.match(blind.lines[0].text, /already 644/i);
+  assert.deepEqual(blind.state.preRepairEvidence, evidenceBefore);
+  assert.equal(blind.state.repairedWithEvidence, false);
+
+  state = run(state, scenarios["path-search"].commands.repair);
+  state = run(state, scenarios["path-search"].commands.symptom);
+  assert.equal(state.verified, true);
+  assert.equal(explain(state, reasoningFor(state, "other-read")).explained, false);
+  state = explain(state, reasoningFor(state));
+  assert.equal(state.explained, true);
+
+  for (const wrong of [
+    { pathEvidenceId: "path-search:before:identity" },
+    { pathFact: "711:/srv/private/site" },
+    { fileFact: "600:/srv/private/site/index.html" },
+    { changedParentMode: "711" },
+    { predictedSymptom: "200" },
+    { repairNeed: "file-read" },
+    { causalClaim: "other-read" }
+  ]) assert.equal(checkPathTransfer(state, pathCounterfactualFor(wrong)).pathTransferPassed, false);
+
+  state = checkPathTransfer(state, pathCounterfactualFor());
+  assert.equal(state.pathTransferPassed, true);
+  const edited = editPathTransfer(state, pathCounterfactualFor({ repairNeed: "file-read" }));
+  assert.equal(edited.pathTransferPassed, false);
+  assert.equal(run(state, "reset").pathTransferPassed, false);
 });
 
 test("editing or resetting permission transfer revokes it, while differential reset preserves a passed gate", () => {
@@ -239,7 +289,7 @@ test("differential cases require distinct mechanism explanations after diagnosis
 });
 
 test("repair syntax is hidden until evidence-backed hypothesis is locked", () => {
-  for (const scenario of ["guided", "differential-listener", "differential-process"]) {
+  for (const scenario of ["guided", "path-search", "differential-listener", "differential-process"]) {
     const fixture = scenarios[scenario];
     const before = execute(initialLabState(scenario), "help").lines[0].text;
     assert.doesNotMatch(before, /Repair syntax/);
@@ -293,7 +343,7 @@ test("blind repairs cannot manufacture diagnostic completion across families", (
 });
 
 test("reset restores exact current fixture and attempts remain immutable", () => {
-  for (const scenario of ["guided", "transfer", "differential-listener", "differential-process"]) {
+  for (const scenario of ["guided", "transfer", "path-search", "differential-listener", "differential-process"]) {
     const changed = run(initialLabState(scenario), scenarios[scenario].commands.repair);
     assert.deepEqual(run(changed, "reset"), initialLabState(scenario));
   }
