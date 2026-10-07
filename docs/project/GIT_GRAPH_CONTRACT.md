@@ -13,3 +13,8 @@ Persistence: compose graphPractice into the existing shared Git/CI checkpoint. S
 Security: pure finite in-browser transitions. No learner Git, YAML, shell, host, network or credential execution. Object IDs/logs are synthetic, not observations from the user's machine or Actions runner. No trusted mastery/certification claim. Required tests cover all existing flows plus source/fact/class errors, wrong two-parent candidate, transfer contract change, cloning, revocation, fresh/draft/locked/completed refresh, stale/corrupt state, denied Storage getter/methods, mobile overflow, visible focus and absent runtime errors. CI checks out and asserts exact PR-head SHA, then runs install/typecheck/all Node tests/audit/build/locked Chromium/all production tests before merge.
 
 Rollback: revert the product PR. Previous schema3 code rejects schema4 checkpoint rather than granting retrospective progress. Re-read LIVE main before any continuation.
+
+
+## Observed SHA input mechanics
+
+Rationale/explanation facts can bind SHA tokens from the learner-selected captured source. Explanation repair binds from its selected intent source. Changed transfer history/request facts bind from their selected visible transfer sources; selectedCommit binds from the linked history source. Candidate lists are extracted from raw output, never from validator answers. The learner chooses identity, order, source and causal predicates. Clear/undo modify ordinary persisted drafts and use existing explanation/transfer revocation; rationale controls remain inside the locked fieldset. Malformed manually entered facts remain editable but must be cleared/corrected before structured binding. No schema, fixture or scoring change.
