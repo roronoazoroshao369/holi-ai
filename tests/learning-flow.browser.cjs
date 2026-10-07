@@ -231,6 +231,7 @@ test("production flow differentiates same connection symptom using process and s
   for (const command of ["curl localhost/private", "namei -l /srv/private/site/index.html", "id www-data"]) await runCommand(page, command);
   await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("-rw-r--r--");
   await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("drwx------");
+  await expect(page.getByRole("log", { name: "Kết quả terminal" })).toContainText("/srv/private");
   await submitHypothesis(page, "permission");
   await runCommand(page, "chmod 644 /srv/private/site/index.html");
   await runCommand(page, "curl localhost/private");
@@ -572,8 +573,8 @@ test("browser persistence and resilience fail closed with practice schema v8", a
   await expect(page.getByText(/Checkpoint cũ\/hỏng đã bị loại bỏ an toàn/)).toBeVisible();
 
   await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
-    schemaVersion: 6,
-    fixtureVersion: 6,
+    schemaVersion: 7,
+    fixtureVersion: 5,
     state: {},
     completed: {}
   })), storageKey);
