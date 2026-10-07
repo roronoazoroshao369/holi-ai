@@ -4,57 +4,76 @@ Updated 2026-10-07. Current phase: v0.3 SIMULATED learning/mastery-flow foundati
 
 ## Latest verified product checkpoint
 
-- Product main: `62ffa961382ac16529541fd3eaa2dfeb37bea34d`, PR #49 — Complete observed SHA binding through graph transfer.
-- Exact final PR head: `92cb41d709acdece09c8d84a88c37951c2580fc8`.
-- Exact-head CI run `37560094762`, job `112595167050`: SUCCESS.
-- 75/75 Node tests, 14/14 production Chromium tests, typecheck, production build and npm audit (0 vulnerabilities) passed.
-- Main tree `8c4309e6d4ceba78debc1eaf688330ffe7c59bff` equals the tested product-head tree.
-- Post-merge main CI run `37560499264`: SUCCESS; full post-merge gate passed.
-- Documentation closeout: branch docs/graph-transfer-binding-closeout; not merged at preparation time. Read LIVE main/PRs for the final documentation commit.
+- Product main: `15638e8a3c247c745dd6c93f1d9e32ac741b7847`, including PR #54 — Diagnose parent-directory search permission under HTTP 403 and corrective PR #56 — Align homepage truth with path-search delivery.
+- #54 exact final head: `ab1cfd6ec581dd8e25bd7a996f947d180fdeed44`; exact-head CI `37566108797` — SUCCESS.
+- #56 exact final head: `fe87b4c79cdb6b0db970049fb9ce782e364549ef`; exact-head CI `37567600706` — SUCCESS.
+- Full verified gate at current product source was repeated by temporary packaging PR #57 final head `b2ab3fa6f75bf05a6bc00a6f775df6f7f5324724`: CI `37570652716` — SUCCESS, including checkout-SHA verification, 77/77 Node tests, typecheck, audit, production build, locked Chromium and 14/14 production browser tests.
+- PR #57 was CLOSED WITHOUT MERGE and its temporary branch was reset to product main, so `contents: write` did not enter `main`.
+- The GitHub connector used here does not surface push-triggered workflow runs for the merged main commit; do not fabricate a separate post-merge-main run id. Current product source was independently re-gated through #57.
 
 ## Delivered goal contract
 
-GOAL: complete observed-SHA inputs through graph explanation and changed-history transfer, with reversible draft binding.
-WHY NOW / USER VALUE: #48 added fact binding, but explanation repair and transfer still required copying full-length synthetic IDs.
-SCOPE: selected-source tokens for explanation repair, transfer history/request facts and selected commit; undo/clear; 44px controls.
-NON-GOALS: no new incident, canonical answer autofill, scoring/schema/fixture change or learner execution.
-ACCEPTANCE: all graph SHA fields can use observed tokens; wrong ordering/source/extra-change identity still fail; lock, reload, revocation, mobile overflow and keyboard focus preserved.
-TEST PLAN / EVIDENCE: full exact-head CI passed, including one new end-to-end production-browser test covering those acceptance criteria.
-SECURITY: candidates come from raw selected evidence output; no host/Git/YAML/shell/network/credential execution.
-LEARNING: source choice, order, causal relation, ancestry and reviewed change series remain learner decisions. Completion is assisted finite practice.
-ROLLBACK: revert #49; Git/CI schema4/fixture4 and Linux schema7/fixture5 are unchanged.
+GOAL: teach and assess the distinction between file read permission and parent-directory search permission under one bounded SIMULATED HTTP 403 incident.
+
+DELIVERED:
+- new `path-search` Linux incident with HTTP symptom, effective identity and namei-style path-component evidence;
+- immutable pre-repair permission hypothesis requirement;
+- explicit rejection of repeating file `chmod 644` when the file is already readable;
+- least-privilege repair on the blocking parent directory;
+- HTTP recovery verification;
+- source-linked explanation;
+- changed-parent transfer that still requires directory-search reasoning;
+- progression gate requiring path-search transfer before health differential practice;
+- Linux persistence migration to schema 8 / fixture 6 with fail-closed stale-state handling;
+- homepage product truth corrected to 08 simulated incidents / 03 transfer gates.
+
+NON-GOALS PRESERVED: no learner host execution, no real Linux/network stack, no server-trusted mastery, no Git/CI persistence change, no weakening of retries/timeouts/security boundaries.
 
 ## What works
 
-Seven primary SIMULATED incidents: four Linux permission/TCP incidents and three Git/CI artifact/revision/graph incidents, plus bounded transfer tasks. Git foundations and evidence-synthesis bridge remain disjoint, React-local teaching scaffolds with no assessment credit.
+Eight primary SIMULATED incidents now exist across Linux and Git/CI. Linux practice includes file-permission, parent-directory path-search and two same-symptom TCP diagnostic causes; Git/CI includes artifact handoff, revision acceptance and graph integration, plus teaching-only Git foundations/evidence-synthesis scaffolds.
 
-Graph practice captures six sources, locks pre-repair reasoning, permits minimal immutable checkout selection, checks consumed identity and ordered parents separately, then requires explanation and a changed linear-history transfer.
+Linux path-search explicitly separates file readability from directory traversal. A changed-parent transfer prevents solving by blindly repeating the prior file chmod. Existing permission/group and listener/socket causal transfers remain required.
 
-Graph rationale/explanation facts bind source-local SHA tokens (#48). Explanation repair and transfer history/request/selected-commit inputs now offer observed SHA binding (#49). Undo/clear use existing state transitions; locked rationale stays immutable. Wrong reasoning cannot be rescued by correct operational recovery.
+Git graph evidence binding remains intact: observed SHA candidates reduce clerical copying while source/order/relation/ancestry decisions remain learner commitments.
 
-Same-browser persistence, reset/retry, corrupt/stale/unavailable storage, sibling isolation and downstream revocation are regression-tested. Client progress remains forgeable and non-authoritative.
+Same-browser persistence, reset/retry, stale/corrupt/unavailable storage, mobile overflow, keyboard focus and runtime-error boundaries remain under mandatory Chromium regression. Client-side checkpoints remain forgeable and non-authoritative.
 
-## Partial implementation / known risks
+## Production deployment
 
-- Curriculum is a skeleton, not a coherent A–Z DevOps course.
-- Corpus, facts and relation grammar remain small, finite, visible and retryable.
-- Linux permission fixtures assume healthy parent-directory traversal and omit ACL/SELinux.
-- Chromium-only coverage remains a compatibility limit.
-- Real isolation/identity/quotas/TTL/cleanup/network/cost controls remain design-only.
-- Local Chromium download failed with an invalid archive; GitHub CI successfully installed the locked browser and ran all tests.
-- CI emitted a Node action-runtime deprecation warning for checkout/setup-node v4; not a failed gate.
-- CSS retains compatibility/cascade layers; consolidation remains maintainability debt.
+Cloudflare Worker: `holi-devops-web`.
 
-## Deployment / concurrent work
+Verified source: `15638e8a3c247c745dd6c93f1d9e32ac741b7847`.
 
-Previously documented serving URL: https://holi.shao.dpdns.org/ (Cloudflare Worker shell). Last recorded verified deployed source before this run: `a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf`.
+Temporary packaging PR #57:
+- first attempt `37570196066` failed safely in Worker packaging because temporary regex literals were over-escaped; publish step was skipped and no deployment occurred;
+- corrected final head `b2ab3fa6f75bf05a6bc00a6f775df6f7f5324724`;
+- packaging CI `37570652716` — SUCCESS;
+- artifact build id: `EWt-Gw5Dki0USIYdA8GQK`;
+- page chunk: `page-9d6a40fdeb1e4354.js`.
 
-Concurrent temporary packaging PR #50 targets source `c8fc4f81fecbb244c174701723d7beaed315c2d5` (#48), not #49. Its branch-only write permission MUST NOT enter main; it explicitly must not be merged. Its CI is green, but this run has not verified a corresponding production deployment. Reconcile LIVE deployment/artifact markers before claiming latest code is served. Pages Git-integration error 8000011 remains historical deployment debt.
+Production deployment: `0c112f93-451c-4970-abc4-6ba7ab2a4fc5`.
+Production version: `fbddfc81-da85-47c9-bfb8-662291566d2f`, 100% traffic.
+Public URL: https://holi.shao.dpdns.org/
+
+Cloudflare Browser Rendering returned HTTP 200 and confirmed the 08/03 product-truth counters, parent-directory-search copy, expected build/page markers, and absence of the prior `page-36a147e4a3373130.js` chunk.
+
+## Known risks
+
+- Curriculum remains a skeleton rather than a coherent A–Z DevOps course.
+- Exercise corpus and typed reasoning grammar remain finite, visible and retryable.
+- localStorage is forgeable and cannot represent trusted certification/mastery.
+- Linux permission modeling still omits ACL, SELinux, capabilities, namespaces and credential-refresh behavior.
+- TCP modeling omits firewall policy, namespaces, bind-address complexity and service-manager behavior.
+- Chromium-only browser coverage remains a compatibility limit.
+- Real sandbox identity, isolation, quotas, TTL, cleanup, restricted egress, cost controls and escape verification remain design-only.
+- CI emits Node action-runtime deprecation warnings for checkout/setup-node v4; this is not a failed gate.
+- Cloudflare Pages Git integration error 8000011 remains historical deployment-automation debt; verified serving continues through the Worker custom domain.
 
 ## ONE next frontier
 
-Expand Linux diagnostic transfer beyond healthy parent-directory traversal. Candidate primary goal: one bounded SIMULATED HTTP 403 path-search incident distinguishing readable-file permission from parent-directory search permission.
+Highest-value nearby gap: Linux explanation/transfer inputs still rely on finite exact text tokens, so clerical formatting can fail separately from causal understanding.
 
-Acceptance candidate: collect file, effective identity and path-component evidence before committing rationale; least-privilege directory repair; verify HTTP/path access; source-linked explanation; changed-path transfer that rejects blindly repeating file chmod. Preserve sibling progress; review schema/fixture migration explicitly if persisted shape/corpus changes. Never execute learner input on the host.
+Candidate primary goal: one bounded Linux evidence-binding UX hardening slice for the permission/path-search reasoning flow. Let learners bind factual claims to already captured identity/path evidence rather than retype fragile strings, while preserving immutable pre-repair commitment, explicit source linkage, causal relation choice, wrong-reasoning failure after successful repair, downstream revocation, schema/fixture fail-closed rules and the SIMULATED trust boundary. Do not convert the assessment into answer-revealing multiple choice.
 
-Reassess LIVE evidence before choosing this goal. External blockers: none for further SIMULATED development. Real execution remains gated on verified isolation.
+Reassess LIVE repository evidence before implementation.
