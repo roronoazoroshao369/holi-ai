@@ -6,6 +6,10 @@ on:
     branches: [main]
 
 
+# TEMPORARY_DEPLOY_PACKAGING: branch-only, never merge.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,6 +37,69 @@ jobs:
         run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run production browser regression
         run: ./node_modules/.bin/playwright test --config=playwright.config.cjs
+      - name: Build verified static deployment artifact
+        if: github.event_name == 'pull_request' && github.head_ref == 'ops/package-linux-path-worker'
+        env:
+          CF_PAGES: "1"
+        run: npm run build
+      - name: Package verified Worker module
+        if: github.event_name == 'pull_request' && github.head_ref == 'ops/package-linux-path-worker'
+        env:
+          VERIFIED_SOURCE: bd57fa67b910a979d70b59b7f3de4ea4d7aea38e
+        run: |
+          export ARTIFACT_DIR="$RUNNER_TEMP/holi-linux-path-worker"
+          rm -rf "$ARTIFACT_DIR"
+          mkdir -p "$ARTIFACT_DIR"
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const root = path.resolve('out');
+          const files = {};
+          const allowed = /\.(?:html|txt|js|css|json)$/;
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) walk(full);
+              else {
+                const rel = path.relative(root, full).split(path.sep).join('/');
+                if (!allowed.test(rel)) throw new Error('Unexpected non-text artifact: ' + rel);
+                files[rel] = fs.readFileSync(full, 'utf8');
+              }
+            }
+          }
+          walk(root);
+          const manifests = Object.keys(files).filter(p => /^_next\/static\/[^/]+\/_buildManifest\.js$/.test(p));
+          const pages = Object.keys(files).filter(p => /^_next\/static\/chunks\/app\/page-[a-f0-9]+\.js$/.test(p));
+          if (manifests.length !== 1 || pages.length !== 1) throw new Error('Unexpected Next artifact shape');
+          const buildId = manifests[0].split('/')[2];
+          const pageChunk = path.posix.basename(pages[0]);
+          const worker = `const FILES=${JSON.stringify(files)};
+          const TYPES={".html":"text/html; charset=utf-8",".txt":"text/plain; charset=utf-8",".js":"application/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".json":"application/json; charset=utf-8"};
+          function typeFor(path){for(const [ext,type] of Object.entries(TYPES)){if(path.endsWith(ext)) return type;}return "application/octet-stream";}
+          export default {async fetch(request){const url=new URL(request.url);let path=decodeURIComponent(url.pathname);if(path==="/")path="/index.html";if(path.endsWith("/"))path+="index.html";const key=path.replace(/^\\//,"");const body=FILES[key];if(body===undefined){const fallback=FILES["404.html"];return new Response(request.method==="HEAD"?null:fallback,{status:404,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-cache"}});}const headers={"content-type":typeFor(key),"x-content-type-options":"nosniff"};if(key.startsWith("_next/static/"))headers["cache-control"]="public, max-age=31536000, immutable";else headers["cache-control"]="no-cache";return new Response(request.method==="HEAD"?null:body,{status:200,headers});}};`;
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, 'worker.js'), worker);
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-source-sha'), process.env.VERIFIED_SOURCE + '\n');
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-build-id'), buildId + '\n');
+          fs.writeFileSync(path.join(process.env.ARTIFACT_DIR, '.holi-page-chunk'), pageChunk + '\n');
+          console.log(JSON.stringify({ files: Object.keys(files).length, bytes: Buffer.byteLength(worker), buildId, pageChunk }));
+          NODE
+      - name: Publish verified Worker deployment artifact
+        if: github.event_name == 'pull_request' && github.head_ref == 'ops/package-linux-path-worker'
+        env:
+          ARTIFACT_BRANCH: deploy/cloudflare-linux-path-worker
+          VERIFIED_SOURCE: bd57fa67b910a979d70b59b7f3de4ea4d7aea38e
+        run: |
+          export ARTIFACT_DIR="$RUNNER_TEMP/holi-linux-path-worker"
+          cd "$ARTIFACT_DIR"
+          test "$(cat .holi-source-sha)" = "$VERIFIED_SOURCE"
+          git init
+          git checkout -b "$ARTIFACT_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Publish verified Worker artifact for $VERIFIED_SOURCE"
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git push --force origin "HEAD:refs/heads/$ARTIFACT_BRANCH"
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
