@@ -5,22 +5,47 @@ import {
   initialGraphState, graphEvidenceReady, graphReasonComplete, inspectGraph, emptyGraphReason,
   editGraphReason, lockGraph, selectGraphCommit, rebuildGraph, verifyGraph,
   emptyGraphExplanation, editGraphExplanation, explainGraph, emptyGraphTransfer, editGraphTransfer, checkGraphTransfer,
-  type GraphState, type GraphReason, type GraphHypothesis
+  type GraphState, type GraphReason, type GraphHypothesis, type GraphSlot
 } from '../lib/git-graph-simulator';
 const names = { symptom: 'delivery checks', review: 'review snapshot', graph: 'object records', workflow: 'job configuration', build: 'produced metadata', intent: 'delivery request' };
+const SHA_TOKEN = /\b[a-f0-9]{40}\b/gi;
+const FACT_BINDING: Partial<Record<GraphSlot, { separator: string; max: number }>> = {
+  review: { separator: ':', max: 2 },
+  graph: { separator: '=', max: 2 },
+  workflow: { separator: '', max: 1 },
+  build: { separator: ':', max: 2 },
+  intent: { separator: ':', max: 3 }
+};
+const shortSha = (sha: string) => `${sha.slice(0, 8)}…${sha.slice(-6)}`;
 export function GitGraphLab({ state, onChange }: { state: GraphState; onChange: (s: GraphState) => void }) {
   const [hypothesis, setHypothesis] = useState<GraphHypothesis>('');
   const [commit, setCommit] = useState('');
   const ready = graphEvidenceReady(state), reason = state.rationale ?? emptyGraphReason();
   const explanation = state.explanation ?? emptyGraphExplanation(), transfer = state.transfer ?? emptyGraphTransfer();
-  function reasonFields(answer: GraphReason, phase: 'rationale' | 'explanation', change: (x: GraphReason) => void) {
-    return <>{GRAPH_SLOTS.map(slot => <fieldset key={slot} disabled={phase === 'rationale' && Boolean(state.hypothesis)}><legend>{names[slot]}</legend>
-      <label>Source<select aria-label={`Git graph ${phase} ${slot} source`} value={answer.sources[slot].id} onChange={e => change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], id: e.target.value } } })}>
-        <option value="">Chọn source đã thu</option>{GRAPH_SLOTS.map(s => <option key={s} value={state.evidence[s]?.id}>{state.evidence[s]?.id}</option>)}</select></label>
-      <label>Fact<input aria-label={`Git graph ${phase} ${slot} fact`} maxLength={160} value={answer.sources[slot].fact} onChange={e => change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], fact: e.target.value } } })} /></label>
-    </fieldset>)}<label>Relation<input aria-label={`Git graph ${phase} relation`} maxLength={160} disabled={phase === 'rationale' && Boolean(state.hypothesis)} value={answer.relation} onChange={e => change({ ...answer, relation: e.target.value })} /></label></>;
+  function sourceShaTokens(sourceId: string) {
+    const source = GRAPH_SLOTS.map(slot => state.evidence[slot]).find(item => item?.id === sourceId);
+    return [...new Set(source?.output.match(SHA_TOKEN) ?? [])];
   }
-  const grammar = <p>Facts grammar: symptom = PIPELINE_STATUS:acceptance-ACCEPTANCE_RESULT (lowercase, nối bằng dấu gạch ngang); review = BASE:PR_HEAD; graph = PR_HEAD=DIRECT_PARENT; workflow = checkout SHA; build = CHECKOUT:METADATA; intent = REQUESTED_COMMIT:FIRST_PARENT:SECOND_PARENT. Dùng SHA đầy đủ, không thêm khoảng trắng. Relation: pr-head-omits-required-base / cache-reuses-output / target-routes-delivery. Đây là grammar hữu hạn, chưa chấm văn bản tự do.</p>;
+  function reasonFields(answer: GraphReason, phase: 'rationale' | 'explanation', change: (x: GraphReason) => void) {
+    return <>{GRAPH_SLOTS.map(slot => {
+      const rule = FACT_BINDING[slot], tokens = sourceShaTokens(answer.sources[slot].id);
+      const boundCount = answer.sources[slot].fact.match(SHA_TOKEN)?.length ?? 0;
+      return <fieldset key={slot} disabled={phase === 'rationale' && Boolean(state.hypothesis)}><legend>{names[slot]}</legend>
+        <label>Source<select aria-label={`Git graph ${phase} ${slot} source`} value={answer.sources[slot].id} onChange={e => change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], id: e.target.value } } })}>
+          <option value="">Chọn source đã thu</option>{GRAPH_SLOTS.map(s => <option key={s} value={state.evidence[s]?.id}>{state.evidence[s]?.id}</option>)}</select></label>
+        <label>Fact<input aria-label={`Git graph ${phase} ${slot} fact`} maxLength={160} value={answer.sources[slot].fact} onChange={e => change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], fact: e.target.value } } })} /></label>
+        {rule && tokens.length > 0 && <div className="gitFactBinder" aria-label={`Git graph ${phase} ${slot} observed SHA binder`}>
+          <span>Bind SHA từ source đã chọn · thứ tự click = thứ tự claim</span>
+          <div>{tokens.map(sha => <button key={sha} type="button" className="secondaryButton" disabled={boundCount >= rule.max} aria-label={`Bind Git graph ${phase} ${slot} observed SHA ${sha}`} onClick={() => {
+            const current = answer.sources[slot].fact.trim();
+            const fact = rule.max === 1 ? sha : current ? `${current}${rule.separator}${sha}` : sha;
+            change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], fact } } });
+          }}><code>{shortSha(sha)}</code></button>)}</div>
+        </div>}
+      </fieldset>;
+    })}<label>Relation<input aria-label={`Git graph ${phase} relation`} maxLength={160} disabled={phase === 'rationale' && Boolean(state.hypothesis)} value={answer.relation} onChange={e => change({ ...answer, relation: e.target.value })} /></label></>;
+  }
+  const grammar = <p>Facts grammar: symptom = PIPELINE_STATUS:acceptance-ACCEPTANCE_RESULT (lowercase, nối bằng dấu gạch ngang); review = BASE:PR_HEAD; graph = PR_HEAD=DIRECT_PARENT; workflow = checkout SHA; build = CHECKOUT:METADATA; intent = REQUESTED_COMMIT:FIRST_PARENT:SECOND_PARENT. Với SHA dài, chọn source rồi bind các giá trị quan sát theo đúng thứ tự claim; binder chỉ lấy token từ source đang chọn và không tự chọn đáp án. Relation: pr-head-omits-required-base / cache-reuses-output / target-routes-delivery. Đây là grammar hữu hạn, chưa chấm văn bản tự do.</p>;
   return <section id="git-graph-practice" className="revisionLab" aria-label="Git graph simulated incident">
     <div className="ciLabHeader"><div><span className="kicker">GIT / SIMULATED</span><h3>{GRAPH_PROMPT.title}</h3><p>{GRAPH_PROMPT.summary}</p></div><div className="ciTruth"><strong>SIMULATED</strong><span>Commit và logs là fixture, không phải Git repo hoặc Actions runner thật.</span></div></div>
     <button type="button" className="secondaryButton" onClick={() => { onChange(initialGraphState()); setHypothesis(''); setCommit(''); }}>Reset Git graph incident</button>

@@ -16,6 +16,27 @@ async function fillReason(page, phase = 'rationale') {
   await page.getByRole('textbox', { name: `Git graph ${phase} relation`, exact: true }).fill('pr-head-omits-required-base');
   if (phase === 'explanation') await page.getByRole('textbox', { name: 'Git graph explanation repair', exact: true }).fill(S.integration);
 }
+async function bindReason(page, phase = 'rationale', graphPair = [S.head, S.root]) {
+  const picks = {
+    review: [S.base, S.head],
+    graph: graphPair,
+    workflow: [S.head],
+    build: [S.head, S.head],
+    intent: [S.integration, S.base, S.head]
+  };
+  for (const slot of slots) {
+    await page.getByRole('combobox', { name: `Git graph ${phase} ${slot} source`, exact: true }).selectOption('git-graph:before:' + slot);
+    if (slot === 'symptom') {
+      await page.getByRole('textbox', { name: `Git graph ${phase} symptom fact`, exact: true }).fill('passed:acceptance-not-met');
+      continue;
+    }
+    for (const sha of picks[slot]) {
+      await page.getByRole('button', { name: `Bind Git graph ${phase} ${slot} observed SHA ${sha}`, exact: true }).click();
+    }
+  }
+  await page.getByRole('textbox', { name: `Git graph ${phase} relation`, exact: true }).fill('pr-head-omits-required-base');
+  if (phase === 'explanation') await page.getByRole('textbox', { name: 'Git graph explanation repair', exact: true }).fill(S.integration);
+}
 async function lock(page, hypothesis = 'integration-selection') {
   await page.getByRole('combobox', { name: 'Git graph hypothesis', exact: true }).selectOption(hypothesis);
   await page.getByRole('button', { name: 'Lock Git graph hypothesis', exact: true }).click();
@@ -52,6 +73,26 @@ async function fillTransfer(page) {
   for (const [field, value] of Object.entries(values)) await page.getByRole('textbox', { name: 'Git graph transfer ' + field, exact: true }).fill(value);
 }
 async function reset(page) { await page.getByRole('button', { name: 'Reset Git graph incident', exact: true }).click(); await saved(page, 'fresh'); }
+
+test('graph evidence binder builds SHA facts from the selected source without weakening locked reasoning', async ({ page }) => {
+  const runtime = []; errors(page, runtime); await page.goto('/'); await expect(lab(page)).toBeVisible();
+  await collect(page);
+
+  await bindReason(page, 'rationale', [S.root, S.head]);
+  await expect(page.getByRole('textbox', { name: 'Git graph rationale graph fact', exact: true })).toHaveValue(`${S.root}=${S.head}`);
+  await lock(page); await recover(page);
+  await expect(lab(page)).toContainText('Graph assessment chưa verified');
+  await expect(region(page, 'explanation')).toHaveCount(0);
+
+  await reset(page); await collect(page); await bindReason(page);
+  await expect(page.getByRole('textbox', { name: 'Git graph rationale review fact', exact: true })).toHaveValue(`${S.base}:${S.head}`);
+  await expect(page.getByRole('textbox', { name: 'Git graph rationale intent fact', exact: true })).toHaveValue(`${S.integration}:${S.base}:${S.head}`);
+  await saved(page, 'draft'); await page.reload();
+  await expect(page.getByRole('textbox', { name: 'Git graph rationale intent fact', exact: true })).toHaveValue(`${S.integration}:${S.base}:${S.head}`);
+  await lock(page); await recover(page);
+  await expect(region(page, 'explanation')).toBeVisible();
+  expect(runtime).toEqual([]);
+});
 
 test('graph diagnosis and source facts lock before repair; green and correct recovery cannot rescue wrong reasoning', async ({ page }) => {
   const runtime = []; errors(page, runtime); await page.goto('/'); await expect(lab(page)).toBeVisible();
