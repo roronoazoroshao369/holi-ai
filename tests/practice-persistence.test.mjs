@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkCausalTransfer, checkPermissionTransfer, execute, explain, initialLabState, recordHypothesis, scenarios } from "../lib/linux-simulator.ts";
+import { checkCausalTransfer, checkPermissionTransfer, checkPathTransfer, execute, explain, initialLabState, recordHypothesis, scenarios } from "../lib/linux-simulator.ts";
 import {
   LINUX_FIXTURE_VERSION,
   PRACTICE_SCHEMA_VERSION,
@@ -15,13 +15,15 @@ import {
 
 function reasoningFor(state, mechanism = scenarios[state.scenario].explanation) {
   const scenario = state.scenario;
-  const file = scenarios[scenario].family === "file-access";
+  const family = scenarios[scenario].family;
+  const file = family === "file-access";
+  const path = family === "path-access";
   return {
-    symptom: { evidenceId: scenario + ":before:symptom", claim: file ? "403" : "refused" },
-    identity: { evidenceId: scenario + ":before:identity", claim: file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent") },
-    resource: { evidenceId: scenario + ":before:resource", claim: file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
+    symptom: { evidenceId: scenario + ":before:symptom", claim: file || path ? "403" : "refused" },
+    identity: { evidenceId: scenario + ":before:identity", claim: path ? "33:www-data" : file ? (scenario === "guided" ? "33:www-data" : "1001:report-worker,web") : (scenario === "differential-listener" ? "present" : "absent") },
+    resource: { evidenceId: scenario + ":before:resource", claim: path ? "700-parent-644-file" : file ? "600" : (scenario === "differential-listener" ? "9090" : "none") },
     mechanism: { evidenceIds: [scenario + ":before:resource", scenario + ":before:identity"], claim: mechanism },
-    target: file ? scenarios[scenario].targetMode : "8080"
+    target: path ? "711" : file ? scenarios[scenario].targetMode : "8080"
   };
 }
 
@@ -53,6 +55,22 @@ function permissionCounterfactualFor(overrides = {}) {
   };
 }
 
+function pathCounterfactualFor(overrides = {}) {
+  return {
+    identityEvidenceId: "path-search:before:identity",
+    identityFact: "33:www-data",
+    pathEvidenceId: "path-search:before:resource",
+    pathFact: "700:/srv/private/site",
+    fileFact: "644:/srv/private/site/index.html",
+    changedParent: "/srv/private/archive",
+    changedParentMode: "700",
+    predictedSymptom: "403",
+    repairNeed: "directory-search",
+    causalClaim: "parent-search-required",
+    ...overrides
+  };
+}
+
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
   return {
@@ -70,11 +88,17 @@ function evidence(
   causalTransfer = null,
   causalTransferPassed = false,
   permissionTransfer = null,
-  permissionTransferPassed = false
+  permissionTransferPassed = false,
+  pathTransfer = null,
+  pathTransferPassed = false
 ) {
-  if (scenario.startsWith("differential") && permissionTransfer === null) {
+  if ((scenario === "path-search" || scenario.startsWith("differential")) && permissionTransfer === null) {
     permissionTransfer = permissionCounterfactualFor();
     permissionTransferPassed = true;
+  }
+  if (scenario.startsWith("differential") && pathTransfer === null) {
+    pathTransfer = pathCounterfactualFor();
+    pathTransferPassed = true;
   }
   let state = initialLabState(
     scenario,
@@ -83,7 +107,9 @@ function evidence(
     causalTransfer,
     causalTransferPassed,
     permissionTransfer,
-    permissionTransferPassed
+    permissionTransferPassed,
+    pathTransfer,
+    pathTransferPassed
   );
   const fixture = scenarios[scenario];
   for (const command of [fixture.commands.symptom, fixture.commands.resource, fixture.commands.identity]) {
@@ -99,7 +125,9 @@ function completed(
   causalTransfer = null,
   causalTransferPassed = false,
   permissionTransfer = null,
-  permissionTransferPassed = false
+  permissionTransferPassed = false,
+  pathTransfer = null,
+  pathTransferPassed = false
 ) {
   const fixture = scenarios[scenario];
   let state = evidence(
@@ -109,12 +137,15 @@ function completed(
     causalTransfer,
     causalTransferPassed,
     permissionTransfer,
-    permissionTransferPassed
+    permissionTransferPassed,
+    pathTransfer,
+    pathTransferPassed
   );
   state = execute(state, fixture.commands.repair).state;
   state = execute(state, fixture.commands.symptom).state;
   state = explain(state, reasoningFor(state));
   if (scenario === "transfer") state = checkPermissionTransfer(state, permissionCounterfactualFor());
+  if (scenario === "path-search") state = checkPathTransfer(state, pathCounterfactualFor());
   return state;
 }
 
@@ -125,6 +156,8 @@ test("valid partial and completed checkpoints round-trip across all incident cas
     completed("guided"),
     evidence("transfer"),
     completed("transfer"),
+    evidence("path-search"),
+    completed("path-search"),
     evidence("differential-listener", "listener-first", 0),
     completed("differential-listener", "listener-first", 0),
     listenerPassed,
@@ -144,24 +177,24 @@ test("valid partial and completed checkpoints round-trip across all incident cas
 });
 
 test("completion requires permission transfer before differential and both transfer gates at the end", () => {
-  assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, differential: false });
-  assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, differential: false });
+  assert.deepEqual(checkpointFor(completed("guided")).completed, { guided: true, transfer: false, pathSearch: false, differential: false });
+  assert.deepEqual(checkpointFor(completed("transfer")).completed, { guided: true, transfer: true, pathSearch: false, differential: false });
 
   let transferWithoutCounterfactual = evidence("transfer");
   transferWithoutCounterfactual = execute(transferWithoutCounterfactual, scenarios.transfer.commands.repair).state;
   transferWithoutCounterfactual = execute(transferWithoutCounterfactual, scenarios.transfer.commands.symptom).state;
   transferWithoutCounterfactual = explain(transferWithoutCounterfactual, reasoningFor(transferWithoutCounterfactual));
-  assert.deepEqual(checkpointFor(transferWithoutCounterfactual).completed, { guided: true, transfer: false, differential: false });
+  assert.deepEqual(checkpointFor(transferWithoutCounterfactual).completed, { guided: true, transfer: false, pathSearch: false, differential: false });
 
-  assert.deepEqual(checkpointFor(completed("differential-listener", "listener-first", 0)).completed, { guided: true, transfer: true, differential: false });
+  assert.deepEqual(checkpointFor(completed("differential-listener", "listener-first", 0)).completed, { guided: true, transfer: true, pathSearch: false, differential: false });
 
   const listenerPassed = checkCausalTransfer(completed("differential-listener", "listener-first", 0), counterfactualFor());
   const finalProcess = checkpointFor(completed("differential-process", "listener-first", 1, listenerPassed.causalTransfer, true));
-  assert.deepEqual(finalProcess.completed, { guided: true, transfer: true, differential: true });
+  assert.deepEqual(finalProcess.completed, { guided: true, transfer: true, pathSearch: true, differential: true });
 
   const finalListenerState = checkCausalTransfer(completed("differential-listener", "process-first", 1), counterfactualFor());
   const reversed = checkpointFor(finalListenerState);
-  assert.deepEqual(reversed.completed, { guided: true, transfer: true, differential: true });
+  assert.deepEqual(reversed.completed, { guided: true, transfer: true, pathSearch: true, differential: true });
 
   finalProcess.completed.differential = false;
   assert.equal(parseCheckpoint(JSON.stringify(finalProcess)), null);
@@ -175,12 +208,12 @@ test("corrupt JSON is discarded and starts clean", () => {
   assert.equal(storage.peek(PRACTICE_STORAGE_KEY), undefined);
 });
 
-test("schema and fixture version mismatches including stale v6 fail closed", () => {
+test("schema and fixture version mismatches including stale v7 fail closed", () => {
   const checkpoint = checkpointFor(evidence());
   for (const changed of [
     { ...checkpoint, schemaVersion: PRACTICE_SCHEMA_VERSION + 1 },
     { ...checkpoint, fixtureVersion: LINUX_FIXTURE_VERSION + 1 },
-    { ...checkpoint, schemaVersion: 6, fixtureVersion: 5 },
+    { ...checkpoint, schemaVersion: 7, fixtureVersion: 5 },
     { ...checkpoint, schemaVersion: 5, fixtureVersion: 5 },
     { ...checkpoint, schemaVersion: 4, fixtureVersion: 4 },
     { ...checkpoint, schemaVersion: 3, fixtureVersion: 3 }
@@ -226,7 +259,7 @@ test("impossible verified, explained or untouched-repaired states are rejected",
     verified: true,
     explained: true
   };
-  impossible.completed = { guided: true, transfer: false, differential: false };
+  impossible.completed = { guided: true, transfer: false, pathSearch: false, differential: false };
   assert.equal(parseCheckpoint(JSON.stringify(impossible)), null);
 
   const untouched = checkpointFor(evidence("differential-process"));
@@ -300,6 +333,27 @@ test("permission transfer persistence rejects forged identity/resource facts and
   differential.state.permissionTransfer = null;
   differential.state.permissionTransferPassed = false;
   differential.completed.transfer = false;
+  assert.equal(parseCheckpoint(JSON.stringify(differential)), null);
+});
+
+test("path-search transfer persistence rejects file-chmod substitution and impossible carry", () => {
+  const valid = checkpointFor(completed("path-search"));
+  assert.ok(parseCheckpoint(JSON.stringify(valid)));
+  for (const mutate of [
+    checkpoint => { checkpoint.state.pathTransfer.pathEvidenceId = "path-search:before:identity"; },
+    checkpoint => { checkpoint.state.pathTransfer.fileFact = "600:/srv/private/site/index.html"; },
+    checkpoint => { checkpoint.state.pathTransfer.repairNeed = "file-read"; },
+    checkpoint => { checkpoint.state.pathTransfer.predictedSymptom = "200"; },
+    checkpoint => { checkpoint.state.pathTransfer.extra = "forged"; }
+  ]) {
+    const forged = structuredClone(valid);
+    mutate(forged);
+    assert.equal(parseCheckpoint(JSON.stringify(forged)), null);
+  }
+  const differential = checkpointFor(evidence("differential-process", "process-first", 0));
+  differential.state.pathTransfer = null;
+  differential.state.pathTransferPassed = false;
+  differential.completed.pathSearch = false;
   assert.equal(parseCheckpoint(JSON.stringify(differential)), null);
 });
 
