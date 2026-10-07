@@ -79,11 +79,11 @@ export function checkGitFoundationsReadiness(
 // and the scored Git graph assessment fixture. Component-local answers must never grant assessment credit.
 export const GIT_EVIDENCE_BRIDGE_FIXTURE = {
   commits: {
-    root: "e11dence0001",
-    base: "e11dence0002",
-    topic: "e11dence0003",
-    integration: "e11dence0004",
-    later: "e11dence0005"
+    root: "e11dece00001",
+    base: "e11dece00002",
+    topic: "e11dece00003",
+    integration: "e11dece00004",
+    later: "e11dece00005"
   },
   refName: "release/candidate"
 } as const;
