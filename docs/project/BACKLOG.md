@@ -1,6 +1,6 @@
 # Ordered backlog
 
-1. Reduce clerical full-length SHA/token transcription in the Git graph assessment without weakening source linkage, immutable pre-repair commitment, wrong-reasoning failure, ordered-parent/ancestry verification or downstream revocation. Prefer binding claims to captured evidence over retyping synthetic IDs; do not expose canonical answers or turn the assessment into guessable multiple choice.
+1. Expand Linux diagnostic transfer beyond the assumption of healthy parent-directory traversal. Candidate: one bounded SIMULATED HTTP 403 path-search incident that requires distinguishing file read permission from directory search permission, with pre-repair evidence, least-privilege repair, verification, explanation and a changed-path transfer. Reassess LIVE product gaps first; preserve existing sibling progress and review schema/fixture migration explicitly.
 2. Decide whether independent randomized differential assignment needs deliberate counterbalancing only if repeat-attempt product requirements justify it. Current Web Crypto selection can repeat and is not balanced exposure.
 3. Add server identity/storage only when cross-device or trusted assessment requirements justify it. Never promote client progress/evidence/counterfactual state into certification.
 4. Continue verified curriculum slices before presenting planned Docker/Kubernetes/IaC/observability labs as implemented. Git & CI now has three verified SIMULATED scored slices plus foundations/evidence-synthesis scaffolding, but the module is not broadly complete.
@@ -11,6 +11,7 @@ Practice schema v7 intentionally discards schema-v6 and older checkpoints. Linux
 
 
 Git/CI checkpoint: schema 4 / fixture 4 is independent from Linux schema 7 / fixture 5. Do not merge their persistence models merely for symmetry; unify only if a concrete cross-module product requirement justifies the migration cost.
+
 
 
 

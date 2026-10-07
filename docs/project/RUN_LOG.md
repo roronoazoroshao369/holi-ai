@@ -207,3 +207,16 @@ PR #45 exact final head `d9ad0b1471704a786e85113a8ea8a5ee91b4a5a4` passed CI `37
 Production was initially stale because the Cloudflare Worker deployment is manual, not automatic from GitHub. Temporary packaging PR #46 rebuilt the merged tree with `CF_PAGES=1`, passed the full repository gate and published artifact branch `deploy/cloudflare-evidence-artifact` with marker `.holi-source-sha = a1907602...`. PR #46 was closed without merge and its branch was reset to main, so temporary `contents: write` permission never entered main. The verified artifact was promoted to Worker `holi-devops-web` deployment `ad055836b8894c368568c44d6153c0d6`. Browser Rendering confirmed production now references build `HstoA1D70-SXSg4-1SOL5` / page chunk `page-36a147e4a3373130.js` and no longer references the prior page chunk.
 
 ONE next frontier: reduce clerical full-length SHA/fact transcription in the scored graph assessment while preserving immutable pre-repair source-linked reasoning, wrong-reasoning failure after recovery, ordered-parent/ancestry verification, revocation and the SIMULATED trust boundary.
+
+
+## 2026-10-07 — Complete observed SHA binding through graph transfer (#49)
+
+LIVE discovery found #48 already merged as c8fc4f81fecbb244c174701723d7beaed315c2d5, so the historical #45 handoff was stale. #48 exact-head CI 37559305330 and main CI 37559663713 succeeded. Temporary deployment PR #50 targets #48 and explicitly must not be merged.
+
+Primary goal: complete observed-SHA entry through explanation repair and changed-history transfer, with reversible draft controls. Delivered source-local binding, undo/clear, malformed-claim guidance and 44px controls. Kept canonical validators, immutable rationale, revocation and persistence schema/fixture unchanged.
+
+Verification: local typecheck, 75/75 Node tests, build and audit (0 vulnerabilities). Local Chromium download returned an invalid archive; locked Chromium installed successfully on GitHub. Product head 92cb41d709acdece09c8d84a88c37951c2580fc8 passed full CI 37560094762 / job112595167050, including 14/14 production Chromium tests. New regression rejects wrong source, reversed parent order and extra-change descendant; proves draft reload, locked rationale controls, downstream revocation, 390px overflow safety and visible keyboard focus.
+
+#49 merged as 62ffa961382ac16529541fd3eaa2dfeb37bea34d; re-read main confirmed tree8c4309e6d4ceba78debc1eaf688330ffe7c59bff equals tested-head tree. Post-merge run37560499264 — SUCCESS. No #49 production deployment claimed.
+
+Next candidate frontier: distinguish file read from parent-directory search permission in one bounded SIMULATED 403 path-access slice; current Linux fixtures explicitly assume traversal healthy. Reassess LIVE before implementing.
