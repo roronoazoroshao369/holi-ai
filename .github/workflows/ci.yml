@@ -6,6 +6,10 @@ on:
     branches: [main]
 
 
+# TEMPORARY_DEPLOY_PACKAGING: branch-only, never merge.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,6 +37,31 @@ jobs:
         run: ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run production browser regression
         run: ./node_modules/.bin/playwright test --config=playwright.config.cjs
+      - name: Build verified static deployment artifact
+        if: github.event_name == 'pull_request' && github.head_ref == 'ops/package-git-graph-evidence-binding'
+        env:
+          CF_PAGES: "1"
+        run: npm run build
+      - name: Publish verified static deployment artifact
+        if: github.event_name == 'pull_request' && github.head_ref == 'ops/package-git-graph-evidence-binding'
+        env:
+          ARTIFACT_BRANCH: deploy/cloudflare-graph-binding-artifact
+          VERIFIED_SOURCE: c8fc4f81fecbb244c174701723d7beaed315c2d5
+        run: |
+          export ARTIFACT_DIR="$RUNNER_TEMP/holi-graph-binding-artifact"
+          rm -rf "$ARTIFACT_DIR"
+          mkdir -p "$ARTIFACT_DIR"
+          cp -R out/. "$ARTIFACT_DIR/"
+          cd "$ARTIFACT_DIR"
+          git init
+          git checkout -b "$ARTIFACT_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          printf '%s\n' "$VERIFIED_SOURCE" > .holi-source-sha
+          git add .
+          git commit -m "Publish verified deployment artifact for $VERIFIED_SOURCE"
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git push --force origin "HEAD:refs/heads/$ARTIFACT_BRANCH"
       - name: Upload browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
