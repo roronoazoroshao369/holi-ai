@@ -1,3 +1,17 @@
+# Active goal contract — complete graph evidence binding
+
+GOAL: complete observed-SHA input support through explanation and changed-history transfer, with reversible draft binding.
+WHY NOW / USER VALUE: LIVE main c8fc4f81fecbb244c174701723d7beaed315c2d5 (#48) introduced rationale/explanation fact binding; repair identity and transfer still require manual full-length SHA transcription.
+SCOPE: evidence-local SHA binding for explanation repair, transfer history/request facts and selected commit; clear/undo draft binding; 44px controls.
+NON-GOALS: no canonical answers, no new lab, no simulator/validator/schema change, no real learner execution.
+ACCEPTANCE: a learner can complete all graph SHA fields via observed tokens; wrong ordering and later-descendant selection still fail; locked rationale cannot be edited; draft reload and downstream revocation remain valid; mobile overflow and focus checks pass.
+TEST PLAN: existing full Node and production browser suite plus end-to-end binder transfer regression, wrong-token/revocation/reload/keyboard/mobile assertions; exact PR-head CI before merge.
+SECURITY / LEARNING: source-local candidate extraction only; no correctness feedback before commitment; inference, source linkage and ordered claims remain learner decisions; localStorage remains untrusted.
+ROLLBACK: revert this product PR; persisted shape remains Git/CI schema4/fixture4 and Linux7/5.
+STATUS: implementation complete; local typecheck, 75/75 Node tests and production build passed. Local Playwright Chromium download returned invalid/truncated archive; full browser verification remains mandatory on exact-head GitHub CI. No merge claimed yet.
+
+---
+
 # Project state
 
 Updated 2026-10-07. Current phase: v0.3 SIMULATED learning/mastery-flow foundation with a verified public Cloudflare deployment shell and redesigned production UI/UX system. Package remains 0.1.0; no release/tag created.
@@ -136,3 +150,4 @@ Recommended bounded goal: redesign the graph rationale/verification input mechan
 Why now: the evidence-synthesis bridge removes the conceptual jump; the remaining nearby usability risk is that full-length SHA and finite grammar transcription can fail independently of conceptual understanding. Reassess against LIVE repository evidence before implementation.
 
 External blockers: none for the completed SIMULATED goal. Real execution remains gated on a separately verified isolation architecture.
+

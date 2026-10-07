@@ -1849,7 +1849,7 @@ footer {
   min-width: 0;
 }
 .ciLab .gitFactBinder button {
-  min-height: 34px;
+  min-height: 44px;
   max-width: 100%;
   padding: 6px 9px;
   border-color: var(--line-strong);
@@ -1863,3 +1863,4 @@ footer {
   font-family: var(--mono);
   font-size: 10px;
 }
+

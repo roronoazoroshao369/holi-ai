@@ -26,22 +26,35 @@ export function GitGraphLab({ state, onChange }: { state: GraphState; onChange: 
     const source = GRAPH_SLOTS.map(slot => state.evidence[slot]).find(item => item?.id === sourceId);
     return [...new Set(source?.output.match(SHA_TOKEN) ?? [])];
   }
+  function shaBinder(value: string, tokens: string[], rule: { separator: string; max: number }, label: string, change: (value: string) => void) {
+    if (!tokens.length) return null;
+    const parts = value.trim() ? (rule.separator ? value.trim().split(rule.separator) : [value.trim()]) : [];
+    const structured = parts.every(part => /^[a-f0-9]{40}$/i.test(part)) && parts.length <= rule.max;
+    return <div className="gitFactBinder" aria-label={`${label} observed SHA binder`}>
+      <span>Bind SHA từ source đã chọn · thứ tự click = thứ tự claim</span>
+      <div>{tokens.map(sha => <button key={sha} type="button" className="secondaryButton" disabled={!structured || parts.length >= rule.max}
+        aria-label={`Bind ${label} observed SHA ${sha}`} onClick={() => change([...parts, sha].join(rule.separator))}>
+        <code>{shortSha(sha)}</code></button>)}</div>
+      <div>
+        <button type="button" className="secondaryButton" aria-label={`Undo ${label} SHA binding`} disabled={!structured || !parts.length} onClick={() => change(parts.slice(0, -1).join(rule.separator))}>Bỏ SHA cuối</button>
+        <button type="button" className="secondaryButton" aria-label={`Clear ${label} SHA binding`} disabled={!value} onClick={() => change('')}>Xóa claim</button>
+      </div>
+      {!structured && <span>Claim hiện tại không theo grammar SHA; sửa trường Fact hoặc xóa claim trước khi bind.</span>}
+    </div>;
+  }
+  function transferShaTokens(sourceId: string) {
+    const source = GRAPH_TRANSFER_SLOTS.map(slot => GRAPH_TRANSFER_SOURCES[slot]).find(item => item.id === sourceId);
+    return [...new Set(source?.output.match(SHA_TOKEN) ?? [])];
+  }
   function reasonFields(answer: GraphReason, phase: 'rationale' | 'explanation', change: (x: GraphReason) => void) {
     return <>{GRAPH_SLOTS.map(slot => {
       const rule = FACT_BINDING[slot], tokens = sourceShaTokens(answer.sources[slot].id);
-      const boundCount = answer.sources[slot].fact.match(SHA_TOKEN)?.length ?? 0;
       return <fieldset key={slot} disabled={phase === 'rationale' && Boolean(state.hypothesis)}><legend>{names[slot]}</legend>
         <label>Source<select aria-label={`Git graph ${phase} ${slot} source`} value={answer.sources[slot].id} onChange={e => change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], id: e.target.value } } })}>
           <option value="">Chọn source đã thu</option>{GRAPH_SLOTS.map(s => <option key={s} value={state.evidence[s]?.id}>{state.evidence[s]?.id}</option>)}</select></label>
         <label>Fact<input aria-label={`Git graph ${phase} ${slot} fact`} maxLength={160} value={answer.sources[slot].fact} onChange={e => change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], fact: e.target.value } } })} /></label>
-        {rule && tokens.length > 0 && <div className="gitFactBinder" aria-label={`Git graph ${phase} ${slot} observed SHA binder`}>
-          <span>Bind SHA từ source đã chọn · thứ tự click = thứ tự claim</span>
-          <div>{tokens.map(sha => <button key={sha} type="button" className="secondaryButton" disabled={boundCount >= rule.max} aria-label={`Bind Git graph ${phase} ${slot} observed SHA ${sha}`} onClick={() => {
-            const current = answer.sources[slot].fact.trim();
-            const fact = rule.max === 1 ? sha : current ? `${current}${rule.separator}${sha}` : sha;
-            change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], fact } } });
-          }}><code>{shortSha(sha)}</code></button>)}</div>
-        </div>}
+        {rule && shaBinder(answer.sources[slot].fact, tokens, rule, `Git graph ${phase} ${slot}`, fact =>
+          change({ ...answer, sources: { ...answer.sources, [slot]: { ...answer.sources[slot], fact } } }))}
       </fieldset>;
     })}<label>Relation<input aria-label={`Git graph ${phase} relation`} maxLength={160} disabled={phase === 'rationale' && Boolean(state.hypothesis)} value={answer.relation} onChange={e => change({ ...answer, relation: e.target.value })} /></label></>;
   }
@@ -67,13 +80,19 @@ export function GitGraphLab({ state, onChange }: { state: GraphState; onChange: 
     {state.verified && <section className="reasoningPanel" aria-label="Git graph explanation"><h4>4. Giải thích cơ chế từ sources</h4>{grammar}
       {reasonFields(explanation, 'explanation', x => onChange(editGraphExplanation(state, { ...x, repair: explanation.repair })))}
       <label>Minimal repair SHA<input aria-label="Git graph explanation repair" maxLength={160} value={explanation.repair} onChange={e => onChange(editGraphExplanation(state, { ...explanation, repair: e.target.value }))} /></label>
+      {shaBinder(explanation.repair, sourceShaTokens(explanation.sources.intent.id), { separator: '', max: 1 }, 'Git graph explanation repair', repair => onChange(editGraphExplanation(state, { ...explanation, repair })))}
       <button type="button" onClick={() => onChange(explainGraph(state))}>Check Git graph explanation</button><p role="status">{state.explained ? 'Giải thích graph hợp lệ.' : state.explanation ? 'Giải thích graph chưa được xác nhận; kiểm tra source, fact, relation và repair.' : ''}</p></section>}
     {state.explained && <section className="reasoningPanel" aria-label="Git graph transfer"><h4>5. Changed transfer · integration policy</h4><p>Yêu cầu và biểu diễn lịch sử đã thay đổi. Không sao chép quy tắc hai parents từ incident đầu. Change IDs chỉ là evidence được quy định trong fixture này, không chứng minh rebase tương đương trong Git thật.</p>
       <div className="evidenceBank">{GRAPH_TRANSFER_SLOTS.map(slot => <article key={slot}><code>{GRAPH_TRANSFER_SOURCES[slot].id}</code><pre>{GRAPH_TRANSFER_SOURCES[slot].output}</pre></article>)}</div>
       <p>Facts grammar: history = SELECTED_COMMIT=DIRECT_PARENT; series = CHANGE_IDS theo thứ tự, phân cách dấu phẩy; request = approved base SHA. Predicates: yes/no; parentCount: số nguyên. Relation: base-ancestor-and-reviewed-series / two-direct-parents / original-head-ancestor.</p>
       {GRAPH_TRANSFER_SLOTS.map(slot => <fieldset key={slot}><legend>{slot}</legend><label>Source<select aria-label={`Git graph transfer ${slot} source`} value={transfer.sources[slot].id} onChange={e => onChange(editGraphTransfer(state, { ...transfer, sources: { ...transfer.sources, [slot]: { ...transfer.sources[slot], id: e.target.value } } }))}><option value="">Chọn source</option>{GRAPH_TRANSFER_SLOTS.map(s => <option key={s} value={GRAPH_TRANSFER_SOURCES[s].id}>{GRAPH_TRANSFER_SOURCES[s].id}</option>)}</select></label>
-        <label>Fact<input aria-label={`Git graph transfer ${slot} fact`} maxLength={160} value={transfer.sources[slot].fact} onChange={e => onChange(editGraphTransfer(state, { ...transfer, sources: { ...transfer.sources, [slot]: { ...transfer.sources[slot], fact: e.target.value } } }))} /></label></fieldset>)}
+        <label>Fact<input aria-label={`Git graph transfer ${slot} fact`} maxLength={160} value={transfer.sources[slot].fact} onChange={e => onChange(editGraphTransfer(state, { ...transfer, sources: { ...transfer.sources, [slot]: { ...transfer.sources[slot], fact: e.target.value } } }))} /></label>
+        {(slot === 'history' || slot === 'request') && shaBinder(transfer.sources[slot].fact, transferShaTokens(transfer.sources[slot].id), { separator: slot === 'history' ? '=' : '', max: slot === 'history' ? 2 : 1 }, `Git graph transfer ${slot}`, fact => onChange(editGraphTransfer(state, { ...transfer, sources: { ...transfer.sources, [slot]: { ...transfer.sources[slot], fact } } })))}
+      </fieldset>)}
       {(['selectedCommit', 'baseAncestor', 'originalHeadAncestor', 'parentCount', 'relation'] as const).map(field => <label key={field}>{field}<input aria-label={`Git graph transfer ${field}`} maxLength={160} value={transfer[field]} onChange={e => onChange(editGraphTransfer(state, { ...transfer, [field]: e.target.value }))} /></label>)}
+      {shaBinder(transfer.selectedCommit, transferShaTokens(transfer.sources.history.id), { separator: '', max: 1 }, 'Git graph transfer selectedCommit', selectedCommit => onChange(editGraphTransfer(state, { ...transfer, selectedCommit })))}
+      <p>Chọn SHA từ bằng chứng đã liên kết; vẫn tự xác định commit, direct parent, ancestry và chuỗi changes. Không có lựa chọn được chấm sẵn.</p>
       <button type="button" onClick={() => onChange(checkGraphTransfer(state))}>Check Git graph transfer</button><p role="status">{state.transferPassed ? 'Hoàn tất graph slice: evidence, diagnosis, commit/parents verification, explanation và linear-history transfer.' : state.transfer ? 'Graph transfer chưa được xác nhận; đối chiếu ancestry và change-series contract.' : ''}</p></section>}
   </section>;
 }
+

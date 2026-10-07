@@ -94,6 +94,62 @@ test('graph evidence binder builds SHA facts from the selected source without we
   expect(runtime).toEqual([]);
 });
 
+test('observed SHA binding completes explanation and changed transfer with fail-closed edits', async ({ page }) => {
+  const runtime = []; errors(page, runtime); await page.goto('/'); await collect(page); await bindReason(page);
+  const button = name => page.getByRole('button', { name, exact: true });
+  const bind = async (field, sha) => button(`Bind Git graph ${field} observed SHA ${sha}`).click();
+  const clear = async field => button(`Clear Git graph ${field} SHA binding`).click();
+  const undo = async field => button(`Undo Git graph ${field} SHA binding`).click();
+  const field = name => page.getByRole('textbox', { name: 'Git graph ' + name, exact: true });
+  await undo('rationale graph');
+  await expect(field('rationale graph fact')).toHaveValue(S.head);
+  await bind('rationale graph', S.root);
+  await lock(page);
+  await expect(button('Undo Git graph rationale graph SHA binding')).toBeDisabled();
+  await expect(button('Clear Git graph rationale graph SHA binding')).toBeDisabled();
+  await recover(page);
+  await bindReason(page, 'explanation'); await clear('explanation repair');
+  // Source choice controls candidates, not a canonical repair answer.
+  await page.getByRole('combobox', { name: 'Git graph explanation intent source', exact: true }).selectOption('git-graph:before:workflow');
+  await expect(button(`Bind Git graph explanation repair observed SHA ${S.integration}`)).toHaveCount(0);
+  await bind('explanation repair', S.head);
+  await button('Check Git graph explanation').click();
+  await expect(region(page, 'transfer')).toHaveCount(0);
+  await page.getByRole('combobox', { name: 'Git graph explanation intent source', exact: true }).selectOption('git-graph:before:intent');
+  await clear('explanation repair'); await bind('explanation repair', S.integration);
+  await button('Check Git graph explanation').click(); await expect(region(page, 'transfer')).toBeVisible();
+  await expect(button(`Bind Git graph transfer selectedCommit observed SHA ${S.rebasedHead}`)).toHaveCount(0);
+  for (const slot of ['history', 'series', 'request']) {
+    await page.getByRole('combobox', { name: `Git graph transfer ${slot} source`, exact: true }).selectOption('git-graph:transfer:' + slot);
+  }
+  await bind('transfer history', S.rebasedFirst); await bind('transfer history', S.rebasedHead);
+  await bind('transfer request', S.base);
+  await field('transfer series fact').fill('p1,p2');
+  for (const [name, value] of Object.entries({ baseAncestor: 'yes', originalHeadAncestor: 'no', parentCount: '1', relation: 'base-ancestor-and-reviewed-series' })) await field('transfer ' + name).fill(value);
+  await bind('transfer selectedCommit', S.rebasedHead);
+  await button('Check Git graph transfer').click(); await expect(lab(page)).not.toContainText('Hoàn tất graph slice');
+  await clear('transfer history'); await bind('transfer history', S.rebasedHead); await bind('transfer history', S.rebasedFirst);
+  // A descendant retaining base ancestry still has an extra change and must fail.
+  await undo('transfer selectedCommit'); await bind('transfer selectedCommit', S.later);
+  await button('Check Git graph transfer').click(); await expect(lab(page)).not.toContainText('Hoàn tất graph slice');
+  await undo('transfer selectedCommit'); await bind('transfer selectedCommit', S.rebasedHead);
+  await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key))?.state.graphPractice.transfer?.selectedCommit, key)).toBe(S.rebasedHead);
+  await page.reload(); await expect(field('transfer history fact')).toHaveValue(`${S.rebasedHead}=${S.rebasedFirst}`);
+  await expect(field('transfer selectedCommit')).toHaveValue(S.rebasedHead);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await button('Undo Git graph transfer selectedCommit SHA binding').focus();
+  await expect(button('Undo Git graph transfer selectedCommit SHA binding')).toBeFocused();
+  expect(await button('Undo Git graph transfer selectedCommit SHA binding').evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
+  expect((await button('Undo Git graph transfer selectedCommit SHA binding').boundingBox()).height).toBeGreaterThanOrEqual(44);
+  await button('Check Git graph transfer').click(); await saved(page, 'complete');
+  await clear('transfer selectedCommit'); await expect(lab(page)).not.toContainText('Hoàn tất graph slice');
+  await bind('transfer selectedCommit', S.rebasedHead); await button('Check Git graph transfer').click(); await saved(page, 'complete');
+  await clear('explanation repair'); await expect(region(page, 'transfer')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(key => { const s = JSON.parse(localStorage.getItem(key))?.state.graphPractice; return s && !s.explained && !s.transferPassed && s.transfer === null; }, key)).toBe(true);
+  expect(runtime).toEqual([]);
+});
+
 test('graph diagnosis and source facts lock before repair; green and correct recovery cannot rescue wrong reasoning', async ({ page }) => {
   const runtime = []; errors(page, runtime); await page.goto('/'); await expect(lab(page)).toBeVisible();
   for (const clue of [S.head, S.integration, 'wrong head', 'missing parent', 'pr-head-omits-required-base']) await expect(lab(page)).not.toContainText(clue);
@@ -262,3 +318,4 @@ test('foundations lesson bridges raw evidence into graph predicates without gran
   })).toBe(true);
   expect(runtime).toEqual([]);
 });
+
