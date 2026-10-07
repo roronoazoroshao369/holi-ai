@@ -92,3 +92,12 @@ Keep real execution disabled and defer persistence/auth until learning assessmen
 2026-10-06 — PR #37: post-merge re-read found a literal `\\n` embedded between two focus CSS rules. Treat this as a same-goal corrective defect, not a second product goal. Replace it with a real newline and require the complete exact-head gate again before merge. No assertions, retries, timeouts, schema, fixture or learning semantics changed.
 
 2026-10-06 — after the foundations lesson, the next candidate is not another incident but a teaching-only evidence-reading bridge: raw synthetic ref/checkout/build/graph evidence → consumed commit / ordered direct parents / ancestry predicates. Use a third disjoint fixture and keep assessment credit at zero.
+
+
+## 2026-10-07 — Complete graph binding without changing assessment semantics
+
+Problem: #48 reduced SHA copying in rationale/explanation facts, while explanation repair and linear-history transfer still required long manual IDs.
+Decision: reuse evidence-local token binding for those fields, with undo/clear for ordinary drafts. Extract candidates only from selected source output, never canonical validator answers. Keep source choice, order, causal relation, ancestry and change-series reasoning explicit.
+Tradeoff: candidate assistance still supports a finite, visible exercise and cannot establish general Git competence. Manual fields remain available; malformed SHA claims must be corrected/cleared before structured binding.
+Security/persistence: no learner execution, trust promotion, schema/fixture change or scoring change. Existing state transitions revoke downstream completion on explanation/transfer edits. Locked rationale remains immutable.
+Verification gate: exact product-head CI must include wrong source, wrong parent order, extra-change commit rejection, reload, locked controls, revocation, mobile overflow/focus and full existing regression.

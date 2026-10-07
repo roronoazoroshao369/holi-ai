@@ -17,13 +17,15 @@
 - Git graph gate: delivered in PR #34; six source-linked pre-repair rationale fields, consumed-commit AND ordered-parent verification and changed linear-history ancestry/series transfer; Git/CI schema4/fixture4. Full exact-head 68 Node/11 production Chromium gates passed.
 - Git foundations gate: delivered in PR #36 with Snapshot → Ref → Direct parent → Ancestry navigation, a disjoint teaching fixture, non-persisted readiness self-check and explicit handoff into graph practice. Same-goal PR #37 cleaned focus CSS. Final effective gate passed 72 Node / 12 production Chromium tests; no schema/fixture change and no assessment credit from lesson state.
 - Git evidence-synthesis gate: delivered in PR #45 with a third disjoint teaching fixture, raw ref/checkout/build/graph evidence, consumed-commit + ordered-parent + ancestry predicates, explanatory teaching feedback, no persistence/assessment credit, exact-head CI and 12/12 production Chromium coverage.
-- Next learning/UX gate: reduce clerical full-length SHA/token transcription in graph assessment while preserving immutable pre-repair source-linked reasoning, fail-closed verification and transfer semantics.
+- Git evidence-input gate: #48 delivered rationale/explanation fact binding; #49 delivered explanation-repair and transfer SHA binding plus reversible draft controls. Exact product-head CI passed 75 Node / 14 production Chromium tests; #49 is merged.
+- Next breadth candidate: diagnose file read versus parent-directory search permission under an HTTP 403 symptom, with explicit least-privilege repair and changed-path transfer. Existing fixtures assume healthy traversal; no directory-search lab is implemented yet.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
 - v0.5-v0.7: Docker, Kubernetes, CI/CD and IaC vertical slices with verifiers and cost budgets.
 - v0.8-v0.9: observability/SRE and unfamiliar cross-domain incidents.
 - v1.0: coherent zero-to-production curriculum with demonstrated transfer, accessibility and operational readiness.
 
 No version is complete solely because its code exists. Consult PROJECT_STATE for actual verification/merge status.
+
 
 
 
