@@ -192,3 +192,18 @@ Final clean PR #43 head `3f3b9c6c109c5520c6dc0e82fa7e3f9e7a08d3f0` passed CI `37
 Known non-blocking maintainability debt: globals.css still contains earlier compatibility/cascade rules ahead of the new design-system layer. Do not conflate this with visual failure; consolidate only as a bounded CSS-architecture task.
 
 Next product frontier remains the teaching-only Git evidence-reading bridge before the graph diagnostic assessment.
+
+
+## 2026-10-07 — Git evidence synthesis bridge
+
+Inspected LIVE main `5312d434e076f44e6755ebf78c4e64e59743ff9c`, open PR/issues (none), current project controls and the foundations/graph code. Revalidated the documented highest-value gap: foundations taught snapshot/ref/direct-parent/ancestry, but the learner still jumped directly into the scored graph incident without a teaching step for synthesizing raw evidence into predicates.
+
+Selected exactly one primary product goal: a teaching-only Git evidence-reading bridge. PR #45 added a third synthetic fixture disjoint from both foundations and graph-assessment SHAs, three raw sources (ref snapshot, checkout/build metadata, graph records), and three derived predicates (consumed commit, ordered direct parents, ancestry reachability). Wrong answers keep the graph assessment CTA locked and receive explanatory teaching feedback; correct answers unlock the existing graph lab. Bridge state is component-local only: no Git/CI checkpoint write, no schema/fixture bump, no mastery/assessment credit and no learner Git/Actions/shell/network execution.
+
+Unit red-team covers fixture isolation, Git-like IDs, raw-source sufficiency, independent predicate failure and fail-closed empty answers. Production browser coverage proves active assessment SHA/relation clues are absent, wrong answers cannot open the handoff, correct answers can, persisted Git/CI state is unchanged, mobile 390px has no overflow and keyboard focus remains visible.
+
+PR #45 exact final head `d9ad0b1471704a786e85113a8ea8a5ee91b4a5a4` passed CI `37553518542`; production Chromium reported **12/12 passed (2.4m)**. Squash merge produced main `a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf`; post-merge main CI `37553882776` also succeeded.
+
+Production was initially stale because the Cloudflare Worker deployment is manual, not automatic from GitHub. Temporary packaging PR #46 rebuilt the merged tree with `CF_PAGES=1`, passed the full repository gate and published artifact branch `deploy/cloudflare-evidence-artifact` with marker `.holi-source-sha = a1907602...`. PR #46 was closed without merge and its branch was reset to main, so temporary `contents: write` permission never entered main. The verified artifact was promoted to Worker `holi-devops-web` deployment `ad055836b8894c368568c44d6153c0d6`. Browser Rendering confirmed production now references build `HstoA1D70-SXSg4-1SOL5` / page chunk `page-36a147e4a3373130.js` and no longer references the prior page chunk.
+
+ONE next frontier: reduce clerical full-length SHA/fact transcription in the scored graph assessment while preserving immutable pre-repair source-linked reasoning, wrong-reasoning failure after recovery, ordered-parent/ancestry verification, revocation and the SIMULATED trust boundary.

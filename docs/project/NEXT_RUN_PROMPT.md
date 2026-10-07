@@ -3,81 +3,87 @@
 Resume autonomous operation of the REAL repository:
 `roronoazoroshao369/holi-ai` through @GitHub. Default branch: `main`. Communicate in VIETNAMESE.
 
-IMPORTANT: this handoff can become stale immediately. Inspect LIVE GitHub first. The repository is authoritative.
+IMPORTANT: this handoff may already be stale. Inspect the live GitHub repository first. The repository is authoritative.
 
-## Verified product + UI + deployment checkpoint
+## Latest verified product checkpoint
 
 Latest verified product main:
-`ae043c1312f592392826aab7eb5b5514ef6da96a`
+`a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf`
 
-Latest product PR:
-#43 — Overhaul Holi UI/UX visual system
+Latest merged product PR:
+#45 — Teach Git evidence synthesis before graph assessment
 
-Final clean PR head:
-`3f3b9c6c109c5520c6dc0e82fa7e3f9e7a08d3f0`
+Product PR exact final head:
+`d9ad0b1471704a786e85113a8ea8a5ee91b4a5a4`
 
 Exact-head CI:
-run `37489630664` — SUCCESS.
+run `37553518542` — SUCCESS; production Chromium **12/12 passed**.
 
 Post-merge main CI:
-run `37490280081` — SUCCESS.
+run `37553882776` — SUCCESS.
 
-Visual QA evidence:
-- visual-QA head `f1648744e25e44f697dc20c35a87429aa1a10a66`;
-- full functional/browser CI succeeded;
-- desktop 1440px and mobile 390px full-page captures were reviewed;
-- no horizontal overflow at the mobile regression target;
-- temporary screenshot/static-preview publishing permissions were removed before merge.
+## Production deployment checkpoint
 
-Current Cloudflare production:
+Verified source artifact:
+`a1907602d5fc8fdbc3e8489179fdd0d15d7e52bf`
+
+Packaging:
+- temporary PR #46 built/published the static artifact after full CI;
+- PR #46 was closed WITHOUT merge;
+- the temporary packaging branch was reset to product main, so its `contents: write` workflow never entered `main`;
+- artifact branch marker `.holi-source-sha` matches the product main above.
+
+Cloudflare:
 - Worker: `holi-devops-web`
-- production deployment id: `5c47a1e596bf441995c7dbb48a88445c`
-- verified public URL: `https://holi.shao.dpdns.org/`
-- Cloudflare Browser Rendering confirmed the redesigned hero/runtime console, `PUBLIC WEB SHELL`, `SIMULATED`, and fully rendered app.
+- deployment id: `ad055836b8894c368568c44d6153c0d6`
+- public URL: `https://holi.shao.dpdns.org/`
+- production HTML references build id `HstoA1D70-SXSg4-1SOL5` and page chunk `page-36a147e4a3373130.js`; the previous page chunk is absent.
 
-## Current product truth
+## Completed in previous run
 
-Phase remains v0.3 SIMULATED learning/mastery-flow foundation; package 0.1.0; no release/tag.
+Delivered one teaching-only evidence bridge between Git foundations and the scored graph assessment:
+- third synthetic fixture, disjoint from foundations and assessment fixtures;
+- raw ref snapshot, checkout/build metadata and graph records;
+- learner derives consumed commit identity, ordered direct parents and ancestry reachability;
+- wrong predicates keep the assessment CTA locked and receive instructional feedback;
+- correct predicates reveal the existing graph diagnostic lab;
+- bridge state remains React-local and grants no assessment/mastery credit;
+- Git/CI persistence schema4/fixture4 unchanged; Linux 7/5 unchanged;
+- no learner Git/YAML/shell/network execution added;
+- production browser regression proves assessment checkpoint unchanged, active incident clues absent, wrong/correct gating, 390px overflow safety and visible focus.
 
-The production UI now uses the Holi dark technical/editorial design system:
-- sans-serif display hierarchy; monospace reserved for runtime/evidence surfaces;
-- responsive hero/runtime console;
-- explicit product-truth labels;
-- richer curriculum cards and learning-loop framing;
-- cohesive Linux lab, evidence/reasoning, Git foundations, Git/CI and method surfaces;
-- visible keyboard focus and reduced-motion handling;
-- responsive down to the 390px regression target.
+## Current phase
 
-Do not regress to the earlier flat mono-only visual treatment.
+v0.3 — SIMULATED learning/mastery-flow foundation with public Cloudflare Worker shell. Package remains 0.1.0; no release/tag. Current labs are still deterministic browser simulations, not real Linux/Git/Actions environments.
 
-Trust boundary remains unchanged:
-- learner exercises are deterministic browser simulations;
-- learner input does not execute host shell, Git, YAML, Docker or arbitrary network operations;
-- localStorage remains untrusted practice state;
-- no D1/Container/Sandbox-backed learner execution is claimed.
+## Current known risks
 
-Known visual-maintainability debt:
-- globals.css retains earlier compatibility/cascade rules before the new design-system layer. This is not a visual blocker but should be consolidated in a future bounded refactor if touching the CSS architecture.
+- localStorage is forgeable and non-authoritative;
+- corpus remains small and finite;
+- Git/CI typed grammar is visible/retryable;
+- graph assessment still requires substantial exact SHA/fact transcription, which can measure clerical accuracy separately from reasoning;
+- Chromium-only browser coverage remains narrow;
+- real sandbox isolation/quotas/TTL/network/cost controls remain design-only;
+- Pages Git integration error `8000011` remains unrelated deployment debt; verified serving path is the Worker custom domain.
 
-## ONE highest-value product frontier
+## Highest-value frontier
 
-A **teaching-only Git evidence-reading bridge** between the current Git foundations lesson and the existing graph diagnostic assessment.
+Reduce clerical full-length SHA/token transcription in the Git graph assessment **without weakening causal rigor**.
 
-Candidate bounded goal:
-- introduce one third synthetic teaching fixture, disjoint from both foundations and assessment fixtures;
-- present raw ref snapshot, checkout/build metadata and a small commit graph;
-- guide a near-zero learner to derive consumed commit identity, ordered direct parents and ancestry reachability;
-- explanatory feedback is allowed because this is teaching, not assessment;
-- no persistence and no diagnostic/verified/explained/transfer credit;
-- do not reveal active incident answers or relation token;
-- preserve immutable pre-repair reasoning and all downstream revocation in the real graph practice;
-- end with the existing graph diagnostic lab handoff.
+## Recommended next primary goal
 
-Reassess this recommendation from LIVE repository evidence before implementation.
+Reassess LIVE evidence, then implement one bounded graph-assessment UX hardening slice that binds learner claims to already-captured evidence and derives/selects observed values instead of requiring manual retyping of long synthetic SHAs.
 
-## Deployment follow-up debt
-
-Cloudflare Pages project `holi-devops` still has Git integration error `8000011`. The verified public serving path is the Worker custom domain. Do not broaden repository write permissions or introduce long-lived deploy secrets merely to repair convenience automation.
+Hard requirements:
+- preserve immutable pre-repair rationale commitment;
+- preserve explicit source linkage and causal relation;
+- wrong reasoning must still fail after operational recovery;
+- preserve ordered-parent and ancestry verification;
+- preserve explanation/transfer revocation and persistence invariants;
+- do not expose canonical answers before commitment;
+- do not turn assessment into easy multiple-choice guessing;
+- no schema migration unless state shape truly changes;
+- no real execution claim.
 
 ## Read first
 
@@ -85,30 +91,36 @@ Cloudflare Pages project `holi-devops` still has Git integration error `8000011`
 - docs/project/NEXT_RUN_PROMPT.md
 - docs/project/ROADMAP.md
 - docs/project/BACKLOG.md
-- docs/project/ARCHITECTURE.md
-- docs/project/DECISIONS.md
 - docs/project/RISKS.md
-- docs/project/PRODUCT.md
 - docs/project/LEARNING_MODEL.md
-- docs/project/LAB_SECURITY.md
-- docs/project/RUN_LOG.md
 - docs/project/GIT_GRAPH_CONTRACT.md
-- docs/project/GIT_REVISION_CONTRACT.md
-- relevant app/components/lib
-- all tests, package manifests and .github/workflows/ci.yml
+- components/GitGraphLab.tsx
+- lib/git-graph-simulator.ts
+- tests/git-graph.test.mjs
+- tests/git-graph.browser.cjs
+- .github/workflows/ci.yml
 
-## Operating loop
+Continue the autonomous multi-expert loop:
 
-Inspect LIVE → reconcile concurrent/stale state → discovery/review → choose exactly ONE bounded primary goal → implement → test/security/UX/learning/red-team → documentation → PR → full exact FINAL-head CI → merge with `expected_head_sha` → confirm LIVE main and push CI → separate documentation closeout with full exact-head CI → new handoff → STOP.
+RESUME
+→ INSPECT LIVE REALITY
+→ RECONCILE DOCS
+→ DISCOVERY
+→ COUNCIL REVIEW
+→ SELECT ONE PRIMARY GOAL
+→ IMPLEMENT
+→ TEST
+→ SECURITY/UX/LEARNING REVIEW
+→ RED-TEAM
+→ VERIFY
+→ DOCUMENT
+→ COMMIT
+→ PR
+→ VERIFY EXACT-HEAD CI
+→ MERGE ONLY WHEN ALL GATES PASS
+→ CONFIRM LIVE MAIN
+→ UPDATE PROJECT STATE
+→ OUTPUT A NEW NEXT_RUN_PROMPT
+→ STOP.
 
-Do not:
-- execute learner input on host;
-- force-push main;
-- merge failing or incomplete checks;
-- weaken assertions, retries or timeouts to hide failures;
-- let teaching/readiness state grant assessment credit;
-- mutate immutable pre-repair reasoning after lock;
-- bypass downstream revocation;
-- claim real sandbox execution merely because the simulator is publicly deployed;
-- regress the production visual hierarchy without explicit visual evidence;
-- begin a second primary product goal in the same run.
+Do not force-push main, merge failing code, weaken assertions to make CI green, execute learner input on the host, grant assessment credit from teaching state, or claim SIMULATED labs are real sandboxes.

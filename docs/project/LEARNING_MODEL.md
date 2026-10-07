@@ -24,7 +24,7 @@ Persistence uses practice schema version 7 / Linux fixture version 5. Schema-v6 
 
 Learning limits remain substantial. Two fixed perturbations across different relations are stronger than one memorized listener token, but both can still be memorized and retried; strict tokens can fail separately from conceptual understanding; the corpus is tiny; localStorage is forgeable; and the simplified models omit many production mechanisms. Passing current gates is assisted local practice, never authoritative mastery/certification.
 
-Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The graph causality slice is delivered. The mechanism-first Git foundations lesson is now delivered with a separate teaching fixture and no assessment credit. The next learning gap is evidence synthesis: turning raw ref/checkout/build/graph observations into consumed-commit, direct-parent and ancestry predicates before the existing assessment.
+Playwright dependency reproducibility and Git/CI breadth are delivered. Pre-repair source-linked Git rationale is delivered. The graph causality slice is delivered. The mechanism-first Git foundations lesson and the follow-on evidence-synthesis bridge are delivered with separate teaching fixtures and no assessment credit. The nearest remaining learning/UX gap is clerical burden: the scored graph rationale still requires substantial exact SHA/fact transcription that can fail independently of conceptual reasoning.
 
 
 ## Git & CI vertical slice — producer/consumer contract
@@ -63,4 +63,12 @@ The learner now encounters a separate teaching-only sequence before graph assess
 
 A four-question self-check gives immediate teaching feedback and reveals the CTA to the existing graph diagnostic lab only after all four concept distinctions are correct. This is readiness scaffolding, not mastery evidence. Browser regression verifies that completing the lesson leaves persisted Git/CI assessment state unchanged and that active graph incident SHAs/relation tokens are absent from the lesson.
 
-The lesson closes vocabulary and mental-model debt, but not the full apprenticeship gap. A learner can know what a ref, direct parent and ancestor are while still struggling to infer those predicates from raw workflow/graph evidence. A future teaching-only evidence-reading bridge should address that gap using a third disjoint fixture, without weakening the assessment.
+The lesson closes vocabulary and mental-model debt. PR #45 adds the next teaching-only bridge so the learner must infer predicates from raw workflow/graph evidence before the scored incident, without weakening assessment.
+
+## Git evidence-reading bridge — PR #45
+
+After the four foundations distinctions pass, the learner receives a third synthetic fixture that is disjoint from both the foundations fixture and the active graph-assessment corpus. Three raw sources are shown: a ref snapshot, checkout/build metadata and commit graph records. The learner must derive three facts rather than copy an assessment answer: which immutable commit was actually consumed, the exact ordered direct-parent pair of that commit, and whether an older root is reachable through ancestry.
+
+Each predicate fails independently. Wrong answers keep the graph-assessment handoff locked and produce explanatory teaching feedback. Correct answers reveal the existing graph diagnostic CTA. The bridge uses React-local state only; it does not write the Git/CI checkpoint, bump schema/fixture versions or grant diagnosis/verified/explained/transfer credit. Browser regression compares persisted Git/CI state before and after the bridge, checks active assessment SHAs/relation tokens are absent from the teaching surface, verifies wrong/correct gating, mobile overflow and keyboard focus.
+
+This is still finite, visible and retryable scaffolding. It improves apprenticeship sequencing but does not establish general Git competence. The next nearby quality problem is that the scored graph rationale relies on long exact synthetic SHA/fact transcription; future changes should reduce copy accuracy as a confound while preserving source linkage and immutable pre-repair causal commitment.
