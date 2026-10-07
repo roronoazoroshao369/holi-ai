@@ -1824,3 +1824,42 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Git graph evidence binder: reduce SHA transcription without exposing canonical claims. */
+.gitFactBinder {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255,255,255,.012);
+}
+.gitFactBinder > span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.gitFactBinder > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+.ciLab .gitFactBinder button {
+  min-height: 34px;
+  max-width: 100%;
+  padding: 6px 9px;
+  border-color: var(--line-strong);
+  background: rgba(255,255,255,.018);
+  color: var(--muted-strong);
+}
+.gitFactBinder button code {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: inherit;
+  font-family: var(--mono);
+  font-size: 10px;
+}
