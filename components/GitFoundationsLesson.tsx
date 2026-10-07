@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import {
+  GIT_EVIDENCE_BRIDGE_FIXTURE,
+  GIT_EVIDENCE_BRIDGE_SOURCES,
   GIT_FOUNDATIONS_FIXTURE,
+  checkGitEvidenceBridge,
   checkGitFoundationsReadiness,
+  emptyGitEvidenceBridgeAnswers,
   emptyGitFoundationsAnswers,
+  type GitEvidenceBridgeAnswers,
   type GitFoundationsAnswers
 } from "../lib/git-foundations";
 
@@ -18,16 +23,30 @@ const steps: readonly { id: Step; label: string }[] = [
 ];
 
 const C = GIT_FOUNDATIONS_FIXTURE.commits;
+const E = GIT_EVIDENCE_BRIDGE_FIXTURE.commits;
 
 export function GitFoundationsLesson() {
   const [step, setStep] = useState<Step>("snapshot");
   const [answers, setAnswers] = useState<GitFoundationsAnswers>(() => emptyGitFoundationsAnswers());
   const [checked, setChecked] = useState(false);
+  const [bridgeAnswers, setBridgeAnswers] = useState<GitEvidenceBridgeAnswers>(() => emptyGitEvidenceBridgeAnswers());
+  const [bridgeChecked, setBridgeChecked] = useState(false);
   const readiness = checkGitFoundationsReadiness(answers);
+  const bridgeResult = checkGitEvidenceBridge(bridgeAnswers);
 
   const setAnswer = <K extends keyof GitFoundationsAnswers>(key: K, value: GitFoundationsAnswers[K]) => {
     setAnswers(current => ({ ...current, [key]: value }));
     setChecked(false);
+    setBridgeAnswers(emptyGitEvidenceBridgeAnswers());
+    setBridgeChecked(false);
+  };
+
+  const setBridgeAnswer = <K extends keyof GitEvidenceBridgeAnswers>(
+    key: K,
+    value: GitEvidenceBridgeAnswers[K]
+  ) => {
+    setBridgeAnswers(current => ({ ...current, [key]: value }));
+    setBridgeChecked(false);
   };
 
   return (
@@ -189,10 +208,105 @@ export function GitFoundationsLesson() {
               : "Chưa sẵn sàng: xem lại concept tương ứng rồi thử lại; không có điểm nào bị trừ."}
         </p>
 
-        {checked && readiness.passed && (
-          <a className="foundationCta" href="#git-graph-practice">Vào graph diagnostic lab →</a>
-        )}
       </section>
+
+      {checked && readiness.passed && (
+        <section className="foundationCheck evidenceBridge" aria-label="Git evidence reading bridge">
+          <div>
+            <span className="kicker">EVIDENCE BRIDGE · TEACHING ONLY</span>
+            <h3>Từ raw evidence tới ba predicate chẩn đoán</h3>
+            <p>
+              Đây là fixture thứ ba, tách khỏi cả lesson và incident assessment. Đọc nguồn trước,
+              rồi suy ra commit thực sự được build, thứ tự direct parents và ancestry reachability.
+              Sai ở đây chỉ nhận feedback; không ghi checkpoint và không cấp assessment credit.
+            </p>
+          </div>
+
+          <div className="evidenceBank" aria-label="Git evidence bridge sources">
+            {Object.values(GIT_EVIDENCE_BRIDGE_SOURCES).map(source => (
+              <article key={source.id}>
+                <strong>{source.title}</strong>
+                <code>{source.id}</code>
+                <pre>{source.output}</pre>
+              </article>
+            ))}
+          </div>
+
+          <div className="foundationQuestions">
+            <label>1. Commit nào thực sự được checkout và đóng gói?
+              <select
+                aria-label="Git evidence bridge consumed commit"
+                value={bridgeAnswers.consumedCommit}
+                onChange={event => setBridgeAnswer("consumedCommit", event.target.value as GitEvidenceBridgeAnswers["consumedCommit"])}
+              >
+                <option value="">Chọn từ evidence</option>
+                <option value="base">{E.base}</option>
+                <option value="integration">{E.integration}</option>
+                <option value="later">{E.later}</option>
+              </select>
+            </label>
+
+            <label>2. Ordered direct parents của commit đó là gì?
+              <select
+                aria-label="Git evidence bridge ordered parents"
+                value={bridgeAnswers.orderedParents}
+                onChange={event => setBridgeAnswer("orderedParents", event.target.value as GitEvidenceBridgeAnswers["orderedParents"])}
+              >
+                <option value="">Chọn parent[0] → parent[1]</option>
+                <option value="topic-base">{E.topic} → {E.base}</option>
+                <option value="base-topic">{E.base} → {E.topic}</option>
+                <option value="root-base">{E.root} → {E.base}</option>
+              </select>
+            </label>
+
+            <label>3. {E.root} có là ancestor của consumed commit không?
+              <select
+                aria-label="Git evidence bridge ancestry"
+                value={bridgeAnswers.rootAncestry}
+                onChange={event => setBridgeAnswer("rootAncestry", event.target.value as GitEvidenceBridgeAnswers["rootAncestry"])}
+              >
+                <option value="">Chọn kết luận</option>
+                <option value="yes">Có · reachable qua parent edges</option>
+                <option value="no">Không · chỉ direct parent mới tính</option>
+              </select>
+            </label>
+          </div>
+
+          <button type="button" onClick={() => setBridgeChecked(true)}>Check evidence predicates</button>
+
+          <div className="bridgeFeedback" role="status">
+            {!bridgeChecked ? (
+              <p>Chưa check. Hãy đối chiếu cả ba nguồn, không suy từ pipeline xanh.</p>
+            ) : (
+              <>
+                <p>
+                  {bridgeResult.passed
+                    ? "Đủ ba predicate: bạn đã nối checkout/build metadata với graph thay vì đoán từ ref hoặc trạng thái job."
+                    : "Còn predicate chưa khớp raw evidence. Đối chiếu từng source bên dưới rồi thử lại."}
+                </p>
+                <ul>
+                  <li>
+                    Consumed commit: {bridgeResult.consumedCommit ? "đúng" : "chưa đúng"} — checkout HEAD và
+                    bundle source_commit phải cùng chỉ tới <code>{E.integration}</code>.
+                  </li>
+                  <li>
+                    Ordered parents: {bridgeResult.orderedParents ? "đúng" : "chưa đúng"} — graph record ghi
+                    parent[0] = <code>{E.base}</code>, parent[1] = <code>{E.topic}</code>.
+                  </li>
+                  <li>
+                    Ancestry: {bridgeResult.rootAncestry ? "đúng" : "chưa đúng"} — <code>{E.root}</code> reachable
+                    tới consumed commit qua nhiều parent edges, dù không phải direct parent.
+                  </li>
+                </ul>
+              </>
+            )}
+          </div>
+
+          {bridgeChecked && bridgeResult.passed && (
+            <a className="foundationCta" href="#git-graph-practice">Vào graph diagnostic lab →</a>
+          )}
+        </section>
+      )}
     </section>
   );
 }

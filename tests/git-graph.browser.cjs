@@ -149,7 +149,7 @@ test('graph refresh rejects stale/corrupt/contradictory checkpoints and storage 
 });
 
 
-test('foundations lesson teaches graph mental models without granting assessment credit', async ({ page }) => {
+test('foundations lesson bridges raw evidence into graph predicates without granting assessment credit', async ({ page }) => {
   const runtime = []; errors(page, runtime);
   await page.goto('/');
   const lesson = page.getByRole('region', { name: 'Git foundations lesson', exact: true });
@@ -176,20 +176,46 @@ test('foundations lesson teaches graph mental models without granting assessment
   await page.getByRole('combobox', { name: 'Git foundations ancestry answer', exact: true }).selectOption('multi-edge');
   const check = page.getByRole('button', { name: 'Check foundations readiness', exact: true });
   await check.click();
-  await expect(lesson.getByRole('status')).toContainText('Sẵn sàng vào graph diagnostic lab');
+  const readinessStatus = page.locator('.foundationStatus');
+  await expect(readinessStatus).toContainText('Sẵn sàng vào graph diagnostic lab');
+
+  const bridge = page.getByRole('region', { name: 'Git evidence reading bridge', exact: true });
+  await expect(bridge).toBeVisible();
+  await expect(bridge).toContainText('EVIDENCE BRIDGE · TEACHING ONLY');
+  await expect(bridge.getByRole('article')).toHaveCount(3);
+  for (const clue of [S.head, S.integration, 'pr-head-omits-required-base']) {
+    await expect(bridge).not.toContainText(clue);
+  }
+
+  const handoff = page.getByRole('link', { name: 'Vào graph diagnostic lab →', exact: true });
+  await expect(handoff).toHaveCount(0);
+
+  await page.getByRole('combobox', { name: 'Git evidence bridge consumed commit', exact: true }).selectOption('base');
+  await page.getByRole('combobox', { name: 'Git evidence bridge ordered parents', exact: true }).selectOption('topic-base');
+  await page.getByRole('combobox', { name: 'Git evidence bridge ancestry', exact: true }).selectOption('no');
+  const bridgeCheck = page.getByRole('button', { name: 'Check evidence predicates', exact: true });
+  await bridgeCheck.click();
+  await expect(bridge.getByRole('status')).toContainText('Còn predicate chưa khớp raw evidence');
+  await expect(handoff).toHaveCount(0);
+
+  await page.getByRole('combobox', { name: 'Git evidence bridge consumed commit', exact: true }).selectOption('integration');
+  await page.getByRole('combobox', { name: 'Git evidence bridge ordered parents', exact: true }).selectOption('base-topic');
+  await page.getByRole('combobox', { name: 'Git evidence bridge ancestry', exact: true }).selectOption('yes');
+  await bridgeCheck.click();
+  await expect(bridge.getByRole('status')).toContainText('Đủ ba predicate');
+  await expect(bridge.getByRole('status')).toContainText('parent[0]');
+  await expect(handoff).toBeVisible();
 
   const after = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).state, key);
   expect(after).toEqual(before);
 
-  const handoff = page.getByRole('link', { name: 'Vào graph diagnostic lab →', exact: true });
-  await expect(handoff).toBeVisible();
   await handoff.click();
   await expect(lab(page)).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await check.focus(); await expect(check).toBeFocused();
-  expect(await check.evaluate(el => {
+  await bridgeCheck.focus(); await expect(bridgeCheck).toBeFocused();
+  expect(await bridgeCheck.evaluate(el => {
     const s = getComputedStyle(el);
     return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
   })).toBe(true);
