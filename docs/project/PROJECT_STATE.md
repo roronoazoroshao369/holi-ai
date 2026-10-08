@@ -8,7 +8,7 @@ Updated 2026-10-08. Phase: v0.3 SIMULATED learning/mastery foundation. Package 0
 - Exact PR head: `cd05a00945c553a26a6db742a7435ccf65f8e242`.
 - Full exact-head CI: `37715953733`, job `113112315240` — SUCCESS. Checkout identity, typecheck, 80/80 Node tests, npm audit (0 vulnerabilities), production build and 14/14 locked Chromium tests passed.
 - Merged-main tree `f90934d97c7d3136cbd452013339e26fed222ebd` equals tested-head tree. GitHub confirms #59 merged; main was re-read after merge.
-- Documentation closeout is separate; inspect LIVE main for its resulting SHA/PR. Post-merge main CI `37716356754` was observed in progress during closeout preparation (checkout/typecheck/Node/audit/build passed, browser running); re-read its final state. No unobserved result is claimed.
+- Documentation closeout is separate; inspect LIVE main for its resulting SHA/PR. Post-merge main CI `37716356754`, job `113113587776` — SUCCESS; all checkout/typecheck/Node/audit/build/Chromium steps passed.
 
 ## Delivered goal contract
 

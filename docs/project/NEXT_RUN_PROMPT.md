@@ -14,7 +14,7 @@ Documentation closeout can advance main; inspect LIVE SHA and open PRs first.
 Phase: v0.3 SIMULATED learning/mastery foundation; package 0.1.0, no tag.
 
 Completed: explicit captured source+fact binding and clear for Linux permission/path explanations and original transfer facts. Candidate parser reads snapshots only and keeps alternative observed parents. No rubric/schema/fixture change. Linux 8/6, Git/CI 4/4.
-Exact product head cd05a00945c553a26a6db742a7435ccf65f8e242 passed full CI 37715953733: 80 Node / 14 Chromium, typecheck/build/audit. Product-main tree equals tested-head tree. Main push run 37716356754 was in progress at closeout preparation; inspect its final status.
+Exact product head cd05a00945c553a26a6db742a7435ccf65f8e242 passed full CI 37715953733: 80 Node / 14 Chromium, typecheck/build/audit. Product-main tree equals tested-head tree. Post-merge main CI 37716356754 / job113113587776 passed every gate.
 
 Deployed at https://holi.shao.dpdns.org/ through Worker holi-devops-web.
 Version 245beb24-5f3c-41ee-ab7e-b8ca50f9c2c4 at 100%; deployment 17769c7d-27b4-470c-82ac-e4ebd0386c88.
