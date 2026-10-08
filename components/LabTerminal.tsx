@@ -24,6 +24,7 @@ import {
   pathTransferSatisfied,
   recordHypothesis,
   scenarios,
+  type EvidenceClaim,
   type CausalTransferAnswer,
   type PermissionTransferAnswer,
   type PathTransferAnswer,
@@ -34,6 +35,8 @@ import {
   type ScenarioId
 } from "../lib/linux-simulator";
 import { clearPractice, loadPractice, savePractice, type PracticeStorage } from "../lib/practice-persistence";
+
+import { permissionObservationClaims } from "../lib/linux-evidence-bindings";
 
 type Line = ReplyLine | { kind: "input"; text: string };
 type PersistenceState = "checking" | "saved" | "unavailable";
@@ -241,6 +244,30 @@ export function LabTerminal() {
     setTransferFeedback("");
   }
 
+  const observedClaims = permissionObservationClaims(state);
+
+  function observationBinding(label: string, current: EvidenceClaim, bind: (claim: EvidenceClaim) => void) {
+    if (!observedClaims.length) return null;
+    return <div className="observationBinding">
+      <label>Chọn fact đã quan sát cho {label}
+        <select aria-label={"Observation cho " + label}
+          value={observedClaims.some(item => item.evidenceId === current.evidenceId && item.claim === current.claim)
+            ? JSON.stringify(current) : ""}
+          onChange={event => {
+            const candidate = observedClaims.find(item => JSON.stringify(item) === event.target.value);
+            if (candidate) bind(candidate);
+          }}>
+          <option value="">Chọn source + fact từ snapshot</option>
+          {observedClaims.map(item => <option key={JSON.stringify(item)} value={JSON.stringify(item)}>
+            {item.evidenceId.split(":").at(-1)} · {item.claim}
+          </option>)}
+        </select>
+      </label>
+      <button type="button" disabled={!current.evidenceId && !current.claim}
+        onClick={() => bind({ evidenceId: "", claim: "" })}>Xóa binding {label}</button>
+    </div>;
+  }
+
   function evidenceOptions() {
     return <>
       <option value="">Chọn nguồn observation</option>
@@ -306,7 +333,7 @@ export function LabTerminal() {
       {state.verified && <section className="reasoningPanel" aria-label="Lập luận từ bằng chứng">
         <h4>Nối bằng chứng với cơ chế</h4>
         <p>Đọc snapshot thu trước sửa. Chọn nguồn cho từng nhận định, rồi nối hai nguồn với cơ chế và đích sửa tối thiểu.
-          Output sau sửa không thay thế các snapshot này. Bài này kiểm tra một bộ từ khóa hữu hạn, chưa đánh giá văn bản tự do.</p>
+          Output sau sửa không thay thế các snapshot này. Có thể chọn source + fact đã quan sát hoặc tự nhập; việc chọn không xác nhận đáp án. Cơ chế, đích sửa và dự đoán vẫn do bạn lập luận. Bài này kiểm tra một bộ từ khóa hữu hạn, chưa đánh giá văn bản tự do.</p>
         <div className="evidenceBank">
           {evidenceSlots.map(slot => {
             const evidence = state.preRepairEvidence[slot];
@@ -317,7 +344,9 @@ export function LabTerminal() {
             </article>;
           })}
         </div>
-        <p>{fixture.family === "file-access"
+        <p>{fixture.family === "path-access"
+          ? "Nhận định: symptom dùng mã HTTP; identity dùng UID:GROUPS; resource nối mode parent và file dạng 700-parent-644-file. Chọn parent liên quan từ snapshot. Cơ chế: parent-search-required / file-read-sufficient. Đích sửa: mode directory tối thiểu."
+          : fixture.family === "file-access"
           ? "Nhận định: symptom dùng mã HTTP; identity dùng UID:GROUPS với tên các group theo thứ tự trong output (ví dụ 42:app,ops); resource dùng mode trước sửa. Cơ chế: owner-read / group-read / other-read. Đích sửa: mode tối thiểu."
           : "Nhận định: symptom dùng refused / ok; identity dùng present / absent; resource dùng port quan sát được hoặc none. Cơ chế: listener-port-match / process-started / file-mode. Đích sửa: port client cần."}</p>
         <form onSubmit={event => {
@@ -334,6 +363,7 @@ export function LabTerminal() {
                 {evidenceOptions()}
               </select>
             </label>
+            {observationBinding(slot, answer[slot], candidate => updateAnswer({ ...answer, [slot]: candidate }))}
             <label>Nhận định từ observation
               <input aria-label={"Nhận định " + slot} maxLength={100} value={answer[slot].claim}
                 onChange={event => updateAnswer({ ...answer, [slot]: { ...answer[slot], claim: event.target.value } })} />
@@ -382,6 +412,8 @@ export function LabTerminal() {
                 {evidenceOptions()}
               </select>
             </label>
+            {observationBinding("Fact identity gốc", { evidenceId: permissionTransferAnswer.identityEvidenceId, claim: permissionTransferAnswer.identityFact },
+              candidate => updatePermissionTransfer({ ...permissionTransferAnswer, identityEvidenceId: candidate.evidenceId, identityFact: candidate.claim }))}
             <label>Fact identity gốc
               <input aria-label="Fact identity gốc" maxLength={100} value={permissionTransferAnswer.identityFact}
                 onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, identityFact: event.target.value })} />
@@ -392,6 +424,8 @@ export function LabTerminal() {
                 {evidenceOptions()}
               </select>
             </label>
+            {observationBinding("Fact file gốc", { evidenceId: permissionTransferAnswer.resourceEvidenceId, claim: permissionTransferAnswer.resourceFact },
+              candidate => updatePermissionTransfer({ ...permissionTransferAnswer, resourceEvidenceId: candidate.evidenceId, resourceFact: candidate.claim }))}
             <label>Fact file gốc
               <input aria-label="Fact file gốc" maxLength={100} value={permissionTransferAnswer.resourceFact}
                 onChange={event => updatePermissionTransfer({ ...permissionTransferAnswer, resourceFact: event.target.value })} />
@@ -442,6 +476,8 @@ export function LabTerminal() {
               <select aria-label="Nguồn identity path-search" value={pathTransferAnswer.identityEvidenceId}
                 onChange={event => updatePathTransfer({ ...pathTransferAnswer, identityEvidenceId: event.target.value })}>{evidenceOptions()}</select>
             </label>
+            {observationBinding("Fact identity path-search", { evidenceId: pathTransferAnswer.identityEvidenceId, claim: pathTransferAnswer.identityFact },
+              candidate => updatePathTransfer({ ...pathTransferAnswer, identityEvidenceId: candidate.evidenceId, identityFact: candidate.claim }))}
             <label>Fact identity path-search
               <input aria-label="Fact identity path-search" maxLength={100} value={pathTransferAnswer.identityFact}
                 onChange={event => updatePathTransfer({ ...pathTransferAnswer, identityFact: event.target.value })} />
@@ -450,10 +486,14 @@ export function LabTerminal() {
               <select aria-label="Nguồn path gốc" value={pathTransferAnswer.pathEvidenceId}
                 onChange={event => updatePathTransfer({ ...pathTransferAnswer, pathEvidenceId: event.target.value })}>{evidenceOptions()}</select>
             </label>
+            {observationBinding("Fact parent gốc", { evidenceId: pathTransferAnswer.pathEvidenceId, claim: pathTransferAnswer.pathFact },
+              candidate => updatePathTransfer({ ...pathTransferAnswer, pathEvidenceId: candidate.evidenceId, pathFact: candidate.claim }))}
             <label>Fact parent gốc
               <input aria-label="Fact parent gốc" maxLength={100} value={pathTransferAnswer.pathFact}
                 onChange={event => updatePathTransfer({ ...pathTransferAnswer, pathFact: event.target.value })} />
             </label>
+            {observationBinding("Fact file readable", { evidenceId: pathTransferAnswer.pathEvidenceId, claim: pathTransferAnswer.fileFact },
+              candidate => updatePathTransfer({ ...pathTransferAnswer, pathEvidenceId: candidate.evidenceId, fileFact: candidate.claim }))}
             <label>Fact file readable
               <input aria-label="Fact file readable" maxLength={100} value={pathTransferAnswer.fileFact}
                 onChange={event => updatePathTransfer({ ...pathTransferAnswer, fileFact: event.target.value })} />

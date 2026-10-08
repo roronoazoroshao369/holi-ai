@@ -22,6 +22,11 @@ async function submitHypothesis(page, value) {
   await expect(input).toBeDisabled();
 }
 
+async function bindObservation(page, label, evidenceId, claim) {
+  await page.getByRole("combobox", { name: "Observation cho " + label, exact: true })
+    .selectOption(JSON.stringify({ evidenceId, claim }));
+}
+
 async function fillPermissionTransfer(page, overrides = {}) {
   const values = {
     identityEvidenceId: "transfer:before:identity",
@@ -36,9 +41,10 @@ async function fillPermissionTransfer(page, overrides = {}) {
     ...overrides
   };
   await page.getByRole("combobox", { name: "Nguồn identity gốc", exact: true }).selectOption(values.identityEvidenceId);
-  await page.getByRole("textbox", { name: "Fact identity gốc", exact: true }).fill(values.identityFact);
+  if (values.identityEvidenceId === "transfer:before:identity") await bindObservation(page, "Fact identity gốc", values.identityEvidenceId, values.identityFact);
+  else await page.getByRole("textbox", { name: "Fact identity gốc", exact: true }).fill(values.identityFact);
   await page.getByRole("combobox", { name: "Nguồn file gốc", exact: true }).selectOption(values.resourceEvidenceId);
-  await page.getByRole("textbox", { name: "Fact file gốc", exact: true }).fill(values.resourceFact);
+  await bindObservation(page, "Fact file gốc", values.resourceEvidenceId, values.resourceFact);
   await page.getByRole("textbox", { name: "Mode giữ cố định", exact: true }).fill(values.fixedMode);
   await page.getByRole("textbox", { name: "Identity giả định", exact: true }).fill(values.hypotheticalIdentity);
   await page.getByRole("textbox", { name: "Dự đoán HTTP permission", exact: true }).fill(values.predictedSymptom);
@@ -60,10 +66,10 @@ async function fillPathTransfer(page, overrides = {}) {
     causalClaim: "parent-search-required", ...overrides
   };
   await page.getByRole("combobox", { name: "Nguồn identity path-search", exact: true }).selectOption(values.identityEvidenceId);
-  await page.getByRole("textbox", { name: "Fact identity path-search", exact: true }).fill(values.identityFact);
+  await bindObservation(page, "Fact identity path-search", values.identityEvidenceId, values.identityFact);
   await page.getByRole("combobox", { name: "Nguồn path gốc", exact: true }).selectOption(values.pathEvidenceId);
-  await page.getByRole("textbox", { name: "Fact parent gốc", exact: true }).fill(values.pathFact);
-  await page.getByRole("textbox", { name: "Fact file readable", exact: true }).fill(values.fileFact);
+  await bindObservation(page, "Fact parent gốc", values.pathEvidenceId, values.pathFact);
+  await bindObservation(page, "Fact file readable", values.pathEvidenceId, values.fileFact);
   await page.getByRole("textbox", { name: "Parent mới", exact: true }).fill(values.changedParent);
   await page.getByRole("textbox", { name: "Mode parent mới", exact: true }).fill(values.changedParentMode);
   await page.getByRole("textbox", { name: "Dự đoán HTTP path-search", exact: true }).fill(values.predictedSymptom);
@@ -110,8 +116,11 @@ async function fillReasoning(page, mechanism) {
     resource: path ? "700-parent-644-file" : file ? "600" : (scenario === "differential-listener" ? "9090" : "none")
   };
   for (const slot of ["symptom", "identity", "resource"]) {
-    await page.getByRole("combobox", { name: "Nguồn " + slot, exact: true }).selectOption(scenario + ":before:" + slot);
-    await page.getByRole("textbox", { name: "Nhận định " + slot, exact: true }).fill(claims[slot]);
+    if (file || path) await bindObservation(page, slot, scenario + ":before:" + slot, claims[slot]);
+    else {
+      await page.getByRole("combobox", { name: "Nguồn " + slot, exact: true }).selectOption(scenario + ":before:" + slot);
+      await page.getByRole("textbox", { name: "Nhận định " + slot, exact: true }).fill(claims[slot]);
+    }
   }
   await page.getByRole("combobox", { name: "Bằng chứng cơ chế 1", exact: true }).selectOption(scenario + ":before:resource");
   await page.getByRole("combobox", { name: "Bằng chứng cơ chế 2", exact: true }).selectOption(scenario + ":before:identity");
@@ -172,6 +181,7 @@ test("production flow differentiates same connection symptom using process and s
   for (const command of ["curl localhost", "ls -l /srv/site/index.html", "id www-data"]) {
     await runCommand(page, command);
   }
+  await expect(page.getByRole("combobox", { name: "Observation cho identity", exact: true })).toHaveCount(0);
   await submitHypothesis(page, "permission");
   await runCommand(page, "chmod 644 /srv/site/index.html");
   await runCommand(page, "curl localhost");
@@ -185,7 +195,7 @@ test("production flow differentiates same connection symptom using process and s
   await expect(page.getByRole("region", { name: "Lập luận từ bằng chứng" })).toContainText("-rw-------");
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  const reasoningInput = page.getByRole("textbox", { name: "Nhận định identity", exact: true });
+  const reasoningInput = page.getByRole("combobox", { name: "Observation cho identity", exact: true });
   await reasoningInput.focus();
   expect(await reasoningInput.evaluate(element => {
     const style = getComputedStyle(element);
@@ -242,13 +252,25 @@ test("production flow differentiates same connection symptom using process and s
   await expect(page.getByRole("textbox", { name: "Giải thích cơ chế", exact: true })).toHaveCount(0);
   await runCommand(page, "chmod 711 /srv/private/site");
   await runCommand(page, "curl localhost/private");
-  await explainWith(page, "parent-search-required");
+  await fillReasoning(page, "parent-search-required");
+  await bindObservation(page, "resource", "path-search:before:resource", "755-parent-644-file");
+  await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
+  await expect(page.getByRole("region", { name: "Dự đoán path-search transfer" })).toHaveCount(0);
+  await bindObservation(page, "resource", "path-search:before:resource", "700-parent-644-file");
+  await page.reload();
+  await expect(page.getByRole("textbox", { name: "Nhận định resource", exact: true })).toHaveValue("700-parent-644-file");
+  await page.getByRole("button", { name: "Kiểm tra giải thích" }).click();
   await expect(page.getByRole("region", { name: "Dự đoán path-search transfer" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
   await submitPathTransfer(page, { repairNeed: "file-read" });
   await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
   await submitPathTransfer(page);
   await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toBeVisible();
+  await page.getByRole("button", { name: "Xóa binding Fact parent gốc", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Fact parent gốc", exact: true })).toHaveValue("");
+  await expect(page.getByRole("combobox", { name: "Nguồn path gốc", exact: true })).toHaveValue("");
+  await submitPathTransfer(page);
   await page.getByRole("textbox", { name: "Repair target path-search", exact: true }).fill("file-read");
   await expect(page.getByRole("button", { name: "Thử differential diagnosis" })).toHaveCount(0);
   await submitPathTransfer(page);
