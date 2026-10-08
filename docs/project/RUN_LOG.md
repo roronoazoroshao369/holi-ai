@@ -220,3 +220,15 @@ Verification: local typecheck, 75/75 Node tests, build and audit (0 vulnerabilit
 #49 merged as 62ffa961382ac16529541fd3eaa2dfeb37bea34d; re-read main confirmed tree8c4309e6d4ceba78debc1eaf688330ffe7c59bff equals tested-head tree. Post-merge run37560499264 — SUCCESS. No #49 production deployment claimed.
 
 Next candidate frontier: distinguish file read from parent-directory search permission in one bounded SIMULATED 403 path-access slice; current Linux fixtures explicitly assume traversal healthy. Reassess LIVE before implementing.
+
+## 2026-10-08 — Linux captured-observation binding (#59)
+
+LIVE main was eeb8b0b1de8cf4e3168aba3204b7eea892cb397c (#58); no open PR/issues. Earlier handoff was stale: #54/#56 path-search and deployment already existed. Selected bounded factual-input UX goal.
+
+Added snapshot-only HTTP/identity/mode/path candidates, explicit source+fact selection and clear for permission/path explanation and original transfer facts. Wrong observed parent still fails; clear revokes progression. Rubrics and Linux8/6 / GitCI4/4 unchanged.
+
+Local 80 Node/typecheck/build/audit passed; local Chromium archive failed. Full exact-head GitHub CI37715953733 / job113112315240 passed 80 Node and 14 Chromium on cd05a00945c553a26a6db742a7435ccf65f8e242. #59 merged as f9d9525d11ffc64f55a162ed02d90dda5eeb2d14; main tree equals tested tree f90934d97c7d3136cbd452013339e26fed222ebd.
+
+Static export deployed to holi-devops-web; deployment17769c7d-27b4-470c-82ac-e4ebd0386c88 / version245beb24-5f3c-41ee-ab7e-b8ca50f9c2c4 at100%. Build g0NAmTzooTn1zjmF71hv9; page-c50a20de620508c3.js. Archived artifact b3d1dc6c956d2a8741f4a1356b2d0a02d14ae527 must not merge into main. Browser Rendering verified HTTP200/new chunk, actual guided command/binding/explanation/clear-revocation and no overflow at390×844. Narrow deployment smoke complements full Next production CI.
+
+Next candidate: Linux source-linked pre-repair rationale. Review distinguished current causal-class lock from Git's detailed immutable rationale; no stronger pre-intervention competence is claimed. Documentation closeout prepared separately and requires its own exact-head CI.

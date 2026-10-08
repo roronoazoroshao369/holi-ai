@@ -101,3 +101,9 @@ Decision: reuse evidence-local token binding for those fields, with undo/clear f
 Tradeoff: candidate assistance still supports a finite, visible exercise and cannot establish general Git competence. Manual fields remain available; malformed SHA claims must be corrected/cleared before structured binding.
 Security/persistence: no learner execution, trust promotion, schema/fixture change or scoring change. Existing state transitions revoke downstream completion on explanation/transfer edits. Locked rationale remains immutable.
 Verification gate: exact product-head CI must include wrong source, wrong parent order, extra-change commit rejection, reload, locked controls, revocation, mobile overflow/focus and full existing regression.
+
+## 2026-10-08 — Bind observed Linux facts without changing grading (#59)
+
+Use an explicit picker for captured source+fact pairs and retain manual entry. Parse pre-repair text only, expose all observed parents rather than infer the blocking one, and keep mechanism/target/prediction as learner decisions. Selection is not early correctness feedback. Clear/edit follows existing revocation transitions. No persisted shape or fixture changed, so no migration. The parser is deliberately limited to current simulated permission output, not a Linux parser or trusted verifier.
+
+Review found the Linux pre-repair lock contains causal class only. Do not call this immutable full rationale; recommend a bounded source-linked rationale commitment next.

@@ -33,4 +33,6 @@
 - Observed-source SHA binding reduces clerical copying in graph rationale, explanation and changed transfer, but finite fact/relation grammar, synthetic fixtures and repeatable attempts still limit what completion demonstrates. Candidate identity/order remain learner choices; binding is assistance, not trusted inference or general Git competence. Teaching/readiness/bridge state must never silently grant diagnostic assessment credit.
 
 
-- Linux permission/path-search explanation and transfer still use finite exact-text grammar; formatting mistakes can fail separately from conceptual understanding. Evidence-binding is a candidate UX hardening, but must not expose canonical answers or weaken source-linked causal commitment.
+- Linux permission/path-search transfer still uses finite exact-text grammar for causal prediction; formatting mistakes can fail separately from understanding. #59 binds original factual claims to captured evidence, while causal commitments remain explicit.
+
+- #59 reduces factual transcription by binding captured observations; it does not remove finite transfer grammar or prove causality. Linux pre-repair commitment is causal class only, so a correct detailed post-repair explanation may be constructed after observing recovery. Full source-linked rationale before intervention is a candidate next gate.
