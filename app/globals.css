@@ -1864,3 +1864,19 @@ footer {
   font-size: 10px;
 }
 
+
+.learningLab .observationBinding {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.learningLab .observationBinding select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 44px;
+}
+.learningLab .observationBinding button {
+  min-height: 44px;
+  white-space: normal;
+}

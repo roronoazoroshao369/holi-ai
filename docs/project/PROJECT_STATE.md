@@ -1,6 +1,6 @@
 # Project state
 
-Updated 2026-10-07. Current phase: v0.3 SIMULATED learning/mastery-flow foundation. Package 0.1.0; no release/tag. No real Linux/Git/Actions learner execution or trusted assessment storage.
+Updated 2026-10-08. Current phase: v0.3 SIMULATED learning/mastery-flow foundation. Package 0.1.0; no release/tag. No real Linux/Git/Actions learner execution or trusted assessment storage.
 
 ## Latest verified product checkpoint
 
@@ -77,3 +77,15 @@ Highest-value nearby gap: Linux explanation/transfer inputs still rely on finite
 Candidate primary goal: one bounded Linux evidence-binding UX hardening slice for the permission/path-search reasoning flow. Let learners bind factual claims to already captured identity/path evidence rather than retype fragile strings, while preserving immutable pre-repair commitment, explicit source linkage, causal relation choice, wrong-reasoning failure after successful repair, downstream revocation, schema/fixture fail-closed rules and the SIMULATED trust boundary. Do not convert the assessment into answer-revealing multiple choice.
 
 Reassess LIVE repository evidence before implementation.
+
+## Current run goal contract
+
+GOAL: bind Linux permission/path explanation and transfer factual claims to captured observations, reducing clerical token copying.
+WHY NOW / USER VALUE: exact-text factual entry creates friction unrelated to causal diagnosis.
+SCOPE: explicit source+fact picker and clear action; captured HTTP, identity, file and path metadata only.
+NON-GOALS: no rubric change, automatic mechanism/target/prediction, learner execution, new schema or Git/CI changes.
+ACCEPTANCE: correct selected facts can complete existing gates; wrong observed parent/source or causal relation still fails; edits/clear revoke dependent progress; refresh preserves existing draft format; reset removes candidates; mobile and keyboard remain usable.
+TEST PLAN: parser adversarial tests, full Node/typecheck/audit/build and production Chromium regressions with actual binding/clear/refresh and wrong-parent attempts; exact-head CI before merge.
+SECURITY / LEARNING: pure bounded snapshot parser, no execution; facts are copying aids rather than certification or causal hints. Immutable pre-repair hypothesis and least-privilege checks remain.
+ROLLBACK: revert slice; persisted shape and schema 8 / fixture 6 remain compatible.
+STATUS: implementation and verification in progress; no new merge/deployment claimed.
