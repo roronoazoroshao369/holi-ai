@@ -1,5 +1,7 @@
 # Architecture
 
+Current checkpoint: Linux schema8/fixture6, Git/CI4/4, five Linux plus three Git/CI SIMULATED incidents, 14 production Chromium regressions. Version-specific sections below record earlier design deliveries; PROJECT_STATE and the final Linux binding section describe current evidence.
+
 Next.js App Router / React / TypeScript. app/page.tsx renders curriculum and the client terminal. lib/linux-simulator.ts is a pure per-attempt SIMULATED state machine; no subprocess or external networking occurs.
 
 The simulator models scenario definitions plus two incident families. `file-access` incidents carry file mode state. `tcp-service` incidents carry both `processRunning` and a simulated `listenerPort`, allowing two connection-refused cases to share the same learner-facing prompt while process/socket observations discriminate the causes. `LabState` separates raw observations from causal hypothesis, repair provenance, verification, explanation and two bounded causal-transfer answers: permission identity and listener/socket.
@@ -98,3 +100,9 @@ The deployment path deliberately keeps the learning trust boundary unchanged. Al
 A Cloudflare Pages project named `holi-devops` also exists, but its Git integration returned Cloudflare error `8000011`. It is therefore not the authoritative verified serving path. Future CI/CD work may repair or replace that integration, but must preserve exact-head verification and avoid unnecessary broad repository-write permissions or long-lived secrets.
 
 Future real labs remain a separate architecture boundary: browser -> authenticated learning API/gateway -> isolated disposable execution environment -> verifier. Public hosting of the simulator is not evidence that this boundary exists.
+
+## Linux observed-fact binding — #59
+
+`lib/linux-evidence-bindings.ts` is a pure bounded parser over captured before-repair output. It extracts HTTP codes, UID/group names and symbolic-mode file/path metadata. Parent/file mode pairs include all observed ancestors, not a validator-selected blocking path. The helper does not import canonical fixture answers or read repaired incident state. Candidate UI is available only after verified permission/path practice; causal mechanism, minimal target and changed prediction remain manual commitments. Selection binds existing source/claim strings; clear/edit reuses existing revocation transitions. Linux schema8/fixture6 and Git/CI4/4 do not change.
+
+Linux currently locks only the hypothesis class before repair. Unlike Git rationale, detailed source-linked reasoning is submitted after repair. This is the next assessment-quality gap, not a guarantee already implemented.

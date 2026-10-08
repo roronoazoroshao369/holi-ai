@@ -19,7 +19,8 @@
 - Git evidence-synthesis gate: delivered in PR #45 with a third disjoint teaching fixture, raw ref/checkout/build/graph evidence, consumed-commit + ordered-parent + ancestry predicates, explanatory teaching feedback, no persistence/assessment credit, exact-head CI and 12/12 production Chromium coverage.
 - Git evidence-input gate: #48 delivered rationale/explanation fact binding; #49 delivered explanation-repair and transfer SHA binding plus reversible draft controls. Exact product-head CI passed 75 Node / 14 production Chromium tests; #49 is merged.
 - Linux path-search breadth gate: delivered in PR #54 and corrected for public product truth in #56. The SIMULATED HTTP 403 slice distinguishes readable file bits from parent-directory search permission, requires least-privilege directory repair, verification, explanation and changed-parent transfer; Linux checkpoint is schema 8 / fixture 6. Current product source passed 77 Node / 14 production Chromium tests and is verified in production.
-- Next Linux UX candidate: evidence binding for permission/path-search facts to reduce clerical exact-text failures without revealing canonical answers or weakening immutable pre-repair reasoning.
+- Linux factual-input gate: delivered in #59 with explicit captured source+fact binding and clear, alternative parent candidates and unchanged grading/persistence. Full exact-head CI passed 80 Node / 14 Chromium; production mobile binding/revocation smoke passed.
+- Next Linux reasoning candidate: immutable source-linked rationale before repair; current Linux pre-repair commitment is causal class only.
 - v0.4: real Linux labs only after isolation, quotas, TTL, cleanup, network policy and escape tests pass.
 - v0.5-v0.7: Docker, Kubernetes, CI/CD and IaC vertical slices with verifiers and cost budgets.
 - v0.8-v0.9: observability/SRE and unfamiliar cross-domain incidents.
